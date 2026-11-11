@@ -36,6 +36,10 @@ interface Props {
   selected: MapPin | null;
   onTown: (slug: string) => void;
   onPin: (id: string) => void;
+  /** Tap on the map outside any municipality or pin. */
+  onBackground?: () => void;
+  /** The camera finished moving to this town ('' = province). */
+  onSettled?: (town: string) => void;
   /** Play the entrance: flat silhouette, then ease into the camera. */
   intro?: boolean;
 }
@@ -48,6 +52,15 @@ const DEM =
 const PAD = 24;
 const MAX_PITCH = 55;
 const INTRO_MS = 1200;
+// Town focus: 2s curved flight, the chosen town lifts while the others dim to 35%.
+const TOWN_FLIGHT_MS = 2000;
+const REVERSE_MS = 600;
+// Tall enough to read at town zoom (~100 m per pixel); translucent so the map shows through.
+const LIFT_M = 1200;
+const TOWN_PITCH = 40;
+const DIM_VEIL = 0.65;
+const reducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Same curve as the --ease-out-expo CSS token.
 const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
@@ -81,6 +94,8 @@ export default function AklanMap3D({
   onTown,
   onPin,
   intro = false,
+  onBackground,
+  onSettled,
 }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -88,9 +103,9 @@ export default function AklanMap3D({
   // Read once at mount: the entrance plays only on the first camera move.
   const introRef = useRef(intro);
   // Latest callbacks for map event handlers registered once.
-  const cb = useRef({ onTown, onPin });
+  const cb = useRef({ onTown, onPin, onBackground, onSettled });
   useEffect(() => {
-    cb.current = { onTown, onPin };
+    cb.current = { onTown, onPin, onBackground, onSettled };
   });
 
   // Create the map once.
@@ -320,6 +335,27 @@ export default function AklanMap3D({
         },
       });
 
+      // Chosen town rises as a translucent slab; height tweens via paint transition.
+      map.addLayer({
+        id: 'town-lift',
+        type: 'fill-extrusion',
+        source: 'towns',
+        filter: ['==', ['get', 'slug'], ''],
+        paint: {
+          'fill-extrusion-color': '#3B78DB',
+          'fill-extrusion-opacity': 0.2,
+          'fill-extrusion-height': 0,
+        },
+      });
+      // Veil over every other town (and its pins): opacity 0.65 leaves them at 35%.
+      map.addLayer({
+        id: 'town-dim',
+        type: 'fill',
+        source: 'towns',
+        filter: ['!=', ['get', 'slug'], ''],
+        paint: { 'fill-color': '#eef1f5', 'fill-opacity': 0 },
+      });
+
       // Hover: municipality highlight and a name tooltip.
       const tip = new maplibregl.Popup({
         closeButton: false,
@@ -374,6 +410,7 @@ export default function AklanMap3D({
         const pin = hit.find(f => f.layer.id === 'pins');
         if (pin) cb.current.onPin(String(pin.properties.id));
         else if (hit[0]) cb.current.onTown(String(hit[0].properties.slug));
+        else cb.current.onBackground?.();
       });
 
       setReady(true);
@@ -429,12 +466,50 @@ export default function AklanMap3D({
     });
   }, [ready, pins]);
 
+  // Town focus: dim the others and lift the chosen one; reverse when cleared.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const still = reducedMotion();
+    const ms = still ? 0 : town ? TOWN_FLIGHT_MS : REVERSE_MS;
+    map.setPaintProperty('town-dim', 'fill-opacity-transition', {
+      duration: ms,
+      delay: 0,
+    });
+    map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
+      duration: ms,
+      delay: 0,
+    });
+    if (!town) {
+      map.setPaintProperty('town-dim', 'fill-opacity', 0);
+      map.setPaintProperty('town-lift', 'fill-extrusion-height', 0);
+      return;
+    }
+    map.setFilter('town-dim', ['!=', ['get', 'slug'], town]);
+    map.setPaintProperty('town-dim', 'fill-opacity', DIM_VEIL);
+    // Start the new town flat so its lift always tweens up from the ground.
+    map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
+      duration: 0,
+      delay: 0,
+    });
+    map.setPaintProperty('town-lift', 'fill-extrusion-height', 0);
+    map.setFilter('town-lift', ['==', ['get', 'slug'], town]);
+    const raf = requestAnimationFrame(() => {
+      map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
+        duration: ms,
+        delay: 0,
+      });
+      map.setPaintProperty('town-lift', 'fill-extrusion-height', LIFT_M);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [ready, town]);
+
   // Camera: fly to the record (street level, tilted), the town, or the province.
   // MapLibre skips the animation when the user prefers reduced motion.
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    let target: maplibregl.CameraOptions & { duration: number };
+    let target: maplibregl.FlyToOptions & { duration: number };
     if (selected) {
       target = {
         center: [selected.lon, selected.lat],
@@ -454,26 +529,52 @@ export default function AklanMap3D({
       target = {
         center: cam.center,
         zoom,
-        pitch: pitchFor(zoom),
+        // Tilt town views so the lifted town reads as raised.
+        pitch: f ? Math.max(pitchFor(zoom), TOWN_PITCH) : pitchFor(zoom),
         bearing: f ? -12 : 0,
-        duration: f ? 2000 : 1600,
+        duration: f ? TOWN_FLIGHT_MS : 1600,
+        // Curved path: rise to a slightly wider view mid-flight, then drop in.
+        minZoom: f
+          ? Math.max(map.getMinZoom(), Math.min(map.getZoom(), zoom) - 0.75)
+          : undefined,
       };
     }
+
+    const settledOn = selected ? null : town;
+    const onEnd = () => {
+      if (settledOn !== null) cb.current.onSettled?.(settledOn);
+    };
+    // Listen only after starting the move: starting it stops any earlier flight,
+    // and that stop fires its own moveend.
+    const listen = () => {
+      if (reducedMotion()) onEnd();
+      else map.once('moveend', onEnd);
+    };
 
     if (introRef.current) {
       // Entrance: straight ease (no zoom-out arc) from the flat province view.
       introRef.current = false;
       map.easeTo({ ...target, duration: INTRO_MS, easing: easeOutExpo });
+      listen();
       if (map.getLayer('silhouette')) {
         map.setPaintProperty('silhouette', 'fill-opacity', 0);
         const id = window.setTimeout(() => {
           if (map.getLayer('silhouette')) map.removeLayer('silhouette');
         }, INTRO_MS + 100);
-        return () => window.clearTimeout(id);
+        return () => {
+          window.clearTimeout(id);
+          map.off('moveend', onEnd);
+        };
       }
-      return;
+      return () => {
+        map.off('moveend', onEnd);
+      };
     }
     map.flyTo({ ...target, curve: selected ? 1.5 : 1.42 });
+    listen();
+    return () => {
+      map.off('moveend', onEnd);
+    };
   }, [ready, boundaries, town, selected]);
 
   // Anchored tooltip on the selected record, with a soft pulse.

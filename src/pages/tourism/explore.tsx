@@ -337,8 +337,18 @@ export default function TourismExplore() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(true);
   useEffect(() => setSheetOpen(true), [sel, town]);
+  // The town card waits for the map to finish flying there (list view needs no wait).
+  const [settledTown, setSettledTown] = useState<string | null>(null);
+  useEffect(() => {
+    if (!town || view !== 'map') return;
+    // Fallback if the map never reports in (tiles down): show the card anyway.
+    const id = window.setTimeout(() => setSettledTown(town), 2600);
+    return () => window.clearTimeout(id);
+  }, [town, view]);
+  const cardReady = view === 'list' || settledTown === town;
   // On phones the map view shows details as a bottom sheet over the map.
-  const sheet = view === 'map' && (selected !== null || townInfo !== null);
+  const sheet =
+    view === 'map' && (selected !== null || (townInfo !== null && cardReady));
 
   // Long result lists push the details panel out of view on phones. After a
   // user picks a result below desktop width, bring the details into view and
@@ -573,6 +583,11 @@ export default function TourismExplore() {
                     update({ town: slug, sel: '' });
                   }}
                   onPin={select}
+                  onSettled={setSettledTown}
+                  onBackground={() => {
+                    setTouring(false);
+                    if (town || sel) update({ town: '', sel: '' });
+                  }}
                 />
 
                 {/* Layer widget: show or hide each pin type, and the municipality shading. */}
@@ -757,7 +772,7 @@ export default function TourismExplore() {
           ref={detailRef}
           tabIndex={-1}
           aria-label='Details'
-          className={`space-y-4 outline-none lg:sticky lg:top-4 lg:self-start ${sheet ? 'max-lg:bg-kapwa-bg-surface max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:space-y-3 max-lg:overflow-y-auto max-lg:rounded-t-card max-lg:p-3 max-lg:shadow-[0_-8px_24px_rgb(15_35_75/0.22)] ' + (sheetOpen ? 'max-lg:max-h-[52vh]' : 'max-lg:max-h-14 max-lg:overflow-hidden') : ''}`}
+          className={`space-y-4 outline-none lg:sticky lg:top-4 lg:self-start ${sheet ? 'max-lg:bg-kapwa-bg-surface max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:space-y-3 max-lg:overflow-y-auto max-lg:rounded-t-card max-lg:p-3 max-lg:motion-safe:animate-[explore-sheet-up_var(--dur-base)_var(--ease-out-expo)_both] max-lg:shadow-[0_-8px_24px_rgb(15_35_75/0.22)] ' + (sheetOpen ? 'max-lg:max-h-[52vh]' : 'max-lg:max-h-14 max-lg:overflow-hidden') : ''}`}
         >
           {sheet && (
             <button
@@ -835,8 +850,12 @@ export default function TourismExplore() {
             </Card>
           ) : null}
 
-          {townInfo && (
-            <Card hover={false} className='rounded-card'>
+          {townInfo && cardReady && (
+            <Card
+              key={townInfo.slug}
+              hover={false}
+              className='rounded-card lg:motion-safe:animate-[explore-slide-in_var(--dur-base)_var(--ease-out-expo)_both]'
+            >
               <CardContent className='space-y-4 p-5'>
                 <div>
                   <h2 className='text-kapwa-text-strong type-display'>

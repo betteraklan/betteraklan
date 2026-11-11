@@ -215,3 +215,24 @@
     transform: none;
   }
 }
+
+/* Explore town card: slides in from the side (desktop) or up as a sheet (phone). */
+@keyframes explore-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes explore-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
