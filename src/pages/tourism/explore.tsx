@@ -71,12 +71,25 @@ const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
 const HOME: [number, number] = [11.75, 122.2];
 const HOME_ZOOM = 10;
 const TOUR_STEP_MS = 5000;
-const TOWN_FEATURES = new Map(
-  SOURCES.boundaries.map(f => [
-    f.properties.slug,
-    { type: 'Feature', properties: {}, geometry: f.geometry },
-  ])
-);
+const TOWNS_GEOJSON = {
+  type: 'FeatureCollection',
+  features: SOURCES.boundaries.map(f => ({
+    type: 'Feature',
+    properties: f.properties,
+    geometry: f.geometry,
+  })),
+} as unknown as GeoJsonObject;
+// Shading ramp for record counts: brighter means more BetterAklan records.
+const TIER_COLOR = [
+  '#1B2B47',
+  '#1D3557',
+  '#24508F',
+  '#2F6FDB',
+  '#5B9BFF',
+  '#B9D6FF',
+];
+const GLASS =
+  'border border-white/20 bg-[rgba(10,22,40,0.74)] text-white shadow-xl backdrop-blur-md';
 const TOWN_BOUNDS = new Map(
   SOURCES.boundaries.map(f => [f.properties.slug, boundsOf(f)])
 );
@@ -193,6 +206,17 @@ export default function TourismExplore() {
     (r): r is Rec & { lat: number; lon: number } =>
       r.lat != null && r.lon != null
   );
+
+  // Client-only map display toggles (the Layer filter above still drives the list).
+  const [hiddenLayers, setHiddenLayers] = useState<Layer[]>([]);
+  const [shade, setShade] = useState(true);
+  const counts = useMemo(() => {
+    const c = new Map<string, number>();
+    filtered.forEach(r => r.town && c.set(r.town, (c.get(r.town) ?? 0) + 1));
+    return c;
+  }, [filtered]);
+  const maxCount = Math.max(1, ...counts.values());
+  const shown = mapped.filter(r => !hiddenLayers.includes(r.layer));
 
   const [touring, setTouring] = useState(false);
   const select = (id: string) => {
@@ -398,22 +422,45 @@ export default function TourismExplore() {
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    className='[filter:invert(1)_hue-rotate(200deg)_brightness(0.8)_saturate(0.5)]'
                   />
-                  {town && TOWN_FEATURES.has(town) && (
-                    <GeoJSON
-                      key={town}
-                      data={TOWN_FEATURES.get(town) as unknown as GeoJsonObject}
-                      style={{
-                        color: '#d97706',
-                        weight: 2,
-                        dashArray: '6 4',
-                        fillColor: '#f59e0b',
-                        fillOpacity: 0.12,
-                      }}
-                      interactive={false}
-                    />
-                  )}
-                  {mapped.map(r => {
+                  <GeoJSON
+                    key={`${town}|${shade}|${filtered.length}|${params.toString()}`}
+                    data={TOWNS_GEOJSON}
+                    style={feature => {
+                      const slug = feature?.properties.slug as string;
+                      const n = counts.get(slug) ?? 0;
+                      const tier =
+                        shade && n ? Math.ceil((5 * n) / maxCount) : 0;
+                      return {
+                        color:
+                          slug === town ? '#FCD116' : 'rgba(190,212,250,0.6)',
+                        weight: slug === town ? 2.6 : 1,
+                        fillColor: TIER_COLOR[tier],
+                        fillOpacity: town && slug !== town ? 0.45 : 0.8,
+                      };
+                    }}
+                    onEachFeature={(feature, lyr) => {
+                      const slug = feature.properties.slug as string;
+                      const n = counts.get(slug) ?? 0;
+                      lyr.bindTooltip(
+                        `${feature.properties.name}<br>${n} record${n === 1 ? '' : 's'}`,
+                        { sticky: true }
+                      );
+                      lyr.on({
+                        mouseover: e => e.target.setStyle({ fillOpacity: 1 }),
+                        mouseout: e =>
+                          e.target.setStyle({
+                            fillOpacity: town && slug !== town ? 0.45 : 0.8,
+                          }),
+                        click: () => {
+                          setTouring(false);
+                          update({ town: slug, sel: '' });
+                        },
+                      });
+                    }}
+                  />
+                  {shown.map(r => {
                     const color = LAYER_COLOR[r.layer];
                     const approx = r.placement === 'approximate';
                     return (
@@ -451,6 +498,49 @@ export default function TourismExplore() {
                   />
                 </MapContainer>
 
+                {/* Layer widget: show or hide each pin type, and the municipality shading. */}
+                <div
+                  role='group'
+                  aria-label='Map layers'
+                  className={`${GLASS} absolute top-[84px] left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
+                >
+                  {(
+                    Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
+                  ).map(k => {
+                    const on = !hiddenLayers.includes(k);
+                    return (
+                      <button
+                        key={k}
+                        type='button'
+                        aria-pressed={on}
+                        onClick={() =>
+                          setHiddenLayers(h =>
+                            on ? [...h, k] : h.filter(x => x !== k)
+                          )
+                        }
+                        className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-white/15' : 'opacity-60'}`}
+                      >
+                        <span
+                          aria-hidden='true'
+                          className='h-2.5 w-2.5 rounded-full border border-white'
+                          style={{
+                            background: on ? LAYER_COLOR[k] : 'transparent',
+                          }}
+                        />
+                        {LAYER_LABEL[k]}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type='button'
+                    aria-pressed={shade}
+                    onClick={() => setShade(v => !v)}
+                    className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-white/15' : 'opacity-60'}`}
+                  >
+                    Shade by records
+                  </button>
+                </div>
+
                 {/* Cinematic overlays: tour control, caption, legend. */}
                 <button
                   type='button'
@@ -487,30 +577,27 @@ export default function TourismExplore() {
                       {selected?.name ?? townInfo?.name ?? 'Aklan'}
                     </p>
                   </div>
-                  <ul
+                  <div
                     aria-label='Map legend'
-                    className='flex flex-wrap gap-x-3 gap-y-1 text-[11px]'
+                    role='group'
+                    className='text-[11px]'
                   >
-                    {(
-                      Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
-                    ).map(k => (
-                      <li key={k} className='flex items-center gap-1'>
+                    <div className='flex items-center gap-1.5'>
+                      <span>Fewer records</span>
+                      {TIER_COLOR.slice(1).map(c => (
                         <span
+                          key={c}
                           aria-hidden='true'
-                          className='h-2.5 w-2.5 rounded-full border border-white'
-                          style={{ background: LAYER_COLOR[k] }}
+                          className='h-2.5 w-5'
+                          style={{ background: c }}
                         />
-                        {LAYER_LABEL[k]}
-                      </li>
-                    ))}
-                    <li className='flex items-center gap-1'>
-                      <span
-                        aria-hidden='true'
-                        className='h-2.5 w-2.5 rounded-full border border-dashed border-white'
-                      />
-                      Faded dashed = approximate
-                    </li>
-                  </ul>
+                      ))}
+                      <span>More</span>
+                    </div>
+                    <p className='mt-1 opacity-80'>
+                      Faded dashed pins = approximate location
+                    </p>
+                  </div>
                 </div>
               </div>
             </Card>
