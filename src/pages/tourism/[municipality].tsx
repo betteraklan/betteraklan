@@ -40,7 +40,7 @@ function EntryCard({
 }) {
   const status = getDateStatus(entry);
   return (
-    <Card hover={false} className='border-kapwa-border-weak shadow-xs'>
+    <Card hover={false} className='border-kapwa-border-weak shadow-elev-1'>
       <CardContent className='space-y-1.5 p-4'>
         {entry.name && (
           <h4 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
@@ -87,7 +87,7 @@ export default function TourismMunicipalityDetail() {
   const next = municipalities[(index + 1) % municipalities.length];
 
   return (
-    <div className='animate-in fade-in space-y-6 pb-8 duration-500'>
+    <div className='animate-in fade-in space-y-6 pb-8 duration-(--dur-slow) ease-out-expo'>
       {/* --- BREADCRUMBS --- */}
       <Breadcrumb>
         <BreadcrumbList>
@@ -106,7 +106,7 @@ export default function TourismMunicipalityDetail() {
       </Breadcrumb>
 
       {/* --- HEADER --- */}
-      <header className='bg-kapwa-bg-surface border-kapwa-border-weak rounded-xl border p-6 shadow-sm'>
+      <header className='bg-kapwa-bg-surface border-kapwa-border-weak rounded-card border p-6 shadow-elev-1'>
         <div className='flex items-center gap-3'>
           <MapPinIcon
             aria-hidden='true'

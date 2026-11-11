@@ -41,7 +41,7 @@ export default function TourismIndex() {
   );
 
   return (
-    <div className='animate-in fade-in space-y-12 duration-500'>
+    <div className='animate-in fade-in space-y-12 duration-(--dur-slow) ease-out-expo'>
       <PageHero
         title='Tourism'
         description={`From the world-famous shores of Boracay to the hidden waterfalls and centuries-old festivals of its 17 municipalities, ${lguLabels.fullName} invites you to discover a province where nature, culture, and hospitality meet.`}
@@ -75,7 +75,7 @@ export default function TourismIndex() {
               <Card key={spot.id} className='group flex h-full flex-col'>
                 <CardContent className='flex h-full flex-col space-y-3 p-5'>
                   <div className='flex items-start gap-3'>
-                    <div className='border-kapwa-border-brand bg-kapwa-bg-surface text-kapwa-text-brand group-hover:bg-kapwa-bg-brand-default group-hover:text-kapwa-text-inverse shrink-0 rounded-lg border p-2 shadow-sm transition-colors'>
+                    <div className='border-kapwa-border-brand bg-kapwa-bg-surface text-kapwa-text-brand group-hover:bg-kapwa-bg-brand-default group-hover:text-kapwa-text-inverse shrink-0 rounded-control border p-2 shadow-elev-1 transition-colors'>
                       <Icon className='h-5 w-5' />
                     </div>
                     <div className='min-w-0 flex-1'>
@@ -131,11 +131,11 @@ export default function TourismIndex() {
             >
               <Card
                 hover
-                className='border-kapwa-border-weak flex h-full flex-col shadow-xs'
+                className='border-kapwa-border-weak flex h-full flex-col shadow-elev-1'
               >
                 <CardContent className='flex h-full flex-col space-y-4 p-4'>
                   <div className='flex items-start gap-3'>
-                    <div className='bg-kapwa-bg-surface text-kapwa-text-brand border-kapwa-border-brand group-hover:bg-kapwa-bg-brand-default group-hover:text-kapwa-text-inverse shrink-0 rounded-lg border p-2 shadow-sm transition-colors'>
+                    <div className='bg-kapwa-bg-surface text-kapwa-text-brand border-kapwa-border-brand group-hover:bg-kapwa-bg-brand-default group-hover:text-kapwa-text-inverse shrink-0 rounded-control border p-2 shadow-elev-1 transition-colors'>
                       <MapPinIcon className='h-5 w-5' />
                     </div>
                     <div className='min-w-0 flex-1'>

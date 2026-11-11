@@ -78,10 +78,6 @@ const TIER_COLOR = [
   '#3B78DB',
   '#1D4FB0',
 ];
-const GLASS =
-  'border border-kapwa-border-weak bg-white/90 text-kapwa-text-strong shadow-lg backdrop-blur-md';
-const FIELD =
-  'border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong min-h-11 rounded-lg border px-3 py-2.5 text-sm';
 const LAYER_ICON = {
   place: LandmarkIcon,
   event: CalendarDaysIcon,
@@ -291,9 +287,9 @@ export default function TourismExplore() {
 
   return (
     <div
-      className={`[&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
+      className={`[&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-lg sm:p-8'>
+      <header className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'>
         <div
           aria-hidden='true'
           className='absolute inset-0 opacity-25'
@@ -330,7 +326,7 @@ export default function TourismExplore() {
                 void navigator.share({ url }).catch(() => {});
               else void navigator.clipboard?.writeText(url);
             }}
-            className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-md sm:px-5'
+            className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-control bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-elev-2 sm:px-5'
           >
             <Share2Icon aria-hidden='true' className='h-4 w-4' />
             <span className='sr-only sm:not-sr-only'>Share view</span>
@@ -339,7 +335,7 @@ export default function TourismExplore() {
       </header>
 
       {/* Controls card: search stays visible; the rest folds away on phones. */}
-      <div className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-2xl border p-3 shadow-sm sm:p-4'>
+      <div className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-card border p-3 shadow-elev-1 sm:p-4'>
         <label className='relative min-w-[200px] flex-1'>
           <span className='sr-only'>Search records</span>
           <SearchIcon
@@ -351,7 +347,7 @@ export default function TourismExplore() {
             value={q}
             onChange={e => update({ q: e.target.value, sel: '' })}
             placeholder='Search records'
-            className={`${FIELD} w-full pl-9`}
+            className='field-control w-full pl-9'
           />
         </label>
         <button
@@ -359,7 +355,7 @@ export default function TourismExplore() {
           aria-expanded={filtersOpen}
           aria-controls='explore-filters'
           onClick={() => setFiltersOpen(o => !o)}
-          className={`${FIELD} inline-flex items-center gap-2 font-bold sm:hidden`}
+          className='field-control inline-flex items-center gap-2 font-bold sm:hidden'
         >
           <SlidersHorizontalIcon aria-hidden='true' className='h-4 w-4' />
           Filters
@@ -376,7 +372,7 @@ export default function TourismExplore() {
                 setTouring(false);
                 update({ town: e.target.value, sel: '' });
               }}
-              className={`${FIELD} mt-1 block font-normal`}
+              className='field-control mt-1 block font-normal'
             >
               <option value=''>All municipalities</option>
               {MUNICIPALITIES.map(m => (
@@ -391,7 +387,7 @@ export default function TourismExplore() {
             <select
               value={layer}
               onChange={e => update({ layer: e.target.value, sel: '' })}
-              className={`${FIELD} mt-1 block font-normal`}
+              className='field-control mt-1 block font-normal'
             >
               <option value='all'>All records</option>
               {(Object.keys(LAYER_LABEL) as Exclude<Layer, 'all'>[]).map(k => (
@@ -410,7 +406,7 @@ export default function TourismExplore() {
                   type='date'
                   value={from}
                   onChange={e => update({ from: e.target.value })}
-                  className={`${FIELD} mt-1 block px-2 font-normal`}
+                  className='field-control mt-1 block px-2 font-normal'
                 />
               </label>
               <label>
@@ -419,7 +415,7 @@ export default function TourismExplore() {
                   type='date'
                   value={to}
                   onChange={e => update({ to: e.target.value })}
-                  className={`${FIELD} mt-1 block px-2 font-normal`}
+                  className='field-control mt-1 block px-2 font-normal'
                 />
               </label>
             </fieldset>
@@ -433,7 +429,7 @@ export default function TourismExplore() {
         <div
           role='group'
           aria-label='View'
-          className='border-kapwa-border-weak flex overflow-hidden rounded-lg border text-sm font-bold'
+          className='border-kapwa-border-weak flex overflow-hidden rounded-control border text-sm font-bold'
         >
           {(['map', 'list'] as const).map(v => (
             <button
@@ -486,7 +482,7 @@ export default function TourismExplore() {
                 <div
                   role='group'
                   aria-label='Map layers'
-                  className={`${GLASS} absolute top-3 left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
+                  className='surface-glass absolute top-3 left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto p-2 sm:flex-col'
                 >
                   {(
                     Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
@@ -502,7 +498,7 @@ export default function TourismExplore() {
                             on ? [...h, k] : h.filter(x => x !== k)
                           )
                         }
-                        className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
+                        className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                       >
                         <span
                           aria-hidden='true'
@@ -523,7 +519,7 @@ export default function TourismExplore() {
                     type='button'
                     aria-pressed={shade}
                     onClick={() => setShade(v => !v)}
-                    className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
+                    className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                   >
                     Shade by records
                   </button>
@@ -540,7 +536,7 @@ export default function TourismExplore() {
                       setTouring(true);
                     }
                   }}
-                  className='bg-kapwa-bg-surface text-kapwa-text-strong absolute top-3 right-3 z-[500] inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold shadow-lg'
+                  className='bg-kapwa-bg-surface text-kapwa-text-strong absolute top-3 right-3 z-[500] inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold shadow-elev-2'
                 >
                   {touring ? (
                     <SquareIcon aria-hidden='true' className='h-4 w-4' />
@@ -551,7 +547,7 @@ export default function TourismExplore() {
                 </button>
                 <div
                   key={selected?.id ?? town}
-                  className='animate-in fade-in slide-in-from-bottom-2 pointer-events-none absolute bottom-4 left-3 z-[500] max-w-[70%] rounded-xl bg-white/90 px-4 py-2.5 shadow-lg backdrop-blur-md duration-700 motion-reduce:animate-none'
+                  className='animate-in fade-in slide-in-from-bottom-2 pointer-events-none absolute bottom-4 left-3 z-[500] max-w-[70%] surface-glass px-4 py-2.5 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'
                 >
                   <p className='text-kapwa-text-muted text-[11px] font-bold tracking-widest uppercase'>
                     {selected
@@ -601,7 +597,7 @@ export default function TourismExplore() {
           ) : null}
 
           {/* Results: always rendered so keyboard users can reach them in both views. */}
-          <Card className='overflow-hidden rounded-2xl p-0' hover={false}>
+          <Card className='overflow-hidden rounded-card p-0' hover={false}>
             <h2
               aria-live='polite'
               className='text-kapwa-text-strong border-kapwa-border-weak border-b px-4 pt-4 pb-3 text-xl font-bold'
@@ -619,7 +615,7 @@ export default function TourismExplore() {
                       type='button'
                       aria-pressed={sel === r.id}
                       onClick={() => select(r.id)}
-                      className={`focus-visible:ring-kapwa-border-brand flex w-full items-center justify-between gap-3 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : 'hover:bg-kapwa-bg-hover'}`}
+                      className={`focus-visible:ring-kapwa-border-brand flex w-full transition-colors duration-(--dur-fast) items-center justify-between gap-3 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : 'hover:bg-kapwa-bg-hover'}`}
                     >
                       <span className='min-w-0 space-y-1'>
                         <span className='text-kapwa-text-strong block text-sm font-bold'>
@@ -670,7 +666,7 @@ export default function TourismExplore() {
                 <button
                   type='button'
                   onClick={() => setPageSize(s => s + RESULTS_PAGE)}
-                  className='text-kapwa-text-brand hover:bg-kapwa-bg-hover min-h-11 w-full rounded-lg text-sm font-bold'
+                  className='text-kapwa-text-brand hover:bg-kapwa-bg-hover min-h-11 w-full rounded-control text-sm font-bold'
                 >
                   Show{' '}
                   {Math.min(RESULTS_PAGE, filtered.length - visible.length)}{' '}
@@ -686,7 +682,7 @@ export default function TourismExplore() {
           ref={detailRef}
           tabIndex={-1}
           aria-label='Details'
-          className={`space-y-4 outline-none lg:sticky lg:top-4 lg:self-start ${sheet ? 'max-lg:bg-kapwa-bg-surface max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:space-y-3 max-lg:overflow-y-auto max-lg:rounded-t-2xl max-lg:p-3 max-lg:shadow-[0_-8px_24px_rgba(0,0,0,0.2)] ' + (sheetOpen ? 'max-lg:max-h-[52vh]' : 'max-lg:max-h-14 max-lg:overflow-hidden') : ''}`}
+          className={`space-y-4 outline-none lg:sticky lg:top-4 lg:self-start ${sheet ? 'max-lg:bg-kapwa-bg-surface max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:space-y-3 max-lg:overflow-y-auto max-lg:rounded-t-card max-lg:p-3 max-lg:shadow-[0_-8px_24px_rgb(15_35_75/0.22)] ' + (sheetOpen ? 'max-lg:max-h-[52vh]' : 'max-lg:max-h-14 max-lg:overflow-hidden') : ''}`}
         >
           {sheet && (
             <button
@@ -763,7 +759,7 @@ export default function TourismExplore() {
           ) : null}
 
           {townInfo && (
-            <Card hover={false} className='rounded-2xl'>
+            <Card hover={false} className='rounded-card'>
               <CardContent className='space-y-4 p-5'>
                 <div>
                   <h2 className='text-kapwa-text-strong text-3xl font-bold'>
@@ -786,7 +782,7 @@ export default function TourismExplore() {
                           disabled={!n}
                           aria-pressed={layer === k}
                           onClick={() => update({ layer: k, sel: '' })}
-                          className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left enabled:hover:bg-kapwa-bg-hover disabled:cursor-default ${layer === k ? 'bg-kapwa-bg-brand-weak' : ''}`}
+                          className={`flex min-h-12 w-full items-center transition-colors duration-(--dur-fast) justify-between gap-3 rounded-control px-2 py-3 text-left enabled:hover:bg-kapwa-bg-hover disabled:cursor-default ${layer === k ? 'bg-kapwa-bg-brand-weak' : ''}`}
                         >
                           <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
                             <Icon
@@ -861,9 +857,9 @@ export default function TourismExplore() {
 
       <section
         aria-labelledby='sources-heading'
-        className='bg-kapwa-bg-surface border-kapwa-border-weak space-y-5 rounded-2xl border p-5 shadow-sm sm:p-6'
+        className='bg-kapwa-bg-surface border-kapwa-border-weak space-y-5 rounded-card border p-5 shadow-elev-1 sm:p-6'
       >
-        <div className='bg-kapwa-bg-brand-weak text-kapwa-text-strong flex gap-3 rounded-xl p-4 text-sm'>
+        <div className='bg-kapwa-bg-brand-weak text-kapwa-text-strong flex gap-3 rounded-panel p-4 text-sm'>
           <InfoIcon
             aria-hidden='true'
             className='text-kapwa-text-brand mt-0.5 h-5 w-5 shrink-0'
@@ -881,7 +877,7 @@ export default function TourismExplore() {
           Information and sources
         </h2>
         <div className='grid gap-4 md:grid-cols-3'>
-          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+          <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
             <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
               Where records come from
             </h3>
@@ -911,7 +907,7 @@ export default function TourismExplore() {
               <li>Municipality boundaries: BetterAklan boundary file</li>
             </ul>
           </div>
-          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+          <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
             <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
               Location precision
             </h3>
@@ -930,7 +926,7 @@ export default function TourismExplore() {
               </li>
             </ul>
           </div>
-          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+          <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
             <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
               Dates and notices
             </h3>

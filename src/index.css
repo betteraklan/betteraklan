@@ -115,8 +115,64 @@
   .sidebar-active {
     background-color: var(--color-bg-kapwa-bg-brand-weak);
     color: var(--color-text-kapwa-text-brand);
-    border-color: var(--color-border-kapwa-border-brand);
+    border-color: var(--color-kapwa-border-brand);
     border-left-width: 2px;
     font-weight: 600;
+  }
+}
+
+/* --- MOTION + ELEVATION TOKENS (tourism section) ---
+   Built on kapwa: durations alias --duration-kapwa-*, radii derive from
+   kapwa's --radius (0.625rem), shadows are tinted with the brand navy. */
+@theme {
+  /* Fast settle for entering panels and camera-adjacent UI. Exits use ease-kapwa-in. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Elevation: 1 = resting surface, 2 = floating over content, 3 = sheet/overlay. */
+  --shadow-elev-1:
+    0 1px 2px 0 rgb(15 35 75 / 0.06), 0 1px 3px 0 rgb(15 35 75 / 0.08);
+  --shadow-elev-2:
+    0 4px 12px -2px rgb(15 35 75 / 0.12), 0 2px 4px -2px rgb(15 35 75 / 0.08);
+  --shadow-elev-3:
+    0 16px 32px -8px rgb(15 35 75 / 0.22), 0 6px 12px -6px rgb(15 35 75 / 0.12);
+
+  /* Radii: control = inputs, buttons, chips; panel = floating map UI; card = page sections. */
+  --radius-control: var(--radius);
+  --radius-panel: calc(var(--radius) + 4px);
+  --radius-card: calc(var(--radius) + 6px);
+}
+
+:root {
+  /* Tailwind 4 has no duration namespace; use as duration-(--dur-base). */
+  --dur-fast: var(--duration-kapwa-150, 150ms);
+  --dur-base: var(--duration-kapwa-300, 300ms);
+  --dur-slow: var(--duration-kapwa-500, 500ms);
+}
+
+/* Shared tourism surfaces, composed only from the tokens above. */
+@utility surface-glass {
+  border: 1px solid var(--color-kapwa-border-weak);
+  background-color: rgb(255 255 255 / 0.9);
+  color: var(--color-kapwa-text-strong);
+  box-shadow: var(--shadow-elev-2);
+  border-radius: var(--radius-panel);
+  backdrop-filter: blur(12px);
+}
+
+@utility field-control {
+  min-height: 2.75rem;
+  border: 1px solid var(--color-kapwa-border-weak);
+  border-radius: var(--radius-control);
+  background-color: var(--color-kapwa-bg-surface);
+  color: var(--color-kapwa-text-strong);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color var(--dur-fast) var(--ease-out-expo);
+  &:hover {
+    border-color: var(--color-kapwa-border-brand);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
