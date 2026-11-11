@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import type { GeoJsonObject } from 'geojson';
-import L from 'leaflet';
 import {
   ArrowRightIcon,
   BedDoubleIcon,
@@ -21,17 +19,6 @@ import {
   SlidersHorizontalIcon,
   SquareIcon,
 } from 'lucide-react';
-import {
-  CircleMarker,
-  GeoJSON,
-  MapContainer,
-  Marker,
-  TileLayer,
-  Tooltip,
-  useMap,
-} from 'react-leaflet';
-
-import 'leaflet/dist/leaflet.css';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -47,7 +34,9 @@ import {
   type Rec,
   type Sources,
 } from '@/lib/tourism/explore';
-import { boundsOf, type BoundaryFeature } from '@/lib/tourism/geo';
+import { type BoundaryFeature } from '@/lib/tourism/geo';
+
+import AklanMap3D, { type MapPin } from './components/AklanMap3D';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
 import boundaryData from '@/data/geo/municipalities-boundaries.json';
@@ -76,17 +65,7 @@ const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
   none: 'Location unavailable',
 };
 
-const HOME: [number, number] = [11.75, 122.2];
-const HOME_ZOOM = 10;
 const TOUR_STEP_MS = 5000;
-const TOWNS_GEOJSON = {
-  type: 'FeatureCollection',
-  features: SOURCES.boundaries.map(f => ({
-    type: 'Feature',
-    properties: f.properties,
-    geometry: f.geometry,
-  })),
-} as unknown as GeoJsonObject;
 // Shading ramp for record counts: brighter means more BetterAklan records.
 const TIER_COLOR = [
   '#EEF3FB',
@@ -106,10 +85,6 @@ const LAYER_ICON = {
   stay: BedDoubleIcon,
   product: ShoppingBasketIcon,
 } as const;
-const TOWN_BOUNDS = new Map(
-  SOURCES.boundaries.map(f => [f.properties.slug, boundsOf(f)])
-);
-
 // Pin colours per layer. Approximate pins are drawn hollow with a dashed ring.
 const LAYER_COLOR: Record<Exclude<Layer, 'all'>, string> = {
   place: '#0d9488',
@@ -118,45 +93,8 @@ const LAYER_COLOR: Record<Exclude<Layer, 'all'>, string> = {
   product: '#7c3aed',
 };
 
-const reducedMotion = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** Cinematic camera: slow intro, then fly to the selected record or town. */
-function Camera({
-  lat,
-  lon,
-  town,
-}: {
-  lat?: number;
-  lon?: number;
-  town: string;
-}) {
-  const map = useMap();
-  const first = useRef(true);
-  useEffect(() => {
-    const animate = !reducedMotion();
-    const bounds = TOWN_BOUNDS.get(town);
-    const isFirst = first.current;
-    first.current = false;
-    if (lat != null && lon != null) {
-      map.flyTo([lat, lon], 15, { animate, duration: 1.4 });
-    } else if (bounds) {
-      map.flyToBounds(bounds, { padding: [24, 24], animate, duration: 1.6 });
-    } else if (isFirst) {
-      if (animate) map.flyTo(HOME, HOME_ZOOM, { duration: 2.5 });
-    } else {
-      map.flyTo(HOME, HOME_ZOOM, { animate, duration: 1.2 });
-    }
-  }, [lat, lon, town, map]);
-  return null;
-}
-
-const pulseIcon = L.divIcon({
-  className: '',
-  iconSize: [28, 28],
-  iconAnchor: [14, 14],
-  html: '<span class="relative flex h-7 w-7"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-70 motion-reduce:animate-none"></span><span class="relative m-2 inline-flex h-3 w-3 rounded-full bg-amber-500 ring-2 ring-white"></span></span>',
-});
+// Sea backdrop: soft wave lines, drawn once as an inline SVG.
+const WAVES = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cpath d='M0 12 Q15 2 30 12 T60 12 T90 12 T120 12' fill='none' stroke='%231D4FB0' stroke-width='1' stroke-opacity='.35'/%3E%3C/svg%3E")`;
 
 function PlacementBadge({ rec }: { rec: Rec }) {
   const variant =
@@ -215,6 +153,21 @@ export default function TourismExplore() {
     [q, town, layer, from, to]
   );
   const selected = ALL_RECORDS.find(r => r.id === sel) ?? null;
+  const selectedPin = useMemo<MapPin | null>(
+    () =>
+      selected && selected.lat != null && selected.lon != null
+        ? {
+            id: selected.id,
+            name: selected.name,
+            lat: selected.lat,
+            lon: selected.lon,
+            color: LAYER_COLOR[selected.layer],
+            approximate: selected.placement === 'approximate',
+            label: `${LAYER_LABEL[selected.layer]} · ${PLACEMENT_LABEL[selected.placement]}`,
+          }
+        : null,
+    [selected]
+  );
   const townInfo = MUNICIPALITIES.find(m => m.slug === town) ?? null;
   const reason =
     filtered.length === 0 ? emptyReason(ALL_RECORDS, filters) : null;
@@ -233,6 +186,32 @@ export default function TourismExplore() {
   }, [filtered]);
   const maxCount = Math.max(1, ...counts.values());
   const shown = mapped.filter(r => !hiddenLayers.includes(r.layer));
+  const shownKey = shown.map(r => r.id).join();
+  const pins = useMemo<MapPin[]>(
+    () =>
+      shown.map(r => ({
+        id: r.id,
+        name: r.name,
+        lat: r.lat,
+        lon: r.lon,
+        color: LAYER_COLOR[r.layer],
+        approximate: r.placement === 'approximate',
+        label: LAYER_LABEL[r.layer],
+      })),
+    // shownKey captures every change to the pin list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [shownKey]
+  );
+  const townFill = useMemo(
+    () =>
+      new Map(
+        [...counts].map(([slug, n]) => [
+          slug,
+          TIER_COLOR[shade && n ? Math.ceil((5 * n) / maxCount) : 0],
+        ])
+      ),
+    [counts, shade, maxCount]
+  );
 
   const [touring, setTouring] = useState(false);
   const select = (id: string) => {
@@ -290,33 +269,49 @@ export default function TourismExplore() {
     <div
       className={`animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='flex flex-wrap items-center justify-between gap-4'>
-        <div className='flex items-stretch gap-4'>
-          <span
-            aria-hidden='true'
-            className='w-1.5 shrink-0 rounded-full bg-[#FCD116]'
-          />
-          <div>
-            <h1 className='kapwa-heading-lg text-kapwa-text-strong'>
-              Explore Aklan
-            </h1>
-            <p className='text-kapwa-text-support mt-1 text-sm sm:text-base'>
-              Find places, festivals, and public visitor information.
-            </p>
+      <header className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-6 text-white shadow-lg sm:p-8'>
+        <div
+          aria-hidden='true'
+          className='absolute inset-0 opacity-25'
+          style={{ backgroundImage: WAVES, backgroundSize: '160px 32px' }}
+        />
+        <div
+          aria-hidden='true'
+          className='absolute -top-16 -right-10 h-56 w-56 rounded-full bg-[#FCD116]/25 blur-3xl'
+        />
+        <div className='relative flex flex-wrap items-end justify-between gap-4'>
+          <div className='flex items-stretch gap-4'>
+            <span
+              aria-hidden='true'
+              className='w-1.5 shrink-0 rounded-full bg-[#FCD116]'
+            />
+            <div>
+              <p className='text-xs font-bold tracking-[0.2em] text-white/70 uppercase'>
+                BetterAklan Tourism
+              </p>
+              <h1 className='kapwa-heading-lg mt-1 text-white'>
+                Explore Aklan
+              </h1>
+              <p className='mt-1 max-w-xl text-sm text-white/85 sm:text-base'>
+                Find places, festivals, and public visitor information across
+                all 17 municipalities.
+              </p>
+            </div>
           </div>
+          <button
+            type='button'
+            onClick={() => {
+              const url = window.location.href;
+              if (navigator.share)
+                void navigator.share({ url }).catch(() => {});
+              else void navigator.clipboard?.writeText(url);
+            }}
+            className='inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#0B3FAE] shadow-md'
+          >
+            <Share2Icon aria-hidden='true' className='h-4 w-4' />
+            Share view
+          </button>
         </div>
-        <button
-          type='button'
-          onClick={() => {
-            const url = window.location.href;
-            if (navigator.share) void navigator.share({ url }).catch(() => {});
-            else void navigator.clipboard?.writeText(url);
-          }}
-          className='bg-kapwa-bg-brand-default text-kapwa-text-inverse inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold shadow-sm'
-        >
-          <Share2Icon aria-hidden='true' className='h-4 w-4' />
-          Share view
-        </button>
       </header>
 
       {/* Controls card: search stays visible; the rest folds away on phones. */}
@@ -445,96 +440,25 @@ export default function TourismExplore() {
           {view === 'map' ? (
             <Card className='overflow-hidden p-0' hover={false}>
               <div className='relative isolate h-[62vh] min-h-[360px] w-full lg:h-[70vh]'>
-                <MapContainer
-                  center={HOME}
-                  zoom={HOME_ZOOM - 1}
-                  scrollWheelZoom
-                  preferCanvas
-                  className='h-full w-full'
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                  />
-                  <GeoJSON
-                    key={`${town}|${shade}|${filtered.length}|${params.toString()}`}
-                    data={TOWNS_GEOJSON}
-                    style={feature => {
-                      const slug = feature?.properties.slug as string;
-                      const n = counts.get(slug) ?? 0;
-                      const tier =
-                        shade && n ? Math.ceil((5 * n) / maxCount) : 0;
-                      return {
-                        color: slug === town ? '#1D4FB0' : '#7A93BD',
-                        weight: slug === town ? 2.6 : 1,
-                        fillColor: TIER_COLOR[tier],
-                        fillOpacity: town && slug !== town ? 0.3 : 0.6,
-                      };
-                    }}
-                    onEachFeature={(feature, lyr) => {
-                      const slug = feature.properties.slug as string;
-                      const n = counts.get(slug) ?? 0;
-                      lyr.bindTooltip(
-                        `${feature.properties.name}<br>${n} record${n === 1 ? '' : 's'}`,
-                        { sticky: true }
-                      );
-                      lyr.on({
-                        mouseover: e =>
-                          e.target.setStyle({ fillOpacity: 0.85 }),
-                        mouseout: e =>
-                          e.target.setStyle({
-                            fillOpacity: town && slug !== town ? 0.3 : 0.6,
-                          }),
-                        click: () => {
-                          setTouring(false);
-                          update({ town: slug, sel: '' });
-                        },
-                      });
-                    }}
-                  />
-                  {shown.map(r => {
-                    const color = LAYER_COLOR[r.layer];
-                    const approx = r.placement === 'approximate';
-                    return (
-                      <CircleMarker
-                        key={r.id}
-                        center={[r.lat, r.lon]}
-                        radius={sel === r.id ? 9 : 6}
-                        pathOptions={{
-                          color: approx ? color : '#ffffff',
-                          weight: approx ? 2 : 1.5,
-                          dashArray: approx ? '3 3' : undefined,
-                          fillColor: color,
-                          fillOpacity: approx ? 0.3 : 0.9,
-                        }}
-                        eventHandlers={{ click: () => select(r.id) }}
-                      >
-                        <Tooltip direction='top'>
-                          {r.name}
-                          {approx ? ' (approximate)' : ''}
-                        </Tooltip>
-                      </CircleMarker>
-                    );
-                  })}
-                  {selected && selected.lat != null && selected.lon != null && (
-                    <Marker
-                      position={[selected.lat, selected.lon]}
-                      icon={pulseIcon}
-                      interactive={false}
-                    />
-                  )}
-                  <Camera
-                    lat={selected?.lat ?? undefined}
-                    lon={selected?.lon ?? undefined}
-                    town={town}
-                  />
-                </MapContainer>
+                <AklanMap3D
+                  boundaries={SOURCES.boundaries}
+                  townFill={townFill}
+                  townCount={counts}
+                  town={town}
+                  pins={pins}
+                  selected={selectedPin}
+                  onTown={slug => {
+                    setTouring(false);
+                    update({ town: slug, sel: '' });
+                  }}
+                  onPin={select}
+                />
 
                 {/* Layer widget: show or hide each pin type, and the municipality shading. */}
                 <div
                   role='group'
                   aria-label='Map layers'
-                  className={`${GLASS} absolute top-[96px] left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
+                  className={`${GLASS} absolute top-3 left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
                 >
                   {(
                     Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
