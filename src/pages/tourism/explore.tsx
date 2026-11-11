@@ -90,10 +90,17 @@ const LAYER_ICON = {
 } as const;
 // Pin colours per layer. Approximate pins are drawn hollow with a dashed ring.
 const LAYER_COLOR: Record<Exclude<Layer, 'all'>, string> = {
-  place: '#0d9488',
-  event: '#d97706',
-  stay: '#2563eb',
-  product: '#7c3aed',
+  place: '#0f766e',
+  event: '#b45309',
+  stay: '#1d4ed8',
+  product: '#6d28d9',
+};
+// Shown on pins and in the layer key so record type never relies on colour alone.
+const LAYER_LETTER: Record<Exclude<Layer, 'all'>, string> = {
+  place: 'P',
+  event: 'F',
+  stay: 'A',
+  product: 'L',
 };
 
 // Sea backdrop: soft wave lines, drawn once as an inline SVG.
@@ -165,6 +172,7 @@ export default function TourismExplore() {
             lat: selected.lat,
             lon: selected.lon,
             color: LAYER_COLOR[selected.layer],
+            letter: LAYER_LETTER[selected.layer],
             approximate: selected.placement === 'approximate',
             label: `${LAYER_LABEL[selected.layer]} · ${PLACEMENT_LABEL[selected.placement]}`,
           }
@@ -198,6 +206,7 @@ export default function TourismExplore() {
         lat: r.lat,
         lon: r.lon,
         color: LAYER_COLOR[r.layer],
+        letter: LAYER_LETTER[r.layer],
         approximate: r.placement === 'approximate',
         label: LAYER_LABEL[r.layer],
       })),
@@ -247,16 +256,28 @@ export default function TourismExplore() {
   // user picks a result below desktop width, bring the details into view and
   // move focus there so the change is noticed by touch and screen-reader users.
   const detailRef = useRef<HTMLElement>(null);
+  // While the phone bottom sheet is open, keep focused elements from scrolling under it.
+  useEffect(() => {
+    if (!(sheet && sheetOpen)) return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = '55vh';
+    return () => {
+      root.style.scrollPaddingBottom = '';
+    };
+  }, [sheet, sheetOpen]);
   const prevSel = useRef(sel);
   useEffect(() => {
     if (
       sel &&
       sel !== prevSel.current &&
-      view === 'list' &&
       window.matchMedia('(max-width: 1023px)').matches
     ) {
       detailRef.current?.focus({ preventScroll: true });
-      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (view === 'list')
+        detailRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
     }
     prevSel.current = sel;
   }, [sel, view]);
@@ -270,9 +291,9 @@ export default function TourismExplore() {
 
   return (
     <div
-      className={`animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
+      className={`[&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-lg sm:p-8'>
+      <header className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-lg sm:p-8'>
         <div
           aria-hidden='true'
           className='absolute inset-0 opacity-25'
@@ -481,15 +502,19 @@ export default function TourismExplore() {
                             on ? [...h, k] : h.filter(x => x !== k)
                           )
                         }
-                        className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
+                        className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                       >
                         <span
                           aria-hidden='true'
-                          className='h-2.5 w-2.5 rounded-full border border-white shadow-sm'
+                          className='flex h-4 w-4 items-center justify-center rounded-full border-2 text-[9px] leading-none font-bold'
                           style={{
+                            borderColor: LAYER_COLOR[k],
                             background: on ? LAYER_COLOR[k] : 'transparent',
+                            color: on ? '#ffffff' : LAYER_COLOR[k],
                           }}
-                        />
+                        >
+                          {LAYER_LETTER[k]}
+                        </span>
                         {LAYER_LABEL[k]}
                       </button>
                     );
@@ -498,7 +523,7 @@ export default function TourismExplore() {
                     type='button'
                     aria-pressed={shade}
                     onClick={() => setShade(v => !v)}
-                    className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
+                    className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                   >
                     Shade by records
                   </button>

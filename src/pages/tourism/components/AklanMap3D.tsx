@@ -20,6 +20,8 @@ export interface MapPin {
   lat: number;
   lon: number;
   color: string;
+  /** One-letter type marker drawn on the pin, so type is not shown by colour alone. */
+  letter: string;
   approximate: boolean;
   label: string;
 }
@@ -104,6 +106,12 @@ export default function AklanMap3D({
       attributionControl: { compact: true },
     });
     mapRef.current = map;
+    map
+      .getCanvas()
+      .setAttribute(
+        'aria-label',
+        'Map of Aklan. Arrow keys pan, plus and minus zoom. Use the results list to choose a record.'
+      );
     map.addControl(
       new maplibregl.NavigationControl({ visualizePitch: true }),
       'bottom-right'
@@ -243,7 +251,17 @@ export default function AklanMap3D({
         type: 'circle',
         source: 'pins',
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 3.5, 15, 7],
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            9,
+            4,
+            12,
+            8,
+            15,
+            9,
+          ],
           'circle-color': ['get', 'color'],
           'circle-opacity': ['case', ['get', 'approximate'], 0.35, 0.95],
           'circle-stroke-color': [
@@ -254,6 +272,30 @@ export default function AklanMap3D({
           ],
           'circle-stroke-width': 1.5,
           'circle-pitch-alignment': 'map',
+        },
+      });
+
+      // Type letter on each pin once pins are big enough to read it.
+      map.addLayer({
+        id: 'pin-letters',
+        type: 'symbol',
+        source: 'pins',
+        minzoom: 11.5,
+        layout: {
+          'text-field': ['get', 'letter'],
+          'text-font': ['Noto Sans Bold'],
+          'text-size': 10,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+          'text-pitch-alignment': 'map',
+        },
+        paint: {
+          'text-color': [
+            'case',
+            ['get', 'approximate'],
+            ['get', 'color'],
+            '#ffffff',
+          ],
         },
       });
 
@@ -356,8 +398,9 @@ export default function AklanMap3D({
         type: 'Feature',
         properties: {
           id: p.id,
-          name: p.approximate ? `${p.name} (approximate)` : p.name,
+          name: `${p.name} · ${p.label}${p.approximate ? ' (approximate location)' : ''}`,
           color: p.color,
+          letter: p.letter,
           approximate: p.approximate,
         },
         geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
@@ -432,7 +475,7 @@ export default function AklanMap3D({
       ref={el}
       role='region'
       aria-label='Map of Aklan. Use the list below to select records with a keyboard.'
-      className='h-full w-full bg-[#eef1f5]'
+      className='h-full w-full bg-[#eef1f5] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
     />
   );
 }
