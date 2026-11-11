@@ -21,14 +21,24 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/navigation/Breadcrumb';
+import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 
+import { advisoriesFor } from '@/lib/tourism/advisories';
+import { DATE_STATUS_LABEL, getDateStatus } from '@/lib/tourism/festivalDates';
 import { toTitleCase } from '@/lib/stringUtils';
 
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
 import { TourismEntry } from '@/types/tourism';
 
-function EntryCard({ entry }: { entry: TourismEntry }) {
+function EntryCard({
+  entry,
+  dated = false,
+}: {
+  entry: TourismEntry;
+  dated?: boolean;
+}) {
+  const status = getDateStatus(entry);
   return (
     <Card hover={false} className='border-kapwa-border-weak shadow-xs'>
       <CardContent className='space-y-1.5 p-4'>
@@ -40,6 +50,24 @@ function EntryCard({ entry }: { entry: TourismEntry }) {
         <p className='text-kapwa-text-support text-sm leading-relaxed'>
           {entry.description}
         </p>
+        {dated && (
+          <div className='flex flex-wrap items-center gap-2 pt-1 text-xs'>
+            <Badge
+              variant={
+                status === 'confirmed'
+                  ? 'success'
+                  : status === 'tentative'
+                    ? 'warning'
+                    : 'slate'
+              }
+            >
+              {DATE_STATUS_LABEL[status]}
+            </Badge>
+            <span className='text-kapwa-text-muted'>
+              Last checked: {entry.dates?.lastCheckedAt ?? 'Not recorded'}
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -99,7 +127,7 @@ export default function TourismMunicipalityDetail() {
         <DetailSection title='Festivals & Events' icon={PartyPopperIcon}>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             {municipality.festivals.map((f, i) => (
-              <EntryCard key={f.name ?? `festival-${i}`} entry={f} />
+              <EntryCard key={f.name ?? `festival-${i}`} entry={f} dated />
             ))}
           </div>
         </DetailSection>
@@ -129,6 +157,33 @@ export default function TourismMunicipalityDetail() {
           </div>
         </DetailSection>
       )}
+
+      {/* --- NOTICES --- */}
+      <DetailSection title='Notices' icon={CalendarHeart}>
+        {advisoriesFor(municipality.slug).length > 0 ? (
+          <ul className='space-y-3'>
+            {advisoriesFor(municipality.slug).map(a => (
+              <li key={a.id} className='text-sm'>
+                <strong>{a.title}</strong> · {a.issuer} · published{' '}
+                {a.publishedAt}
+                {a.endsAt ? ` · until ${a.endsAt}` : ''}
+                <a
+                  href={a.sourceUrl}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-kapwa-text-brand block text-xs hover:underline'
+                >
+                  Source
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className='text-kapwa-text-support text-sm'>
+            No verified notices are published for this municipality yet.
+          </p>
+        )}
+      </DetailSection>
 
       {/* --- SOURCE NOTE --- */}
       <p className='text-kapwa-text-disabled text-xs italic'>

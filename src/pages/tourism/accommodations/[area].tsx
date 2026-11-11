@@ -103,6 +103,7 @@ function groupPopupHtml(g: CoordinateGroup): string {
     return `<div class="space-y-1 text-sm">
       <p class="font-semibold">${escapeHtml(p.name)}</p>
       <p class="text-xs text-gray-500">${escapeHtml(p.address)}</p>
+      ${p.geocodePrecision !== 'exact' ? `<p class="text-[11px] font-semibold">Approximate pin · ${escapeHtml(p.geocodePrecision)} level</p>` : ''}
       <a href="${googleMapsUrl(p.lat, p.lon)}" target="_blank" rel="noreferrer" class="text-xs font-medium text-blue-600">Open in Google Maps →</a>
     </div>`;
   }
@@ -242,8 +243,10 @@ export default function AccommodationsPage() {
           </h1>
         </div>
         <p className='text-kapwa-text-support mt-2 text-sm'>
-          {all.length} DOT-listed accommodation establishments in{' '}
-          {AREA_LABELS[area]}, Aklan.
+          {all.length} accommodation establishments in {AREA_LABELS[area]},
+          Aklan, from the Provincial Government of Aklan&apos;s published
+          listing. Being listed here does not confirm current accreditation or
+          availability.
         </p>
       </header>
 
@@ -298,6 +301,9 @@ export default function AccommodationsPage() {
                     {g.items.length === 1
                       ? g.items[0].name
                       : `${g.items.length} establishments`}
+                    {g.items.some(p => p.geocodePrecision !== 'exact')
+                      ? ' (approximate pin)'
+                      : ''}
                   </Tooltip>
                   <Popup>
                     {g.items.length === 1 ? (
@@ -306,6 +312,12 @@ export default function AccommodationsPage() {
                         <p className='text-xs text-gray-500'>
                           {g.items[0].address}
                         </p>
+                        {g.items[0].geocodePrecision !== 'exact' && (
+                          <p className='text-[11px] font-semibold'>
+                            Approximate pin · {g.items[0].geocodePrecision}{' '}
+                            level
+                          </p>
+                        )}
                         <a
                           href={googleMapsUrl(g.lat, g.lon)}
                           target='_blank'
@@ -388,8 +400,8 @@ export default function AccommodationsPage() {
                     </span>
                   )}
                   {a.geocodePrecision !== 'exact' && a.lat != null && (
-                    <span className='text-kapwa-text-disabled text-[10px] tracking-wide uppercase'>
-                      ~{a.geocodePrecision}
+                    <span className='text-kapwa-text-support text-[11px] font-bold'>
+                      Approximate pin · {a.geocodePrecision} level
                     </span>
                   )}
                 </div>

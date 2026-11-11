@@ -97,6 +97,7 @@ const TourismMunicipalityDetail = lazy(
 const AccommodationsPage = lazy(
   () => import('@/pages/tourism/accommodations/[area]')
 );
+const TourismExplore = lazy(() => import('@/pages/tourism/explore'));
 
 // OpenLGU Portal
 const OpenLGULayout = lazy(() => import('@/pages/openlgu/layout'));
@@ -268,6 +269,7 @@ function AppContent() {
           {config.features.tourism && (
             <Route path='tourism' element={<TourismLayout />}>
               <Route index element={<TourismIndex />} />
+              <Route path='explore' element={<TourismExplore />} />
               <Route path='accommodations'>
                 <Route index element={<Navigate to='mainland' replace />} />
                 <Route path=':area' element={<AccommodationsPage />} />

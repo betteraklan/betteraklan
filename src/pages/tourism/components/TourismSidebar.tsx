@@ -42,6 +42,14 @@ export default function TourismSidebar() {
           ))}
       </SidebarGroup>
 
+      <SidebarGroup title='Explore'>
+        <SidebarItem
+          label='Map and list'
+          icon={MapPinIcon}
+          path='/tourism/explore'
+        />
+      </SidebarGroup>
+
       <SidebarGroup title='Accommodations'>
         <SidebarItem
           label='Boracay'
