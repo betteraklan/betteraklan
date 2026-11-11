@@ -44,3 +44,18 @@ export function findMunicipalityAt(
   }
   return null;
 }
+
+/** Leaflet-style [[south, west], [north, east]] box around a boundary. */
+export function boundsOf(
+  f: BoundaryFeature
+): [[number, number], [number, number]] {
+  const g = f.geometry;
+  const rings = g.type === 'Polygon' ? g.coordinates : g.coordinates.flat();
+  const pts = rings.flat();
+  const lons = pts.map(p => p[0]);
+  const lats = pts.map(p => p[1]);
+  return [
+    [Math.min(...lats), Math.min(...lons)],
+    [Math.max(...lats), Math.max(...lons)],
+  ];
+}

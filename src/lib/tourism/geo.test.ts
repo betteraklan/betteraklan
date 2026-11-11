@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { findMunicipalityAt, type BoundaryFeature } from './geo';
+import { boundsOf, findMunicipalityAt, type BoundaryFeature } from './geo';
 
 // Unit square [0,1] x [0,1] (lon, lat) with a square hole at [0.4,0.6].
 const square: BoundaryFeature = {
@@ -35,5 +35,14 @@ describe('findMunicipalityAt', () => {
   });
   it('excludes points inside a hole', () => {
     expect(findMunicipalityAt(0.5, 0.5, [square])).toBeNull();
+  });
+});
+
+describe('boundsOf', () => {
+  it('returns [[south, west], [north, east]]', () => {
+    expect(boundsOf(square)).toEqual([
+      [0, 0],
+      [1, 1],
+    ]);
   });
 });
