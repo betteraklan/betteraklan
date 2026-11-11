@@ -8,6 +8,9 @@ import maplibregl, {
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+import { addPinIcons } from './pinIcons';
+
+import type { Layer } from '@/lib/tourism/explore';
 import type { BoundaryFeature } from '@/lib/tourism/geo';
 
 // Province outline: union of the municipality boundaries, precomputed so the
@@ -20,8 +23,10 @@ export interface MapPin {
   lat: number;
   lon: number;
   color: string;
-  /** One-letter type marker drawn on the pin, so type is not shown by colour alone. */
-  letter: string;
+  /** Record layer: picks the pin's shape, so type is not shown by colour alone. */
+  layer: Exclude<Layer, 'all'>;
+  /** Municipality slug, used when a stacked group can't be split by zooming. */
+  town: string | null;
   approximate: boolean;
   label: string;
 }
@@ -59,6 +64,19 @@ const REVERSE_MS = 600;
 const LIFT_M = 1200;
 const TOWN_PITCH = 40;
 const DIM_VEIL = 0.65;
+/** Icon scale by zoom; the selected pin is drawn 40% larger. */
+const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  9,
+  ['case', ['==', ['get', 'id'], selectedId], 1.05, 0.75],
+  14,
+  ['case', ['==', ['get', 'id'], selectedId], 1.4, 1],
+];
+
+const CLUSTER_MAX_ZOOM = 12;
+
 const reducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Same curve as the --ease-out-expo CSS token.
@@ -278,60 +296,97 @@ export default function AklanMap3D({
         },
       });
 
+      // Pins cluster at low zoom; count bubbles expand on tap.
+      addPinIcons(map);
       map.addSource('pins', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+        cluster: true,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+        clusterRadius: 36,
+      });
+      const isCluster = [
+        'has',
+        'point_count',
+      ] as maplibregl.ExpressionSpecification;
+      const notCluster = ['!', isCluster] as maplibregl.ExpressionSpecification;
+      const bubble = [
+        'step',
+        ['get', 'point_count'],
+        15,
+        10,
+        18,
+        50,
+        23,
+      ] as maplibregl.ExpressionSpecification;
+      map.addLayer({
+        id: 'cluster-shadow',
+        type: 'circle',
+        source: 'pins',
+        filter: isCluster,
+        paint: {
+          'circle-radius': ['+', bubble, 3],
+          'circle-color': '#0f234b',
+          'circle-opacity': 0.22,
+          'circle-blur': 0.7,
+          'circle-translate': [0, 2],
+        },
+      });
+      map.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'pins',
+        filter: isCluster,
+        paint: {
+          'circle-radius': bubble,
+          'circle-color': '#1D4FB0',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 3,
+        },
+      });
+      map.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'pins',
+        filter: isCluster,
+        layout: {
+          'text-field': ['get', 'point_count_abbreviated'],
+          'text-font': ['Noto Sans Bold'],
+          'text-size': 13,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        paint: { 'text-color': '#ffffff' },
+      });
+      // Selected pin: a brand ring under the enlarged icon.
+      map.addLayer({
+        id: 'pin-ring',
+        type: 'circle',
+        source: 'pins',
+        filter: ['all', notCluster, ['==', ['get', 'id'], '']],
+        paint: {
+          'circle-radius': 19,
+          'circle-color': 'rgba(29,79,176,0.12)',
+          'circle-stroke-color': '#1D4FB0',
+          'circle-stroke-width': 3,
+        },
       });
       map.addLayer({
         id: 'pins',
-        type: 'circle',
-        source: 'pins',
-        paint: {
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            9,
-            4,
-            12,
-            8,
-            15,
-            9,
-          ],
-          'circle-color': ['get', 'color'],
-          'circle-opacity': ['case', ['get', 'approximate'], 0.35, 0.95],
-          'circle-stroke-color': [
-            'case',
-            ['get', 'approximate'],
-            ['get', 'color'],
-            '#ffffff',
-          ],
-          'circle-stroke-width': 1.5,
-          'circle-pitch-alignment': 'map',
-        },
-      });
-
-      // Type letter on each pin once pins are big enough to read it.
-      map.addLayer({
-        id: 'pin-letters',
         type: 'symbol',
         source: 'pins',
-        minzoom: 11.5,
+        filter: notCluster,
         layout: {
-          'text-field': ['get', 'letter'],
-          'text-font': ['Noto Sans Bold'],
-          'text-size': 10,
-          'text-allow-overlap': true,
-          'text-ignore-placement': true,
-          'text-pitch-alignment': 'map',
-        },
-        paint: {
-          'text-color': [
-            'case',
-            ['get', 'approximate'],
-            ['get', 'color'],
-            '#ffffff',
+          'icon-image': [
+            'concat',
+            'pin-',
+            ['get', 'layer'],
+            ['case', ['get', 'approximate'], '-approx', ''],
           ],
+          'icon-size': pinSize(''),
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'symbol-sort-key': ['case', ['==', ['get', 'id'], ''], 1, 0],
         },
       });
 
@@ -401,14 +456,50 @@ export default function AklanMap3D({
           tip.setLngLat(e.lngLat).setText(String(f.properties.name)).addTo(map);
       });
       map.on('mouseleave', 'pins', () => tip.remove());
+      map.on('mouseenter', 'clusters', e => {
+        map.getCanvas().style.cursor = 'pointer';
+        const n = e.features?.[0]?.properties.point_count as number;
+        tip
+          .setLngLat(e.lngLat)
+          .setText(`${n} records · tap to expand`)
+          .addTo(map);
+      });
+      map.on('mouseleave', 'clusters', () => {
+        map.getCanvas().style.cursor = '';
+        tip.remove();
+      });
 
       // Clicks: a pin wins over the municipality underneath it.
       map.on('click', e => {
         const hit = map.queryRenderedFeatures(e.point, {
-          layers: ['pins', 'town-fill'],
+          layers: ['clusters', 'pins', 'town-fill'],
         });
+        const cluster = hit.find(f => f.layer.id === 'clusters');
         const pin = hit.find(f => f.layer.id === 'pins');
-        if (pin) cb.current.onPin(String(pin.properties.id));
+        if (cluster) {
+          // Zoom just far enough for this group to split apart.
+          const src = map.getSource('pins') as GeoJSONSource;
+          const centre = (cluster.geometry as GeoJSON.Point).coordinates as [
+            number,
+            number,
+          ];
+          const id = cluster.properties.cluster_id as number;
+          void src.getClusterExpansionZoom(id).then(async z => {
+            if (z <= CLUSTER_MAX_ZOOM) {
+              map.easeTo({
+                center: centre,
+                zoom: Math.min(z + 0.25, 16),
+                pitch: pitchFor(z),
+                duration: 600,
+              });
+              return;
+            }
+            // Records stacked on one approximate pin never split; open their town instead.
+            const [leaf] = await src.getClusterLeaves(id, 1, 0);
+            const slug = leaf?.properties?.town as string | undefined;
+            if (slug) cb.current.onTown(slug);
+          });
+        } else if (pin) cb.current.onPin(String(pin.properties.id));
         else if (hit[0]) cb.current.onTown(String(hit[0].properties.slug));
         else cb.current.onBackground?.();
       });
@@ -458,7 +549,8 @@ export default function AklanMap3D({
           id: p.id,
           name: `${p.name} · ${p.label}${p.approximate ? ' (approximate location)' : ''}`,
           color: p.color,
-          letter: p.letter,
+          layer: p.layer,
+          town: p.town ?? '',
           approximate: p.approximate,
         },
         geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
@@ -577,32 +669,40 @@ export default function AklanMap3D({
     };
   }, [ready, boundaries, town, selected]);
 
-  // Anchored tooltip on the selected record, with a soft pulse.
+  // Selected pin grows and gains a ring; the label is anchored above it.
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map || !selected) return;
-    const dot = document.createElement('span');
-    dot.className = 'relative flex h-6 w-6';
-    dot.innerHTML =
-      '<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/60 motion-reduce:animate-none"></span><span class="relative m-1.5 inline-flex h-3 w-3 rounded-full bg-amber-500 ring-2 ring-white"></span>';
+    if (!ready || !map) return;
+    const id = selected?.id ?? '';
+    map.setLayoutProperty('pins', 'icon-size', pinSize(id));
+    map.setLayoutProperty('pins', 'symbol-sort-key', [
+      'case',
+      ['==', ['get', 'id'], id],
+      1,
+      0,
+    ]);
+    map.setFilter('pin-ring', [
+      'all',
+      ['!', ['has', 'point_count']],
+      ['==', ['get', 'id'], id],
+    ]);
+    if (!selected) return;
     const label = document.createElement('div');
     const title = document.createElement('strong');
     title.textContent = selected.name;
     const sub = document.createElement('div');
     sub.textContent = selected.label;
     label.append(title, sub);
-    const marker = new maplibregl.Marker({ element: dot })
+    const popup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      offset: 22,
+    })
       .setLngLat([selected.lon, selected.lat])
-      .setPopup(
-        new maplibregl.Popup({
-          closeButton: false,
-          offset: 16,
-        }).setDOMContent(label)
-      )
+      .setDOMContent(label)
       .addTo(map);
-    marker.togglePopup();
     return () => {
-      marker.remove();
+      popup.remove();
     };
   }, [ready, selected]);
 

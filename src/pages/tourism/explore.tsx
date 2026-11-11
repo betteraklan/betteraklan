@@ -33,7 +33,8 @@ import {
 import { type BoundaryFeature } from '@/lib/tourism/geo';
 
 import AklanMap3D, { type MapPin } from './components/AklanMap3D';
-import { LAYER_COLOR, LAYER_ICON, LAYER_LETTER } from './components/layerMeta';
+import LayerGlyph from './components/LayerGlyph';
+import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
 import { DatePill, LocationPill, Pill } from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
@@ -147,7 +148,8 @@ export default function TourismExplore() {
             lat: selected.lat,
             lon: selected.lon,
             color: LAYER_COLOR[selected.layer],
-            letter: LAYER_LETTER[selected.layer],
+            layer: selected.layer,
+            town: selected.town,
             approximate: selected.placement === 'approximate',
             label: `${LAYER_LABEL[selected.layer]} · ${PLACEMENT_LABEL[selected.placement]}`,
           }
@@ -181,7 +183,8 @@ export default function TourismExplore() {
         lat: r.lat,
         lon: r.lon,
         color: LAYER_COLOR[r.layer],
-        letter: LAYER_LETTER[r.layer],
+        layer: r.layer,
+        town: r.town,
         approximate: r.placement === 'approximate',
         label: LAYER_LABEL[r.layer],
       })),
@@ -508,17 +511,7 @@ export default function TourismExplore() {
                         }
                         className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                       >
-                        <span
-                          aria-hidden='true'
-                          className='flex h-4 w-4 items-center justify-center rounded-full border-2 text-[9px] leading-none font-bold'
-                          style={{
-                            borderColor: LAYER_COLOR[k],
-                            background: on ? LAYER_COLOR[k] : 'transparent',
-                            color: on ? '#ffffff' : LAYER_COLOR[k],
-                          }}
-                        >
-                          {LAYER_LETTER[k]}
-                        </span>
+                        <LayerGlyph layer={k} hollow={!on} />
                         {LAYER_LABEL[k]}
                       </button>
                     );
@@ -587,11 +580,17 @@ export default function TourismExplore() {
                   More
                 </span>
                 <span className='flex items-center gap-1.5'>
+                  <LayerGlyph layer='stay' hollow />
+                  Dashed outline = approximate location
+                </span>
+                <span className='flex items-center gap-1.5'>
                   <span
                     aria-hidden='true'
-                    className='h-3 w-3 rounded-full border-2 border-dashed border-[#2563eb] bg-[#2563eb]/30'
-                  />
-                  Approximate location
+                    className='flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1D4FB0] px-1 text-[10px] font-bold text-white shadow-elev-1'
+                  >
+                    12
+                  </span>
+                  Group of records, tap to expand
                 </span>
                 <span className='flex items-center gap-1.5'>
                   <span

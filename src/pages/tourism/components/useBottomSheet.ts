@@ -5,6 +5,7 @@ import {
   type PointerEvent,
   type RefObject,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -110,6 +111,15 @@ export function useBottomSheet(
     el.style.transform = offset(visible);
   };
 
+  // The DOM transform always follows the snap and the current viewport. Set here
+  // rather than via the style prop, which React skips when its value is unchanged
+  // even though a drag moved the sheet in between.
+  useLayoutEffect(() => {
+    if (active) place(heights[snap], true);
+    // place only reads ref and heights, both covered here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, snap, heights]);
+
   // Slide up from off-screen when the sheet first appears.
   useEffect(() => {
     if (!active) return;
@@ -209,7 +219,6 @@ export function useBottomSheet(
     sheetStyle: active
       ? {
           height: heights.full,
-          transform: offset(heights[snap]),
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }
       : undefined,

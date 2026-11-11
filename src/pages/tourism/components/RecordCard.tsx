@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { LAYER_LABEL, type Rec, teaser } from '@/lib/tourism/explore';
 
-import { LAYER_COLOR, LAYER_ICON, LAYER_LETTER, townTint } from './layerMeta';
+import LayerGlyph from './LayerGlyph';
+import { LAYER_ICON, townTint } from './layerMeta';
 import { DatePill, LocationPill } from './StatusPills';
 
 interface Props {
@@ -72,13 +73,7 @@ export default function RecordCard({ rec, selected, onSelect }: Props) {
         )}
         <span className='flex flex-wrap items-center gap-1.5'>
           <span className='type-meta border-kapwa-border-weak text-kapwa-text-strong inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold'>
-            <span
-              aria-hidden='true'
-              className='flex h-4 w-4 items-center justify-center rounded-full text-[9px] leading-none font-bold text-white'
-              style={{ background: LAYER_COLOR[rec.layer] }}
-            >
-              {LAYER_LETTER[rec.layer]}
-            </span>
+            <LayerGlyph layer={rec.layer} />
             {LAYER_LABEL[rec.layer]}
           </span>
           {rec.layer === 'event' && <DatePill rec={rec} />}
