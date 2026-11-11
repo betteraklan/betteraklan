@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { TourismEntry } from '@/types/tourism';
 
-import { filterByDateRange, getDateStatus } from './festivalDates';
+import {
+  filterByDateRange,
+  formatDateRange,
+  getDateStatus,
+} from './festivalDates';
 
 const plain: TourismEntry = { name: 'No dates', description: '' };
 const confirmed: TourismEntry = {
@@ -53,5 +57,18 @@ describe('filterByDateRange', () => {
   });
   it('drops dated records that fall outside the range', () => {
     expect(filterByDateRange(all, '2027-02-01', '2027-02-28')).toEqual([plain]);
+  });
+});
+
+describe('formatDateRange', () => {
+  it('formats a single day without shifting by time zone', () => {
+    expect(formatDateRange('2027-01-10')).toMatch(/Jan 10, 2027/);
+  });
+
+  it('formats a range and collapses an end equal to the start', () => {
+    expect(formatDateRange('2027-01-10', '2027-01-16')).toMatch(
+      /Jan 10, 2027 – Jan 16, 2027/
+    );
+    expect(formatDateRange('2027-01-10', '2027-01-10')).not.toContain('–');
   });
 });

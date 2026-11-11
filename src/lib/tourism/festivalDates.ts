@@ -38,3 +38,18 @@ export const DATE_STATUS_LABEL: Record<DateStatus, string> = {
   tentative: 'Tentative',
   unavailable: 'Date not recorded',
 };
+
+const DAY = new Intl.DateTimeFormat('en-PH', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** Display form of recorded ISO dates: "Jan 10, 2027" or "Jan 10, 2027 – Jan 16, 2027". */
+export function formatDateRange(start: string, end?: string): string {
+  const a = DAY.format(new Date(`${start}T00:00:00Z`));
+  return end && end !== start
+    ? `${a} – ${DAY.format(new Date(`${end}T00:00:00Z`))}`
+    : a;
+}

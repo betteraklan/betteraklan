@@ -1,8 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import {
   ArrowRightIcon,
+  CalendarCheckIcon,
+  CalendarClockIcon,
+  CalendarX2Icon,
+  CheckCircle2Icon,
+  CircleDashedIcon,
   BedDoubleIcon,
   CalendarDaysIcon,
   ChevronDownIcon,
@@ -11,7 +23,7 @@ import {
   InfoIcon,
   LandmarkIcon,
   ListIcon,
-  MapPinIcon,
+  MapPinOffIcon,
   MapIcon,
   PlayIcon,
   SearchIcon,
@@ -21,11 +33,13 @@ import {
   SquareIcon,
 } from 'lucide-react';
 
-import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor } from '@/lib/tourism/advisories';
-import { DATE_STATUS_LABEL } from '@/lib/tourism/festivalDates';
+import {
+  DATE_STATUS_LABEL,
+  formatDateRange,
+} from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
   emptyReason,
@@ -102,18 +116,71 @@ const LAYER_LETTER: Record<Exclude<Layer, 'all'>, string> = {
 // Sea backdrop: soft wave lines, drawn once as an inline SVG.
 const WAVES = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cpath d='M0 12 Q15 2 30 12 T60 12 T90 12 T120 12' fill='none' stroke='%231D4FB0' stroke-width='1' stroke-opacity='.35'/%3E%3C/svg%3E")`;
 
-function PlacementBadge({ rec }: { rec: Rec }) {
-  const variant =
-    rec.placement === 'exact'
-      ? 'success'
-      : rec.placement === 'approximate'
-        ? 'warning'
-        : 'slate';
+// Status pills: icon + sentence-case text, so status reads at a glance and never by colour alone.
+const PILL_TONE = {
+  ok: 'bg-kapwa-bg-success-weak text-kapwa-text-success border-kapwa-border-success',
+  warn: 'bg-kapwa-bg-warning-weak text-kapwa-text-warning border-kapwa-border-warning',
+  none: 'bg-kapwa-bg-surface-raised text-kapwa-text-support border-kapwa-border-weak',
+} as const;
+
+function Pill({
+  tone,
+  icon: Icon,
+  children,
+}: {
+  tone: keyof typeof PILL_TONE;
+  icon: typeof CheckCircle2Icon;
+  children: ReactNode;
+}) {
   return (
-    <Badge variant={variant}>
-      {PLACEMENT_LABEL[rec.placement]}
-      {rec.placementNote ? ` · ${rec.placementNote}` : ''}
-    </Badge>
+    <span
+      className={`type-meta inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold whitespace-nowrap ${PILL_TONE[tone]}`}
+    >
+      <Icon aria-hidden='true' className='h-4 w-4 shrink-0' />
+      {children}
+    </span>
+  );
+}
+
+const LOCATION_PILL = {
+  exact: { tone: 'ok', icon: CheckCircle2Icon, text: 'Exact pin' },
+  approximate: {
+    tone: 'warn',
+    icon: CircleDashedIcon,
+    text: 'Approximate pin',
+  },
+  none: { tone: 'none', icon: MapPinOffIcon, text: 'Not on map' },
+} as const;
+
+function LocationPill({ placement }: { placement: Rec['placement'] }) {
+  const p = LOCATION_PILL[placement];
+  return (
+    <Pill tone={p.tone} icon={p.icon}>
+      {p.text}
+    </Pill>
+  );
+}
+
+function DatePill({ rec }: { rec: Rec }) {
+  const when = rec.dates?.start
+    ? formatDateRange(rec.dates.start, rec.dates.end)
+    : null;
+  if (rec.dateStatus === 'confirmed' && when)
+    return (
+      <Pill tone='ok' icon={CalendarCheckIcon}>
+        {when}
+      </Pill>
+    );
+  if (rec.dateStatus === 'tentative' && when)
+    return (
+      <Pill tone='warn' icon={CalendarClockIcon}>
+        Tentative · {when}
+      </Pill>
+    );
+  return (
+    <Pill tone='none' icon={CalendarX2Icon}>
+      {DATE_STATUS_LABEL.unavailable}
+    </Pill>
   );
 }
 
@@ -287,7 +354,7 @@ export default function TourismExplore() {
 
   return (
     <div
-      className={`[&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
+      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
       <header className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'>
         <div
@@ -306,13 +373,11 @@ export default function TourismExplore() {
               className='w-1.5 shrink-0 rounded-full bg-[#FCD116]'
             />
             <div>
-              <p className='hidden text-xs font-bold tracking-[0.2em] text-white/70 uppercase sm:block'>
+              <p className='type-meta hidden font-bold tracking-[0.2em] text-white/70 uppercase sm:block'>
                 BetterAklan Tourism
               </p>
-              <h1 className='kapwa-heading-lg text-white sm:mt-1'>
-                Explore Aklan
-              </h1>
-              <p className='mt-1 hidden max-w-xl text-white/85 sm:block sm:text-base'>
+              <h1 className='type-display text-white sm:mt-1'>Explore Aklan</h1>
+              <p className='type-body mt-1 hidden max-w-xl text-white/85 sm:block'>
                 Find places, festivals, and public visitor information across
                 all 17 municipalities.
               </p>
@@ -364,7 +429,7 @@ export default function TourismExplore() {
           id='explore-filters'
           className={`${filtersOpen ? 'flex' : 'hidden'} w-full flex-wrap items-end gap-3 sm:contents`}
         >
-          <label className='text-kapwa-text-strong text-xs font-bold'>
+          <label className='text-kapwa-text-strong type-meta font-semibold'>
             Municipality
             <select
               value={town}
@@ -382,7 +447,7 @@ export default function TourismExplore() {
               ))}
             </select>
           </label>
-          <label className='text-kapwa-text-strong text-xs font-bold'>
+          <label className='text-kapwa-text-strong type-meta font-semibold'>
             Layer
             <select
               value={layer}
@@ -398,7 +463,7 @@ export default function TourismExplore() {
             </select>
           </label>
           {HAS_DATED && (layer === 'event' || layer === 'all') && (
-            <fieldset className='flex flex-wrap gap-2 text-xs font-bold'>
+            <fieldset className='type-meta flex flex-wrap gap-2 font-semibold'>
               <legend className='sr-only'>Festival date range</legend>
               <label>
                 From
@@ -421,7 +486,7 @@ export default function TourismExplore() {
             </fieldset>
           )}
           {!HAS_DATED && layer === 'event' && (
-            <p className='text-kapwa-text-support self-center text-xs'>
+            <p className='text-kapwa-text-support type-meta self-center'>
               No festival dates are recorded yet, so there is no date filter.
             </p>
           )}
@@ -453,7 +518,7 @@ export default function TourismExplore() {
       {!reason &&
         (filters.from || filters.to) &&
         filtered.some(r => r.dateStatus === 'unavailable') && (
-          <p className='text-kapwa-text-muted text-xs'>
+          <p className='text-kapwa-text-muted type-meta'>
             {filtered.filter(r => r.dateStatus === 'unavailable').length} kept
             with no recorded date; the rest fall in the range.
           </p>
@@ -498,7 +563,7 @@ export default function TourismExplore() {
                             on ? [...h, k] : h.filter(x => x !== k)
                           )
                         }
-                        className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
+                        className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                       >
                         <span
                           aria-hidden='true'
@@ -519,7 +584,7 @@ export default function TourismExplore() {
                     type='button'
                     aria-pressed={shade}
                     onClick={() => setShade(v => !v)}
-                    className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
+                    className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                   >
                     Shade by records
                   </button>
@@ -549,14 +614,14 @@ export default function TourismExplore() {
                   key={selected?.id ?? town}
                   className='animate-in fade-in slide-in-from-bottom-2 pointer-events-none absolute bottom-4 left-3 z-[500] max-w-[70%] surface-glass px-4 py-2.5 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'
                 >
-                  <p className='text-kapwa-text-muted text-[11px] font-bold tracking-widest uppercase'>
+                  <p className='text-kapwa-text-muted type-meta font-semibold tracking-wider uppercase'>
                     {selected
                       ? LAYER_LABEL[selected.layer]
                       : townInfo
                         ? `Municipality · ${filtered.length} results`
                         : 'Province'}
                   </p>
-                  <p className='text-kapwa-text-strong text-xl font-bold sm:text-2xl'>
+                  <p className='text-kapwa-text-strong type-display'>
                     {selected?.name ?? townInfo?.name ?? 'Aklan'}
                   </p>
                 </div>
@@ -564,7 +629,7 @@ export default function TourismExplore() {
               <div
                 role='group'
                 aria-label='Map legend'
-                className='border-kapwa-border-weak text-kapwa-text-support flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3 text-xs'
+                className='border-kapwa-border-weak text-kapwa-text-support type-meta flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3'
               >
                 <span className='flex items-center gap-1.5'>
                   Fewer records
@@ -600,13 +665,13 @@ export default function TourismExplore() {
           <Card className='overflow-hidden rounded-card p-0' hover={false}>
             <h2
               aria-live='polite'
-              className='text-kapwa-text-strong border-kapwa-border-weak border-b px-4 pt-4 pb-3 text-xl font-bold'
+              className='text-kapwa-text-strong border-kapwa-border-weak type-title border-b px-4 pt-4 pb-3'
             >
               {filtered.length} record{filtered.length === 1 ? '' : 's'}
               {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
             </h2>
             {filtered.length === 0 ? (
-              <p className='text-kapwa-text-support p-6 text-sm'>{reason}</p>
+              <p className='text-kapwa-text-support type-body p-6'>{reason}</p>
             ) : (
               <ul className='divide-kapwa-border-weak divide-y lg:max-h-[60vh] lg:overflow-y-auto'>
                 {visible.map(r => (
@@ -618,38 +683,16 @@ export default function TourismExplore() {
                       className={`focus-visible:ring-kapwa-border-brand flex w-full transition-colors duration-(--dur-fast) items-center justify-between gap-3 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : 'hover:bg-kapwa-bg-hover'}`}
                     >
                       <span className='min-w-0 space-y-1'>
-                        <span className='text-kapwa-text-strong block text-sm font-bold'>
+                        <span className='text-kapwa-text-strong type-body block font-semibold'>
                           {r.name}
                         </span>
-                        <span className='text-kapwa-text-support block text-xs'>
+                        <span className='text-kapwa-text-support type-meta block'>
                           {LAYER_LABEL[r.layer]}
                           {r.townName ? ` · ${r.townName}` : ''}
                         </span>
-                        <span className='flex flex-wrap items-center gap-1.5 pt-1'>
-                          {r.placement !== 'exact' && (
-                            <span className='text-kapwa-text-muted inline-flex items-center gap-1 text-xs'>
-                              <MapPinIcon
-                                aria-hidden='true'
-                                className='h-3.5 w-3.5'
-                              />
-                              {r.placement === 'approximate'
-                                ? 'Approximate location'
-                                : 'Not on map'}
-                            </span>
-                          )}
-                          {r.layer === 'event' && (
-                            <Badge
-                              variant={
-                                r.dateStatus === 'confirmed'
-                                  ? 'success'
-                                  : r.dateStatus === 'tentative'
-                                    ? 'warning'
-                                    : 'slate'
-                              }
-                            >
-                              {DATE_STATUS_LABEL[r.dateStatus]}
-                            </Badge>
-                          )}
+                        <span className='flex flex-wrap items-center gap-1.5 pt-1.5'>
+                          {r.layer === 'event' && <DatePill rec={r} />}
+                          <LocationPill placement={r.placement} />
                         </span>
                       </span>
                       <ArrowRightIcon
@@ -689,7 +732,7 @@ export default function TourismExplore() {
               type='button'
               aria-expanded={sheetOpen}
               onClick={() => setSheetOpen(o => !o)}
-              className='text-kapwa-text-support flex w-full items-center justify-center gap-2 min-h-11 text-xs font-bold lg:hidden'
+              className='text-kapwa-text-support flex w-full items-center justify-center gap-2 min-h-11 type-meta font-semibold lg:hidden'
             >
               {sheetOpen ? (
                 <ChevronDownIcon aria-hidden='true' className='h-4 w-4' />
@@ -702,35 +745,37 @@ export default function TourismExplore() {
           {selected ? (
             <Card hover={false}>
               <CardContent className='space-y-3 p-5'>
-                <p className='text-kapwa-text-muted text-xs font-bold uppercase'>
+                <p className='text-kapwa-text-muted type-meta font-semibold tracking-wider uppercase'>
                   {LAYER_LABEL[selected.layer]}
                 </p>
-                <h2 className='text-kapwa-text-strong text-lg font-bold'>
+                <h2 className='text-kapwa-text-strong type-title'>
                   {selected.name}
                 </h2>
-                <p className='text-kapwa-text-support text-sm'>
+                <p className='text-kapwa-text-support type-body'>
                   {selected.description}
                 </p>
-                <dl className='space-y-1 text-xs'>
-                  <div>
-                    <dt className='inline font-bold'>Location: </dt>
-                    <dd className='inline'>
-                      <PlacementBadge rec={selected} />
-                    </dd>
-                  </div>
+                <dl className='type-meta space-y-2'>
                   {selected.layer === 'event' && (
-                    <div>
-                      <dt className='inline font-bold'>Date: </dt>
-                      <dd className='inline'>
-                        {DATE_STATUS_LABEL[selected.dateStatus]}
-                        {selected.dates?.start
-                          ? ` · ${selected.dates.start}${selected.dates.end ? ` to ${selected.dates.end}` : ''}`
-                          : ''}
+                    <div className='flex flex-wrap items-center gap-2'>
+                      <dt className='font-semibold'>Date</dt>
+                      <dd>
+                        <DatePill rec={selected} />
                       </dd>
                     </div>
                   )}
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <dt className='font-semibold'>Location</dt>
+                    <dd className='flex flex-wrap items-center gap-2'>
+                      <LocationPill placement={selected.placement} />
+                      {selected.placementNote && (
+                        <span className='text-kapwa-text-support'>
+                          {selected.placementNote}
+                        </span>
+                      )}
+                    </dd>
+                  </div>
                   <div>
-                    <dt className='inline font-bold'>Last checked: </dt>
+                    <dt className='inline font-semibold'>Last checked: </dt>
                     <dd className='inline'>
                       {selected.dates?.lastCheckedAt ?? 'Not recorded'}
                     </dd>
@@ -741,7 +786,7 @@ export default function TourismExplore() {
                     href={selected.dates.sourceUrl}
                     target='_blank'
                     rel='noreferrer'
-                    className='text-kapwa-text-brand inline-flex items-center gap-1 text-xs font-bold hover:underline'
+                    className='text-kapwa-text-brand type-meta inline-flex items-center gap-1 font-semibold hover:underline'
                   >
                     Source{' '}
                     <ExternalLinkIcon aria-hidden='true' className='h-3 w-3' />
@@ -750,7 +795,7 @@ export default function TourismExplore() {
                 <button
                   type='button'
                   onClick={() => update({ sel: '' })}
-                  className='text-kapwa-text-support block text-xs underline'
+                  className='text-kapwa-text-support type-meta block underline'
                 >
                   Clear selection
                 </button>
@@ -762,10 +807,10 @@ export default function TourismExplore() {
             <Card hover={false} className='rounded-card'>
               <CardContent className='space-y-4 p-5'>
                 <div>
-                  <h2 className='text-kapwa-text-strong text-3xl font-bold'>
+                  <h2 className='text-kapwa-text-strong type-display'>
                     {townInfo.name}
                   </h2>
-                  <p className='text-kapwa-text-support text-base font-semibold'>
+                  <p className='text-kapwa-text-support type-meta font-semibold'>
                     Municipality overview
                   </p>
                 </div>
@@ -791,7 +836,7 @@ export default function TourismExplore() {
                             />
                             {LAYER_LABEL[k]}
                           </span>
-                          <span className='text-kapwa-text-support text-sm'>
+                          <span className='text-kapwa-text-support type-meta'>
                             {n
                               ? `${n} record${n === 1 ? '' : 's'}`
                               : 'No records yet'}
@@ -808,11 +853,9 @@ export default function TourismExplore() {
                   })}
                 </ul>
                 <div>
-                  <h3 className='text-kapwa-text-strong text-2xl font-bold'>
-                    Notices
-                  </h3>
+                  <h3 className='text-kapwa-text-strong type-title'>Notices</h3>
                   {advisoriesFor(townInfo.slug).length ? (
-                    <ul className='mt-2 space-y-2 text-sm'>
+                    <ul className='type-body mt-2 space-y-2'>
                       {advisoriesFor(townInfo.slug).map(a => (
                         <li key={a.id}>
                           <strong>{a.title}</strong> · {a.issuer} · published{' '}
@@ -822,7 +865,7 @@ export default function TourismExplore() {
                             href={a.sourceUrl}
                             target='_blank'
                             rel='noreferrer'
-                            className='text-kapwa-text-brand block text-xs hover:underline'
+                            className='text-kapwa-text-brand type-meta block hover:underline'
                           >
                             Source
                           </a>
@@ -830,14 +873,14 @@ export default function TourismExplore() {
                       ))}
                     </ul>
                   ) : (
-                    <p className='text-kapwa-text-support mt-2 text-sm'>
+                    <p className='text-kapwa-text-support type-body mt-2'>
                       No verified notices published.
                     </p>
                   )}
                 </div>
                 <Link
                   to={`/tourism/${townInfo.slug}`}
-                  className='text-kapwa-text-brand inline-flex items-center gap-2 text-base font-bold hover:underline'
+                  className='text-kapwa-text-brand type-body inline-flex items-center gap-2 font-bold hover:underline'
                 >
                   View municipality page
                   <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
@@ -847,7 +890,7 @@ export default function TourismExplore() {
           )}
 
           {!selected && !townInfo && (
-            <p className='text-kapwa-text-support text-sm'>
+            <p className='text-kapwa-text-support type-body'>
               Select a result on the map or in the list to see its details,
               source, and location precision.
             </p>
@@ -859,7 +902,7 @@ export default function TourismExplore() {
         aria-labelledby='sources-heading'
         className='bg-kapwa-bg-surface border-kapwa-border-weak space-y-5 rounded-card border p-5 shadow-elev-1 sm:p-6'
       >
-        <div className='bg-kapwa-bg-brand-weak text-kapwa-text-strong flex gap-3 rounded-panel p-4 text-sm'>
+        <div className='bg-kapwa-bg-brand-weak text-kapwa-text-strong type-body flex gap-3 rounded-panel p-4'>
           <InfoIcon
             aria-hidden='true'
             className='text-kapwa-text-brand mt-0.5 h-5 w-5 shrink-0'
@@ -870,18 +913,15 @@ export default function TourismExplore() {
             Check with the venue or organiser before you travel.
           </p>
         </div>
-        <h2
-          id='sources-heading'
-          className='text-kapwa-text-strong text-2xl font-bold'
-        >
+        <h2 id='sources-heading' className='text-kapwa-text-strong type-title'>
           Information and sources
         </h2>
         <div className='grid gap-4 md:grid-cols-3'>
           <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
-            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+            <h3 className='text-kapwa-text-strong type-meta font-bold tracking-wide uppercase'>
               Where records come from
             </h3>
-            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+            <ul className='text-kapwa-text-support type-body space-y-3'>
               <li>
                 Places, festivals and products:{' '}
                 <a
@@ -908,39 +948,45 @@ export default function TourismExplore() {
             </ul>
           </div>
           <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
-            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+            <h3 className='text-kapwa-text-strong type-meta font-bold tracking-wide uppercase'>
               Location precision
             </h3>
-            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+            <ul className='text-kapwa-text-support type-body space-y-3'>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='success'>Exact location</Badge>
+                <LocationPill placement='exact' />
                 Pinned at the published address.
               </li>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='warning'>Approximate pin</Badge>
+                <LocationPill placement='approximate' />
                 Placed by area or municipality; not exact.
               </li>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='slate'>Location unavailable</Badge>
+                <LocationPill placement='none' />
                 Listed, but not on the map.
               </li>
             </ul>
           </div>
           <div className='border-kapwa-border-weak space-y-2 rounded-panel border p-4'>
-            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+            <h3 className='text-kapwa-text-strong type-meta font-bold tracking-wide uppercase'>
               Dates and notices
             </h3>
-            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+            <ul className='text-kapwa-text-support type-body space-y-3'>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='success'>{DATE_STATUS_LABEL.confirmed}</Badge>
+                <Pill tone='ok' icon={CalendarCheckIcon}>
+                  Confirmed date
+                </Pill>
                 Date from a cited source.
               </li>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='warning'>{DATE_STATUS_LABEL.tentative}</Badge>
+                <Pill tone='warn' icon={CalendarClockIcon}>
+                  Tentative · date
+                </Pill>
                 Source says the date may change.
               </li>
               <li className='flex flex-col items-start gap-1'>
-                <Badge variant='slate'>{DATE_STATUS_LABEL.unavailable}</Badge>
+                <Pill tone='none' icon={CalendarX2Icon}>
+                  {DATE_STATUS_LABEL.unavailable}
+                </Pill>
                 No source date. Never estimated.
               </li>
               <li>
@@ -949,7 +995,7 @@ export default function TourismExplore() {
             </ul>
           </div>
         </div>
-        <p className='text-kapwa-text-muted text-xs'>
+        <p className='text-kapwa-text-muted type-meta'>
           Last checked: Not recorded. Map data &copy; OpenStreetMap
           contributors. Accommodation locations are geocoded from published
           addresses and may not be exact.

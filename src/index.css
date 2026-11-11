@@ -176,3 +176,30 @@
     transition: none;
   }
 }
+
+/* --- TYPE SCALE (tourism section) ---
+   Three heading roles plus body. Body never drops below 16px. */
+@utility type-display {
+  font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.25rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+@utility type-title {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+@utility type-meta {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
