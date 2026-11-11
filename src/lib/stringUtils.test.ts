@@ -86,12 +86,12 @@ describe('toTitleCase() - title case formatter', () => {
   });
 
   it('keeps minor words lowercase except first word', () => {
-    const result = toTitleCase('MAYOR OF THE TOWN');
+    const result = toTitleCase('GOVERNOR OF THE TOWN');
     expect(result).toBe('Governor of the Town');
   });
 
   it('capitalizes first word even if minor word', () => {
-    const result = toTitleCase('the office of mayor');
+    const result = toTitleCase('the office of governor');
     expect(result).toBe('The Office of Governor');
   });
 
@@ -111,7 +111,7 @@ describe('toTitleCase() - title case formatter', () => {
   });
 
   it('handles single word', () => {
-    const result = toTitleCase('mayor');
+    const result = toTitleCase('governor');
     expect(result).toBe('Governor');
   });
 
@@ -131,7 +131,7 @@ describe('toTitleCase() - title case formatter', () => {
   });
 
   it('handles minor word after first word', () => {
-    const result = toTitleCase('MAYOR OF MUNICIPALITY');
+    const result = toTitleCase('GOVERNOR OF MUNICIPALITY');
     expect(result).toBe('Governor of Municipality');
   });
 

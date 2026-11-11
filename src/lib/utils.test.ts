@@ -117,22 +117,22 @@ describe('getRandomNumber() - random number generation', () => {
 });
 
 describe('toTelUri() - phone number to tel: URI conversion', () => {
-  it('converts local 7-digit number with area code 049', () => {
+  it('converts landline with Aklan area code 036', () => {
     const result = toTelUri('(036) 272-7000');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63362727000');
   });
 
   it('handles number with extension keyword', () => {
     const result = toTelUri('(036) 272-7000 ext 3000');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63362727000');
   });
 
   it('handles number with comma extension separator', () => {
     const result = toTelUri('(036) 272-7000, 3000');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63362727000');
   });
 
-  it('converts 9-digit number starting with 049', () => {
+  it('converts 10-digit landline from another area code', () => {
     const result = toTelUri('049 536 7965');
     expect(result).toBe('tel:+63495367965');
   });
@@ -144,12 +144,12 @@ describe('toTelUri() - phone number to tel: URI conversion', () => {
 
   it('handles various extension formats', () => {
     const result = toTelUri('(036) 272-7000 ex 3000');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63362727000');
   });
 
   it('handles "x" extension format', () => {
     const result = toTelUri('(036) 272-7000 x3000');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63362727000');
   });
 
   it('returns null for null input', () => {
@@ -169,7 +169,7 @@ describe('toTelUri() - phone number to tel: URI conversion', () => {
 
   it('handles 7-digit number with spaces', () => {
     const result = toTelUri('530 2981');
-    expect(result).toBe('tel:+63495302981');
+    expect(result).toBe('tel:+63365302981');
   });
 
   it('handles 9-digit number with hyphens', () => {

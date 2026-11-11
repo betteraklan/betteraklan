@@ -25,11 +25,13 @@ export const getRandomNumber = (min: number, max: number): number => {
 /**
  * Convert phone number to tel: URI format (E.164)
  * Handles various formats:
- * - "(036) 272-7000 ext 3000" → "tel:+63495302981"
- * - "(036) 272-7000, 3000" → "tel:+63495302981"
+ * - "(036) 272-7000 ext 3000" → "tel:+63362727000"
+ * - "272 7000" (local, no area code) → "tel:+63362727000"
  * - "049 536 7965" → "tel:+63495367965"
  * - "0927 509 1198" → "tel:+639275091198"
  */
+const AKLAN_AREA_CODE = '36';
+
 export function toTelUri(phone: string | null): string | null {
   if (!phone) return null;
 
@@ -42,10 +44,10 @@ export function toTelUri(phone: string | null): string | null {
 
   // Handle different formats
   if (mainNumber.length === 7) {
-    // Local: 5302981 → add 049 area code → +63495302981
-    return `tel:+6349${mainNumber}`;
-  } else if (mainNumber.length === 10 && mainNumber.startsWith('049')) {
-    // With area code: 0495367965 → +63495367965 (remove leading 0)
+    // Local: 2727000 → add Aklan's 036 area code → +63362727000
+    return `tel:+63${AKLAN_AREA_CODE}${mainNumber}`;
+  } else if (mainNumber.length === 10 && mainNumber.startsWith('0')) {
+    // Landline with area code: 0362727000 → +63362727000 (remove leading 0)
     return `tel:+63${mainNumber.slice(1)}`;
   } else if (mainNumber.length === 11 && mainNumber.startsWith('0')) {
     // Mobile: 09275091198 → +639275091198
