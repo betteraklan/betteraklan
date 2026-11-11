@@ -4,12 +4,20 @@ import { Link, useSearchParams } from 'react-router-dom';
 import type { GeoJsonObject } from 'geojson';
 import L from 'leaflet';
 import {
+  ArrowRightIcon,
+  BedDoubleIcon,
+  CalendarDaysIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   ExternalLinkIcon,
-  MapPinIcon,
+  InfoIcon,
+  LandmarkIcon,
+  ListIcon,
+  MapIcon,
   PlayIcon,
   SearchIcon,
+  Share2Icon,
+  ShoppingBasketIcon,
   SlidersHorizontalIcon,
   SquareIcon,
 } from 'lucide-react';
@@ -81,15 +89,23 @@ const TOWNS_GEOJSON = {
 } as unknown as GeoJsonObject;
 // Shading ramp for record counts: brighter means more BetterAklan records.
 const TIER_COLOR = [
-  '#1B2B47',
-  '#1D3557',
-  '#24508F',
-  '#2F6FDB',
-  '#5B9BFF',
-  '#B9D6FF',
+  '#EEF3FB',
+  '#D6E4FA',
+  '#A9C7F5',
+  '#6FA0EC',
+  '#3B78DB',
+  '#1D4FB0',
 ];
 const GLASS =
-  'border border-white/20 bg-[rgba(10,22,40,0.74)] text-white shadow-xl backdrop-blur-md';
+  'border border-kapwa-border-weak bg-white/90 text-kapwa-text-strong shadow-lg backdrop-blur-md';
+const FIELD =
+  'border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong rounded-lg border px-3 py-2.5 text-sm';
+const LAYER_ICON = {
+  place: LandmarkIcon,
+  event: CalendarDaysIcon,
+  stay: BedDoubleIcon,
+  product: ShoppingBasketIcon,
+} as const;
 const TOWN_BOUNDS = new Map(
   SOURCES.boundaries.map(f => [f.properties.slug, boundsOf(f)])
 );
@@ -274,25 +290,37 @@ export default function TourismExplore() {
     <div
       className={`animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='bg-kapwa-bg-surface border-kapwa-border-weak rounded-xl border p-6 shadow-sm'>
-        <div className='flex items-center gap-3'>
-          <MapPinIcon
+      <header className='flex flex-wrap items-center justify-between gap-4'>
+        <div className='flex items-stretch gap-4'>
+          <span
             aria-hidden='true'
-            className='text-kapwa-text-brand h-5 w-5'
+            className='w-1.5 shrink-0 rounded-full bg-[#FCD116]'
           />
-          <h1 className='kapwa-heading-lg text-kapwa-text-strong'>
-            Explore Aklan
-          </h1>
+          <div>
+            <h1 className='kapwa-heading-lg text-kapwa-text-strong'>
+              Explore Aklan
+            </h1>
+            <p className='text-kapwa-text-support mt-1 text-sm sm:text-base'>
+              Find places, festivals, and public visitor information.
+            </p>
+          </div>
         </div>
-        <p className='text-kapwa-text-support mt-2 text-sm'>
-          Places, festivals, accommodation listings, and local products from
-          BetterAklan&apos;s records. Approximate pins show area or municipality
-          locations, not exact ones.
-        </p>
+        <button
+          type='button'
+          onClick={() => {
+            const url = window.location.href;
+            if (navigator.share) void navigator.share({ url }).catch(() => {});
+            else void navigator.clipboard?.writeText(url);
+          }}
+          className='bg-kapwa-bg-brand-default text-kapwa-text-inverse inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold shadow-sm'
+        >
+          <Share2Icon aria-hidden='true' className='h-4 w-4' />
+          Share view
+        </button>
       </header>
 
-      {/* Controls: search stays visible; the rest folds away on phones. */}
-      <div className='flex flex-wrap items-end gap-3'>
+      {/* Controls card: search stays visible; the rest folds away on phones. */}
+      <div className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-2xl border p-3 shadow-sm sm:p-4'>
         <label className='relative min-w-[200px] flex-1'>
           <span className='sr-only'>Search records</span>
           <SearchIcon
@@ -304,7 +332,7 @@ export default function TourismExplore() {
             value={q}
             onChange={e => update({ q: e.target.value, sel: '' })}
             placeholder='Search records'
-            className='border-kapwa-border-weak bg-kapwa-bg-surface w-full rounded-md border py-2 pr-3 pl-9 text-sm'
+            className={`${FIELD} w-full pl-9`}
           />
         </label>
         <button
@@ -312,7 +340,7 @@ export default function TourismExplore() {
           aria-expanded={filtersOpen}
           aria-controls='explore-filters'
           onClick={() => setFiltersOpen(o => !o)}
-          className='border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold sm:hidden'
+          className={`${FIELD} inline-flex items-center gap-2 font-bold sm:hidden`}
         >
           <SlidersHorizontalIcon aria-hidden='true' className='h-4 w-4' />
           Filters
@@ -329,7 +357,7 @@ export default function TourismExplore() {
                 setTouring(false);
                 update({ town: e.target.value, sel: '' });
               }}
-              className='border-kapwa-border-weak bg-kapwa-bg-surface mt-1 block rounded-md border px-3 py-2 text-sm font-normal'
+              className={`${FIELD} mt-1 block font-normal`}
             >
               <option value=''>All municipalities</option>
               {MUNICIPALITIES.map(m => (
@@ -344,7 +372,7 @@ export default function TourismExplore() {
             <select
               value={layer}
               onChange={e => update({ layer: e.target.value, sel: '' })}
-              className='border-kapwa-border-weak bg-kapwa-bg-surface mt-1 block rounded-md border px-3 py-2 text-sm font-normal'
+              className={`${FIELD} mt-1 block font-normal`}
             >
               <option value='all'>All records</option>
               {(Object.keys(LAYER_LABEL) as Exclude<Layer, 'all'>[]).map(k => (
@@ -363,7 +391,7 @@ export default function TourismExplore() {
                   type='date'
                   value={from}
                   onChange={e => update({ from: e.target.value })}
-                  className='border-kapwa-border-weak bg-kapwa-bg-surface mt-1 block rounded-md border px-2 py-1.5 text-sm font-normal'
+                  className={`${FIELD} mt-1 block px-2 py-1.5 font-normal`}
                 />
               </label>
               <label>
@@ -372,7 +400,7 @@ export default function TourismExplore() {
                   type='date'
                   value={to}
                   onChange={e => update({ to: e.target.value })}
-                  className='border-kapwa-border-weak bg-kapwa-bg-surface mt-1 block rounded-md border px-2 py-1.5 text-sm font-normal'
+                  className={`${FIELD} mt-1 block px-2 py-1.5 font-normal`}
                 />
               </label>
             </fieldset>
@@ -381,7 +409,7 @@ export default function TourismExplore() {
         <div
           role='group'
           aria-label='View'
-          className='flex overflow-hidden rounded-md border text-sm font-bold'
+          className='border-kapwa-border-weak flex overflow-hidden rounded-lg border text-sm font-bold'
         >
           {(['map', 'list'] as const).map(v => (
             <button
@@ -389,8 +417,13 @@ export default function TourismExplore() {
               type='button'
               aria-pressed={view === v}
               onClick={() => update({ view: v })}
-              className={`px-4 py-2 capitalize ${view === v ? 'bg-kapwa-bg-brand-default text-kapwa-text-inverse' : 'bg-kapwa-bg-surface text-kapwa-text-strong'}`}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 capitalize ${view === v ? 'bg-kapwa-bg-brand-default text-kapwa-text-inverse' : 'bg-kapwa-bg-surface text-kapwa-text-strong'}`}
             >
+              {v === 'map' ? (
+                <MapIcon aria-hidden='true' className='h-4 w-4' />
+              ) : (
+                <ListIcon aria-hidden='true' className='h-4 w-4' />
+              )}
               {v}
             </button>
           ))}
@@ -422,7 +455,6 @@ export default function TourismExplore() {
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                    className='[filter:invert(1)_hue-rotate(200deg)_brightness(0.8)_saturate(0.5)]'
                   />
                   <GeoJSON
                     key={`${town}|${shade}|${filtered.length}|${params.toString()}`}
@@ -433,11 +465,10 @@ export default function TourismExplore() {
                       const tier =
                         shade && n ? Math.ceil((5 * n) / maxCount) : 0;
                       return {
-                        color:
-                          slug === town ? '#FCD116' : 'rgba(190,212,250,0.6)',
+                        color: slug === town ? '#1D4FB0' : '#7A93BD',
                         weight: slug === town ? 2.6 : 1,
                         fillColor: TIER_COLOR[tier],
-                        fillOpacity: town && slug !== town ? 0.45 : 0.8,
+                        fillOpacity: town && slug !== town ? 0.3 : 0.6,
                       };
                     }}
                     onEachFeature={(feature, lyr) => {
@@ -448,10 +479,11 @@ export default function TourismExplore() {
                         { sticky: true }
                       );
                       lyr.on({
-                        mouseover: e => e.target.setStyle({ fillOpacity: 1 }),
+                        mouseover: e =>
+                          e.target.setStyle({ fillOpacity: 0.85 }),
                         mouseout: e =>
                           e.target.setStyle({
-                            fillOpacity: town && slug !== town ? 0.45 : 0.8,
+                            fillOpacity: town && slug !== town ? 0.3 : 0.6,
                           }),
                         click: () => {
                           setTouring(false);
@@ -502,7 +534,7 @@ export default function TourismExplore() {
                 <div
                   role='group'
                   aria-label='Map layers'
-                  className={`${GLASS} absolute top-[84px] left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
+                  className={`${GLASS} absolute top-[96px] left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto rounded-2xl p-2 sm:flex-col`}
                 >
                   {(
                     Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
@@ -518,11 +550,11 @@ export default function TourismExplore() {
                             on ? [...h, k] : h.filter(x => x !== k)
                           )
                         }
-                        className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-white/15' : 'opacity-60'}`}
+                        className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
                       >
                         <span
                           aria-hidden='true'
-                          className='h-2.5 w-2.5 rounded-full border border-white'
+                          className='h-2.5 w-2.5 rounded-full border border-white shadow-sm'
                           style={{
                             background: on ? LAYER_COLOR[k] : 'transparent',
                           }}
@@ -535,7 +567,7 @@ export default function TourismExplore() {
                     type='button'
                     aria-pressed={shade}
                     onClick={() => setShade(v => !v)}
-                    className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-white/15' : 'opacity-60'}`}
+                    className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
                   >
                     Shade by records
                   </button>
@@ -561,50 +593,63 @@ export default function TourismExplore() {
                   )}
                   {touring ? 'Stop tour' : 'Tour Aklan'}
                 </button>
-                <div className='pointer-events-none absolute inset-x-0 bottom-0 z-[500] flex flex-col justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-4 pt-20 text-white sm:flex-row sm:items-end'>
-                  <div
-                    key={selected?.id ?? town}
-                    className='animate-in fade-in slide-in-from-bottom-2 duration-700 motion-reduce:animate-none'
-                  >
-                    <p className='text-xs font-bold tracking-widest uppercase opacity-80'>
-                      {selected
-                        ? LAYER_LABEL[selected.layer]
-                        : townInfo
-                          ? `Municipality · ${filtered.length} results`
-                          : 'Province'}
-                    </p>
-                    <p className='text-2xl font-bold sm:text-3xl'>
-                      {selected?.name ?? townInfo?.name ?? 'Aklan'}
-                    </p>
-                  </div>
-                  <div
-                    aria-label='Map legend'
-                    role='group'
-                    className='text-[11px]'
-                  >
-                    <div className='flex items-center gap-1.5'>
-                      <span>Fewer records</span>
-                      {TIER_COLOR.slice(1).map(c => (
-                        <span
-                          key={c}
-                          aria-hidden='true'
-                          className='h-2.5 w-5'
-                          style={{ background: c }}
-                        />
-                      ))}
-                      <span>More</span>
-                    </div>
-                    <p className='mt-1 opacity-80'>
-                      Faded dashed pins = approximate location
-                    </p>
-                  </div>
+                <div
+                  key={selected?.id ?? town}
+                  className='animate-in fade-in slide-in-from-bottom-2 pointer-events-none absolute bottom-4 left-3 z-[500] max-w-[70%] rounded-xl bg-white/90 px-4 py-2.5 shadow-lg backdrop-blur-md duration-700 motion-reduce:animate-none'
+                >
+                  <p className='text-kapwa-text-muted text-[11px] font-bold tracking-widest uppercase'>
+                    {selected
+                      ? LAYER_LABEL[selected.layer]
+                      : townInfo
+                        ? `Municipality · ${filtered.length} results`
+                        : 'Province'}
+                  </p>
+                  <p className='text-kapwa-text-strong text-xl font-bold sm:text-2xl'>
+                    {selected?.name ?? townInfo?.name ?? 'Aklan'}
+                  </p>
                 </div>
+              </div>
+              <div
+                role='group'
+                aria-label='Map legend'
+                className='border-kapwa-border-weak text-kapwa-text-support flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3 text-xs'
+              >
+                <span className='flex items-center gap-1.5'>
+                  Fewer records
+                  {TIER_COLOR.slice(1).map(c => (
+                    <span
+                      key={c}
+                      aria-hidden='true'
+                      className='h-2.5 w-5'
+                      style={{ background: c }}
+                    />
+                  ))}
+                  More
+                </span>
+                <span className='flex items-center gap-1.5'>
+                  <span
+                    aria-hidden='true'
+                    className='h-3 w-3 rounded-full border-2 border-dashed border-[#2563eb] bg-[#2563eb]/30'
+                  />
+                  Approximate location
+                </span>
+                <span className='flex items-center gap-1.5'>
+                  <span
+                    aria-hidden='true'
+                    className='h-3 w-5 rounded-sm border-2 border-[#1D4FB0] bg-[#D6E4FA]'
+                  />
+                  Selected municipality
+                </span>
               </div>
             </Card>
           ) : null}
 
           {/* Results: always rendered so keyboard users can reach them in both views. */}
-          <Card className='overflow-hidden p-0' hover={false}>
+          <Card className='overflow-hidden rounded-2xl p-0' hover={false}>
+            <h2 className='text-kapwa-text-strong border-kapwa-border-weak border-b px-4 pt-4 pb-3 text-xl font-bold'>
+              {filtered.length} record{filtered.length === 1 ? '' : 's'}
+              {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
+            </h2>
             {filtered.length === 0 ? (
               <p className='text-kapwa-text-support p-6 text-sm'>{reason}</p>
             ) : (
@@ -615,31 +660,37 @@ export default function TourismExplore() {
                       type='button'
                       aria-pressed={sel === r.id}
                       onClick={() => select(r.id)}
-                      className={`focus-visible:ring-kapwa-border-brand w-full space-y-1 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : ''}`}
+                      className={`focus-visible:ring-kapwa-border-brand flex w-full items-center justify-between gap-3 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : 'hover:bg-kapwa-bg-hover'}`}
                     >
-                      <span className='text-kapwa-text-strong block text-sm font-bold'>
-                        {r.name}
+                      <span className='min-w-0 space-y-1'>
+                        <span className='text-kapwa-text-strong block text-sm font-bold'>
+                          {r.name}
+                        </span>
+                        <span className='text-kapwa-text-support block text-xs'>
+                          {LAYER_LABEL[r.layer]}
+                          {r.townName ? ` · ${r.townName}` : ''}
+                        </span>
+                        <span className='flex flex-wrap gap-1.5 pt-1'>
+                          <PlacementBadge rec={r} />
+                          {r.layer === 'event' && (
+                            <Badge
+                              variant={
+                                r.dateStatus === 'confirmed'
+                                  ? 'success'
+                                  : r.dateStatus === 'tentative'
+                                    ? 'warning'
+                                    : 'slate'
+                              }
+                            >
+                              {DATE_STATUS_LABEL[r.dateStatus]}
+                            </Badge>
+                          )}
+                        </span>
                       </span>
-                      <span className='text-kapwa-text-support block text-xs'>
-                        {LAYER_LABEL[r.layer]}
-                        {r.townName ? ` · ${r.townName}` : ''}
-                      </span>
-                      <span className='flex flex-wrap gap-1.5 pt-1'>
-                        <PlacementBadge rec={r} />
-                        {r.layer === 'event' && (
-                          <Badge
-                            variant={
-                              r.dateStatus === 'confirmed'
-                                ? 'success'
-                                : r.dateStatus === 'tentative'
-                                  ? 'warning'
-                                  : 'slate'
-                            }
-                          >
-                            {DATE_STATUS_LABEL[r.dateStatus]}
-                          </Badge>
-                        )}
-                      </span>
+                      <ArrowRightIcon
+                        aria-hidden='true'
+                        className='text-kapwa-text-brand h-5 w-5 shrink-0'
+                      />
                     </button>
                   </li>
                 ))}
@@ -743,55 +794,77 @@ export default function TourismExplore() {
           ) : null}
 
           {townInfo && (
-            <Card hover={false}>
-              <CardContent className='space-y-3 p-5'>
-                <h2 className='text-kapwa-text-strong text-lg font-bold'>
-                  {townInfo.name}
-                </h2>
-                {(['place', 'event', 'product', 'stay'] as const).map(k => {
-                  const n = ALL_RECORDS.filter(
-                    r => r.town === townInfo.slug && r.layer === k
-                  ).length;
-                  return (
-                    <p key={k} className='text-kapwa-text-support text-sm'>
-                      <span className='font-bold'>{LAYER_LABEL[k]}: </span>
-                      {n
-                        ? `${n} record${n === 1 ? '' : 's'}`
-                        : 'BetterAklan has no records for this category yet.'}
-                    </p>
-                  );
-                })}
-                <h3 className='text-kapwa-text-strong pt-2 text-sm font-bold'>
-                  Notices
-                </h3>
-                {advisoriesFor(townInfo.slug).length ? (
-                  <ul className='space-y-2 text-sm'>
-                    {advisoriesFor(townInfo.slug).map(a => (
-                      <li key={a.id}>
-                        <strong>{a.title}</strong> · {a.issuer} · published{' '}
-                        {a.publishedAt}
-                        {a.endsAt ? ` · until ${a.endsAt}` : ''}
-                        <a
-                          href={a.sourceUrl}
-                          target='_blank'
-                          rel='noreferrer'
-                          className='text-kapwa-text-brand block text-xs hover:underline'
-                        >
-                          Source
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className='text-kapwa-text-support text-sm'>
-                    No verified notices are published for this municipality yet.
+            <Card hover={false} className='rounded-2xl'>
+              <CardContent className='space-y-4 p-5'>
+                <div>
+                  <h2 className='text-kapwa-text-strong text-3xl font-bold'>
+                    {townInfo.name}
+                  </h2>
+                  <p className='text-kapwa-text-support text-base font-semibold'>
+                    Municipality overview
                   </p>
-                )}
+                </div>
+                <ul className='divide-kapwa-border-weak border-kapwa-border-weak divide-y border-y'>
+                  {(['place', 'event', 'stay', 'product'] as const).map(k => {
+                    const n = ALL_RECORDS.filter(
+                      r => r.town === townInfo.slug && r.layer === k
+                    ).length;
+                    const Icon = LAYER_ICON[k];
+                    return (
+                      <li
+                        key={k}
+                        className='flex items-center justify-between gap-3 py-3'
+                      >
+                        <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
+                          <Icon
+                            aria-hidden='true'
+                            className='text-kapwa-text-support h-6 w-6'
+                          />
+                          {LAYER_LABEL[k]}
+                        </span>
+                        <span className='text-kapwa-text-support text-sm'>
+                          {n
+                            ? `${n} record${n === 1 ? '' : 's'}`
+                            : 'No records yet'}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div>
+                  <h3 className='text-kapwa-text-strong text-2xl font-bold'>
+                    Notices
+                  </h3>
+                  {advisoriesFor(townInfo.slug).length ? (
+                    <ul className='mt-2 space-y-2 text-sm'>
+                      {advisoriesFor(townInfo.slug).map(a => (
+                        <li key={a.id}>
+                          <strong>{a.title}</strong> · {a.issuer} · published{' '}
+                          {a.publishedAt}
+                          {a.endsAt ? ` · until ${a.endsAt}` : ''}
+                          <a
+                            href={a.sourceUrl}
+                            target='_blank'
+                            rel='noreferrer'
+                            className='text-kapwa-text-brand block text-xs hover:underline'
+                          >
+                            Source
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className='text-kapwa-text-support mt-2 text-sm'>
+                      No verified notices published.
+                    </p>
+                  )}
+                </div>
                 <Link
                   to={`/tourism/${townInfo.slug}`}
-                  className='text-kapwa-text-brand block text-sm font-bold hover:underline'
+                  className='text-kapwa-text-brand inline-flex items-center gap-2 text-base font-bold hover:underline'
                 >
-                  Full municipality page
+                  View municipality page
+                  <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
                 </Link>
               </CardContent>
             </Card>
@@ -805,6 +878,107 @@ export default function TourismExplore() {
           )}
         </aside>
       </div>
+
+      <section
+        aria-labelledby='sources-heading'
+        className='bg-kapwa-bg-surface border-kapwa-border-weak space-y-5 rounded-2xl border p-5 shadow-sm sm:p-6'
+      >
+        <div className='bg-kapwa-bg-brand-weak text-kapwa-text-strong flex gap-3 rounded-xl p-4 text-sm'>
+          <InfoIcon
+            aria-hidden='true'
+            className='text-kapwa-text-brand mt-0.5 h-5 w-5 shrink-0'
+          />
+          <p>
+            <strong>Listings only.</strong> BetterAklan shows published records.
+            It does not take bookings or payments, and it does not guess dates.
+            Check with the venue or organiser before you travel.
+          </p>
+        </div>
+        <h2
+          id='sources-heading'
+          className='text-kapwa-text-strong text-2xl font-bold'
+        >
+          Information and sources
+        </h2>
+        <div className='grid gap-4 md:grid-cols-3'>
+          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+              Where records come from
+            </h3>
+            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+              <li>
+                Places, festivals and products:{' '}
+                <a
+                  href='https://aklan.gov.ph/tourism/'
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-kapwa-text-brand hover:underline'
+                >
+                  Aklan Provincial Government Tourism pages
+                </a>
+              </li>
+              <li>
+                Accommodation:{' '}
+                <a
+                  href='https://aklan.gov.ph/tourism/accommodation/'
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-kapwa-text-brand hover:underline'
+                >
+                  Provincial Government of Aklan
+                </a>
+              </li>
+              <li>Municipality boundaries: BetterAklan boundary file</li>
+            </ul>
+          </div>
+          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+              Location precision
+            </h3>
+            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='success'>Exact location</Badge>
+                Pinned at the published address.
+              </li>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='warning'>Approximate pin</Badge>
+                Placed by area or municipality; not exact.
+              </li>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='slate'>Location unavailable</Badge>
+                Listed, but not on the map.
+              </li>
+            </ul>
+          </div>
+          <div className='border-kapwa-border-weak space-y-2 rounded-xl border p-4'>
+            <h3 className='text-kapwa-text-strong text-sm font-bold tracking-wide uppercase'>
+              Dates and notices
+            </h3>
+            <ul className='text-kapwa-text-support space-y-2 text-sm'>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='success'>{DATE_STATUS_LABEL.confirmed}</Badge>
+                Date from a cited source.
+              </li>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='warning'>{DATE_STATUS_LABEL.tentative}</Badge>
+                Source says the date may change.
+              </li>
+              <li className='flex flex-col items-start gap-1'>
+                <Badge variant='slate'>{DATE_STATUS_LABEL.unavailable}</Badge>
+                No source date. Never estimated.
+              </li>
+              <li>
+                Notices appear only when verified, with issuer and source.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p className='text-kapwa-text-muted text-xs'>
+          Last checked: Not recorded. Map data &copy; OpenStreetMap
+          contributors. Accommodation locations are geocoded from published
+          addresses and may not be exact.
+        </p>
+      </section>
     </div>
   );
 }
