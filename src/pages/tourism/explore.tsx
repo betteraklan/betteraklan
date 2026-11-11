@@ -1,11 +1,4 @@
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import {
@@ -13,20 +6,13 @@ import {
   CalendarCheckIcon,
   CalendarClockIcon,
   CalendarX2Icon,
-  CheckCircle2Icon,
-  CircleDashedIcon,
-  BedDoubleIcon,
-  CalendarDaysIcon,
   ExternalLinkIcon,
   InfoIcon,
-  LandmarkIcon,
   ListIcon,
-  MapPinOffIcon,
   MapIcon,
   PlayIcon,
   SearchIcon,
   Share2Icon,
-  ShoppingBasketIcon,
   SlidersHorizontalIcon,
   SquareIcon,
 } from 'lucide-react';
@@ -34,10 +20,7 @@ import {
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor } from '@/lib/tourism/advisories';
-import {
-  DATE_STATUS_LABEL,
-  formatDateRange,
-} from '@/lib/tourism/festivalDates';
+import { DATE_STATUS_LABEL } from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
   emptyReason,
@@ -50,6 +33,9 @@ import {
 import { type BoundaryFeature } from '@/lib/tourism/geo';
 
 import AklanMap3D, { type MapPin } from './components/AklanMap3D';
+import { LAYER_COLOR, LAYER_ICON, LAYER_LETTER } from './components/layerMeta';
+import RecordCard from './components/RecordCard';
+import { DatePill, LocationPill, Pill } from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
@@ -91,36 +77,8 @@ const TIER_COLOR = [
   '#3B78DB',
   '#1D4FB0',
 ];
-const LAYER_ICON = {
-  place: LandmarkIcon,
-  event: CalendarDaysIcon,
-  stay: BedDoubleIcon,
-  product: ShoppingBasketIcon,
-} as const;
-// Pin colours per layer. Approximate pins are drawn hollow with a dashed ring.
-const LAYER_COLOR: Record<Exclude<Layer, 'all'>, string> = {
-  place: '#0f766e',
-  event: '#b45309',
-  stay: '#1d4ed8',
-  product: '#6d28d9',
-};
-// Shown on pins and in the layer key so record type never relies on colour alone.
-const LAYER_LETTER: Record<Exclude<Layer, 'all'>, string> = {
-  place: 'P',
-  event: 'F',
-  stay: 'A',
-  product: 'L',
-};
-
 // Sea backdrop: soft wave lines, drawn once as an inline SVG.
 const WAVES = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cpath d='M0 12 Q15 2 30 12 T60 12 T90 12 T120 12' fill='none' stroke='%231D4FB0' stroke-width='1' stroke-opacity='.35'/%3E%3C/svg%3E")`;
-
-// Status pills: icon + sentence-case text, so status reads at a glance and never by colour alone.
-const PILL_TONE = {
-  ok: 'bg-kapwa-bg-success-weak text-kapwa-text-success border-kapwa-border-success',
-  warn: 'bg-kapwa-bg-warning-weak text-kapwa-text-warning border-kapwa-border-warning',
-  none: 'bg-kapwa-bg-surface-raised text-kapwa-text-support border-kapwa-border-weak',
-} as const;
 
 const INTRO_KEY = 'betteraklan:explore-intro-played';
 /** The entrance plays once per browser session and never with reduced motion. */
@@ -137,67 +95,6 @@ function introWanted(): boolean {
 const rise = (i: number) => ({
   animation: `explore-rise var(--dur-slow) var(--ease-out-expo) ${i * 60}ms both`,
 });
-
-function Pill({
-  tone,
-  icon: Icon,
-  children,
-}: {
-  tone: keyof typeof PILL_TONE;
-  icon: typeof CheckCircle2Icon;
-  children: ReactNode;
-}) {
-  return (
-    <span
-      className={`type-meta inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold whitespace-nowrap ${PILL_TONE[tone]}`}
-    >
-      <Icon aria-hidden='true' className='h-4 w-4 shrink-0' />
-      {children}
-    </span>
-  );
-}
-
-const LOCATION_PILL = {
-  exact: { tone: 'ok', icon: CheckCircle2Icon, text: 'Exact pin' },
-  approximate: {
-    tone: 'warn',
-    icon: CircleDashedIcon,
-    text: 'Approximate pin',
-  },
-  none: { tone: 'none', icon: MapPinOffIcon, text: 'Not on map' },
-} as const;
-
-function LocationPill({ placement }: { placement: Rec['placement'] }) {
-  const p = LOCATION_PILL[placement];
-  return (
-    <Pill tone={p.tone} icon={p.icon}>
-      {p.text}
-    </Pill>
-  );
-}
-
-function DatePill({ rec }: { rec: Rec }) {
-  const when = rec.dates?.start
-    ? formatDateRange(rec.dates.start, rec.dates.end)
-    : null;
-  if (rec.dateStatus === 'confirmed' && when)
-    return (
-      <Pill tone='ok' icon={CalendarCheckIcon}>
-        {when}
-      </Pill>
-    );
-  if (rec.dateStatus === 'tentative' && when)
-    return (
-      <Pill tone='warn' icon={CalendarClockIcon}>
-        Tentative · {when}
-      </Pill>
-    );
-  return (
-    <Pill tone='none' icon={CalendarX2Icon}>
-      {DATE_STATUS_LABEL.unavailable}
-    </Pill>
-  );
-}
 
 export default function TourismExplore() {
   const [params, setParams] = useSearchParams();
@@ -719,33 +616,14 @@ export default function TourismExplore() {
             {filtered.length === 0 ? (
               <p className='text-kapwa-text-support type-body p-6'>{reason}</p>
             ) : (
-              <ul className='divide-kapwa-border-weak divide-y lg:max-h-[60vh] lg:overflow-y-auto'>
+              <ul className='grid gap-3 p-3 sm:grid-cols-2 lg:max-h-[70vh] lg:overflow-y-auto'>
                 {visible.map(r => (
                   <li key={r.id}>
-                    <button
-                      type='button'
-                      aria-pressed={sel === r.id}
-                      onClick={() => select(r.id)}
-                      className={`focus-visible:ring-kapwa-border-brand flex w-full transition-colors duration-(--dur-fast) items-center justify-between gap-3 p-4 text-left focus-visible:ring-2 ${sel === r.id ? 'bg-kapwa-bg-brand-weak' : 'hover:bg-kapwa-bg-hover'}`}
-                    >
-                      <span className='min-w-0 space-y-1'>
-                        <span className='text-kapwa-text-strong type-body block font-semibold'>
-                          {r.name}
-                        </span>
-                        <span className='text-kapwa-text-support type-meta block'>
-                          {LAYER_LABEL[r.layer]}
-                          {r.townName ? ` · ${r.townName}` : ''}
-                        </span>
-                        <span className='flex flex-wrap items-center gap-1.5 pt-1.5'>
-                          {r.layer === 'event' && <DatePill rec={r} />}
-                          <LocationPill placement={r.placement} />
-                        </span>
-                      </span>
-                      <ArrowRightIcon
-                        aria-hidden='true'
-                        className='text-kapwa-text-brand h-5 w-5 shrink-0'
-                      />
-                    </button>
+                    <RecordCard
+                      rec={r}
+                      selected={sel === r.id}
+                      onSelect={select}
+                    />
                   </li>
                 ))}
               </ul>

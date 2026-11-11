@@ -5,6 +5,7 @@ import type {
   DateStatus,
   MunicipalityTourism,
   TourismDates,
+  TourismImage,
 } from '@/types/tourism';
 
 export type Layer = 'all' | 'place' | 'event' | 'stay' | 'product';
@@ -36,6 +37,7 @@ export interface Rec {
   dates?: TourismDates;
   dateStatus: DateStatus;
   sourceUrl?: string;
+  image?: TourismImage;
 }
 
 export interface Centroid {
@@ -91,6 +93,7 @@ export function buildRecords(s: Sources): Rec[] {
           placementNote: c ? 'Municipality centroid' : null,
           dates: e.dates,
           dateStatus: getDateStatus(e),
+          image: e.image,
         });
       });
     place('place', m.attractions, 'place');
@@ -198,4 +201,12 @@ export function emptyReason(all: Rec[], f: Filters): string | null {
     return `No dated records fall in this range.${undated ? ` ${undated} record(s) have no recorded date and are shown below.` : ''}`;
   }
   return 'No records match these filters.';
+}
+
+/** One-line "why go" teaser: the description's first sentence. */
+export function teaser(description: string): string {
+  const text = description.replace(/\s+/g, ' ').trim();
+  // A sentence ends at . ! or ? before a space, but not after an initial like "M.".
+  const first = text.match(/^.+?(?<!\b[A-Z])[.!?](?=\s|$)/);
+  return (first ? first[0] : text).trim();
 }

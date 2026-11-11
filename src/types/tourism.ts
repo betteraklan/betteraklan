@@ -11,10 +11,23 @@ export interface TourismDates {
   lastCheckedAt?: string;
 }
 
+/**
+ * A credited photo for a record. Use a WebP `src`; `color` is the photo's
+ * average colour, shown as the placeholder until it loads. Add photos only
+ * with a known source and credit.
+ */
+export interface TourismImage {
+  src: string;
+  alt: string;
+  credit: string;
+  color?: string;
+}
+
 export interface TourismEntry {
   name: string | null;
   description: string;
   dates?: TourismDates;
+  image?: TourismImage;
 }
 
 export interface Advisory {

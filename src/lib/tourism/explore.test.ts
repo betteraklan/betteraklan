@@ -5,6 +5,7 @@ import {
   emptyReason,
   filterRecords,
   type Sources,
+  teaser,
 } from './explore';
 import type { BoundaryFeature } from './geo';
 
@@ -124,6 +125,24 @@ describe('filterRecords and emptyReason', () => {
     );
     expect(emptyReason(recs, { ...none, q: 'zzz' })).toBe(
       'No records match these filters.'
+    );
+  });
+});
+
+describe('teaser', () => {
+  it('keeps the first sentence only', () => {
+    expect(teaser('White sand beach. Busy in summer.')).toBe(
+      'White sand beach.'
+    );
+  });
+
+  it('does not split on a decimal or an abbreviation without a space', () => {
+    expect(teaser('Open 8.30am daily. Free entry.')).toBe('Open 8.30am daily.');
+  });
+
+  it('does not end a sentence at an initial, and tidies whitespace', () => {
+    expect(teaser('  0808 M. Laserna St,\n Kalibo ')).toBe(
+      '0808 M. Laserna St, Kalibo'
     );
   });
 });
