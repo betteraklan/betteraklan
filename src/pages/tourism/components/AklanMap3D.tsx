@@ -36,6 +36,8 @@ interface Props {
   selected: MapPin | null;
   onTown: (slug: string) => void;
   onPin: (id: string) => void;
+  /** Play the entrance: flat silhouette, then ease into the camera. */
+  intro?: boolean;
 }
 
 // Free vector basemap (OpenMapTiles schema, includes building heights). No API key.
@@ -45,6 +47,9 @@ const DEM =
   'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
 const PAD = 24;
 const MAX_PITCH = 55;
+const INTRO_MS = 1200;
+// Same curve as the --ease-out-expo CSS token.
+const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 /** Flat over the province, tilting to 3D as you zoom towards street level. */
 const pitchFor = (zoom: number) =>
@@ -75,10 +80,13 @@ export default function AklanMap3D({
   selected,
   onTown,
   onPin,
+  intro = false,
 }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
+  // Read once at mount: the entrance plays only on the first camera move.
+  const introRef = useRef(intro);
   // Latest callbacks for map event handlers registered once.
   const cb = useRef({ onTown, onPin });
   useEffect(() => {
@@ -231,6 +239,19 @@ export default function AklanMap3D({
         },
         paint: { 'fill-color': '#eef1f5', 'fill-opacity': 0.94 },
       });
+
+      // Entrance only: a solid Aklan silhouette that fades as the camera settles.
+      if (introRef.current)
+        map.addLayer({
+          id: 'silhouette',
+          type: 'fill',
+          source: { type: 'geojson', data: outline as GeoJSON.Feature },
+          paint: {
+            'fill-color': '#1D4FB0',
+            'fill-opacity': 0.9,
+            'fill-opacity-transition': { duration: INTRO_MS, delay: 0 },
+          },
+        });
 
       map.addLayer({
         id: 'town-line',
@@ -413,32 +434,46 @@ export default function AklanMap3D({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
+    let target: maplibregl.CameraOptions & { duration: number };
     if (selected) {
-      map.flyTo({
+      target = {
         center: [selected.lon, selected.lat],
         zoom: 16,
         pitch: MAX_PITCH,
         bearing: -20,
         duration: 2200,
-        curve: 1.5,
-      });
+      };
+    } else {
+      const f = boundaries.find(b => b.properties.slug === town);
+      const bounds = (
+        f ? boundsOf([f]) : boundsOf(boundaries)
+      ) as LngLatBoundsLike;
+      const cam = map.cameraForBounds(bounds, { padding: f ? 48 : PAD });
+      if (!cam) return;
+      const zoom = Math.max(cam.zoom ?? 10, map.getMinZoom());
+      target = {
+        center: cam.center,
+        zoom,
+        pitch: pitchFor(zoom),
+        bearing: f ? -12 : 0,
+        duration: f ? 2000 : 1600,
+      };
+    }
+
+    if (introRef.current) {
+      // Entrance: straight ease (no zoom-out arc) from the flat province view.
+      introRef.current = false;
+      map.easeTo({ ...target, duration: INTRO_MS, easing: easeOutExpo });
+      if (map.getLayer('silhouette')) {
+        map.setPaintProperty('silhouette', 'fill-opacity', 0);
+        const id = window.setTimeout(() => {
+          if (map.getLayer('silhouette')) map.removeLayer('silhouette');
+        }, INTRO_MS + 100);
+        return () => window.clearTimeout(id);
+      }
       return;
     }
-    const f = boundaries.find(b => b.properties.slug === town);
-    const target = (
-      f ? boundsOf([f]) : boundsOf(boundaries)
-    ) as LngLatBoundsLike;
-    const cam = map.cameraForBounds(target, { padding: f ? 48 : PAD });
-    if (!cam) return;
-    const zoom = Math.max(cam.zoom ?? 10, map.getMinZoom());
-    map.flyTo({
-      center: cam.center,
-      zoom,
-      pitch: pitchFor(zoom),
-      bearing: f ? -12 : 0,
-      duration: f ? 2000 : 1600,
-      curve: 1.42,
-    });
+    map.flyTo({ ...target, curve: selected ? 1.5 : 1.42 });
   }, [ready, boundaries, town, selected]);
 
   // Anchored tooltip on the selected record, with a soft pulse.

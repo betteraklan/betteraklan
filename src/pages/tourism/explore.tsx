@@ -123,6 +123,22 @@ const PILL_TONE = {
   none: 'bg-kapwa-bg-surface-raised text-kapwa-text-support border-kapwa-border-weak',
 } as const;
 
+const INTRO_KEY = 'betteraklan:explore-intro-played';
+/** The entrance plays once per browser session and never with reduced motion. */
+function introWanted(): boolean {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    return false;
+  try {
+    return sessionStorage.getItem(INTRO_KEY) !== '1';
+  } catch {
+    return false;
+  }
+}
+// Fade up 12px; the second element starts 60ms after the first.
+const rise = (i: number) => ({
+  animation: `explore-rise var(--dur-slow) var(--ease-out-expo) ${i * 60}ms both`,
+});
+
 function Pill({
   tone,
   icon: Icon,
@@ -289,6 +305,15 @@ export default function TourismExplore() {
   );
 
   const [touring, setTouring] = useState(false);
+  const [intro] = useState(introWanted);
+  useEffect(() => {
+    if (!intro) return;
+    try {
+      sessionStorage.setItem(INTRO_KEY, '1');
+    } catch {
+      // Storage blocked: the entrance may replay, which is harmless.
+    }
+  }, [intro]);
   const select = (id: string) => {
     setTouring(false);
     update({ sel: id });
@@ -354,9 +379,12 @@ export default function TourismExplore() {
 
   return (
     <div
-      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] animate-in fade-in space-y-6 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
+      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'>
+      <header
+        style={intro ? rise(0) : undefined}
+        className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'
+      >
         <div
           aria-hidden='true'
           className='absolute inset-0 opacity-25'
@@ -400,7 +428,10 @@ export default function TourismExplore() {
       </header>
 
       {/* Controls card: search stays visible; the rest folds away on phones. */}
-      <div className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-card border p-3 shadow-elev-1 sm:p-4'>
+      <div
+        style={intro ? rise(1) : undefined}
+        className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-card border p-3 shadow-elev-1 sm:p-4'
+      >
         <label className='relative min-w-[200px] flex-1'>
           <span className='sr-only'>Search records</span>
           <SearchIcon
@@ -530,6 +561,7 @@ export default function TourismExplore() {
             <Card className='overflow-hidden p-0' hover={false}>
               <div className='relative isolate h-[55vh] min-h-[320px] w-full sm:h-[62vh] sm:min-h-[360px] lg:h-[70vh] [&_.maplibregl-ctrl-group_button]:!h-11 [&_.maplibregl-ctrl-group_button]:!w-11'>
                 <AklanMap3D
+                  intro={intro}
                   boundaries={SOURCES.boundaries}
                   townFill={townFill}
                   townCount={counts}
