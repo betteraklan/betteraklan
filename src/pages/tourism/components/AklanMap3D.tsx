@@ -98,6 +98,8 @@ export default function AklanMap3D({
         [province[1][0] + 0.05, province[1][1] + 0.05],
       ],
       maxPitch: MAX_PITCH + 5,
+      // On touch screens one finger scrolls the page; two fingers move the map.
+      cooperativeGestures: window.matchMedia('(pointer: coarse)').matches,
       canvasContextAttributes: { antialias: !lowEnd },
       attributionControl: { compact: true },
     });

@@ -11,6 +11,7 @@ import {
   InfoIcon,
   LandmarkIcon,
   ListIcon,
+  MapPinIcon,
   MapIcon,
   PlayIcon,
   SearchIcon,
@@ -58,6 +59,8 @@ const MUNICIPALITIES = [...SOURCES.municipalities].sort((a, b) =>
 );
 const LAYERS: Layer[] = ['all', 'place', 'event', 'stay', 'product'];
 const RESULTS_PAGE = 50;
+// The date filter only appears once at least one festival has a sourced date.
+const HAS_DATED = ALL_RECORDS.some(r => r.dateStatus !== 'unavailable');
 
 const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
   exact: 'Exact location',
@@ -78,7 +81,7 @@ const TIER_COLOR = [
 const GLASS =
   'border border-kapwa-border-weak bg-white/90 text-kapwa-text-strong shadow-lg backdrop-blur-md';
 const FIELD =
-  'border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong rounded-lg border px-3 py-2.5 text-sm';
+  'border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong min-h-11 rounded-lg border px-3 py-2.5 text-sm';
 const LAYER_ICON = {
   place: LandmarkIcon,
   event: CalendarDaysIcon,
@@ -269,7 +272,7 @@ export default function TourismExplore() {
     <div
       className={`animate-in fade-in space-y-6 duration-500 motion-reduce:animate-none ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
     >
-      <header className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-6 text-white shadow-lg sm:p-8'>
+      <header className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-lg sm:p-8'>
         <div
           aria-hidden='true'
           className='absolute inset-0 opacity-25'
@@ -279,20 +282,20 @@ export default function TourismExplore() {
           aria-hidden='true'
           className='absolute -top-16 -right-10 h-56 w-56 rounded-full bg-[#FCD116]/25 blur-3xl'
         />
-        <div className='relative flex flex-wrap items-end justify-between gap-4'>
+        <div className='relative flex items-center justify-between gap-4 sm:items-end'>
           <div className='flex items-stretch gap-4'>
             <span
               aria-hidden='true'
               className='w-1.5 shrink-0 rounded-full bg-[#FCD116]'
             />
             <div>
-              <p className='text-xs font-bold tracking-[0.2em] text-white/70 uppercase'>
+              <p className='hidden text-xs font-bold tracking-[0.2em] text-white/70 uppercase sm:block'>
                 BetterAklan Tourism
               </p>
-              <h1 className='kapwa-heading-lg mt-1 text-white'>
+              <h1 className='kapwa-heading-lg text-white sm:mt-1'>
                 Explore Aklan
               </h1>
-              <p className='mt-1 max-w-xl text-sm text-white/85 sm:text-base'>
+              <p className='mt-1 hidden max-w-xl text-white/85 sm:block sm:text-base'>
                 Find places, festivals, and public visitor information across
                 all 17 municipalities.
               </p>
@@ -306,10 +309,10 @@ export default function TourismExplore() {
                 void navigator.share({ url }).catch(() => {});
               else void navigator.clipboard?.writeText(url);
             }}
-            className='inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#0B3FAE] shadow-md'
+            className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-md sm:px-5'
           >
             <Share2Icon aria-hidden='true' className='h-4 w-4' />
-            Share view
+            <span className='sr-only sm:not-sr-only'>Share view</span>
           </button>
         </div>
       </header>
@@ -377,7 +380,7 @@ export default function TourismExplore() {
               ))}
             </select>
           </label>
-          {(layer === 'event' || layer === 'all') && (
+          {HAS_DATED && (layer === 'event' || layer === 'all') && (
             <fieldset className='flex flex-wrap gap-2 text-xs font-bold'>
               <legend className='sr-only'>Festival date range</legend>
               <label>
@@ -386,7 +389,7 @@ export default function TourismExplore() {
                   type='date'
                   value={from}
                   onChange={e => update({ from: e.target.value })}
-                  className={`${FIELD} mt-1 block px-2 py-1.5 font-normal`}
+                  className={`${FIELD} mt-1 block px-2 font-normal`}
                 />
               </label>
               <label>
@@ -395,10 +398,15 @@ export default function TourismExplore() {
                   type='date'
                   value={to}
                   onChange={e => update({ to: e.target.value })}
-                  className={`${FIELD} mt-1 block px-2 py-1.5 font-normal`}
+                  className={`${FIELD} mt-1 block px-2 font-normal`}
                 />
               </label>
             </fieldset>
+          )}
+          {!HAS_DATED && layer === 'event' && (
+            <p className='text-kapwa-text-support self-center text-xs'>
+              No festival dates are recorded yet, so there is no date filter.
+            </p>
           )}
         </div>
         <div
@@ -412,7 +420,7 @@ export default function TourismExplore() {
               type='button'
               aria-pressed={view === v}
               onClick={() => update({ view: v })}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 capitalize ${view === v ? 'bg-kapwa-bg-brand-default text-kapwa-text-inverse' : 'bg-kapwa-bg-surface text-kapwa-text-strong'}`}
+              className={`inline-flex min-h-11 items-center gap-2 px-4 capitalize ${view === v ? 'bg-kapwa-bg-brand-default text-kapwa-text-inverse' : 'bg-kapwa-bg-surface text-kapwa-text-strong'}`}
             >
               {v === 'map' ? (
                 <MapIcon aria-hidden='true' className='h-4 w-4' />
@@ -425,21 +433,20 @@ export default function TourismExplore() {
         </div>
       </div>
 
-      <p aria-live='polite' className='text-kapwa-text-muted text-xs'>
-        {filtered.length} result{filtered.length === 1 ? '' : 's'}
-        {reason ? ` · ${reason}` : ''}
-        {!reason &&
+      {!reason &&
         (filters.from || filters.to) &&
-        filtered.some(r => r.dateStatus === 'unavailable')
-          ? ` · ${filtered.filter(r => r.dateStatus === 'unavailable').length} kept with no recorded date; the rest fall in the range.`
-          : ''}
-      </p>
+        filtered.some(r => r.dateStatus === 'unavailable') && (
+          <p className='text-kapwa-text-muted text-xs'>
+            {filtered.filter(r => r.dateStatus === 'unavailable').length} kept
+            with no recorded date; the rest fall in the range.
+          </p>
+        )}
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]'>
         <div className='min-w-0 space-y-4'>
           {view === 'map' ? (
             <Card className='overflow-hidden p-0' hover={false}>
-              <div className='relative isolate h-[62vh] min-h-[360px] w-full lg:h-[70vh]'>
+              <div className='relative isolate h-[55vh] min-h-[320px] w-full sm:h-[62vh] sm:min-h-[360px] lg:h-[70vh] [&_.maplibregl-ctrl-group_button]:!h-11 [&_.maplibregl-ctrl-group_button]:!w-11'>
                 <AklanMap3D
                   boundaries={SOURCES.boundaries}
                   townFill={townFill}
@@ -474,7 +481,7 @@ export default function TourismExplore() {
                             on ? [...h, k] : h.filter(x => x !== k)
                           )
                         }
-                        className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
+                        className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
                       >
                         <span
                           aria-hidden='true'
@@ -491,7 +498,7 @@ export default function TourismExplore() {
                     type='button'
                     aria-pressed={shade}
                     onClick={() => setShade(v => !v)}
-                    className={`flex min-h-9 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
+                    className={`flex min-h-11 flex-none items-center gap-2 rounded-lg px-3 text-xs font-bold ${shade ? 'bg-kapwa-bg-brand-weak' : 'opacity-60'}`}
                   >
                     Shade by records
                   </button>
@@ -508,7 +515,7 @@ export default function TourismExplore() {
                       setTouring(true);
                     }
                   }}
-                  className='bg-kapwa-bg-surface text-kapwa-text-strong absolute top-3 right-3 z-[500] inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold shadow-lg'
+                  className='bg-kapwa-bg-surface text-kapwa-text-strong absolute top-3 right-3 z-[500] inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold shadow-lg'
                 >
                   {touring ? (
                     <SquareIcon aria-hidden='true' className='h-4 w-4' />
@@ -570,7 +577,10 @@ export default function TourismExplore() {
 
           {/* Results: always rendered so keyboard users can reach them in both views. */}
           <Card className='overflow-hidden rounded-2xl p-0' hover={false}>
-            <h2 className='text-kapwa-text-strong border-kapwa-border-weak border-b px-4 pt-4 pb-3 text-xl font-bold'>
+            <h2
+              aria-live='polite'
+              className='text-kapwa-text-strong border-kapwa-border-weak border-b px-4 pt-4 pb-3 text-xl font-bold'
+            >
               {filtered.length} record{filtered.length === 1 ? '' : 's'}
               {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
             </h2>
@@ -594,8 +604,18 @@ export default function TourismExplore() {
                           {LAYER_LABEL[r.layer]}
                           {r.townName ? ` · ${r.townName}` : ''}
                         </span>
-                        <span className='flex flex-wrap gap-1.5 pt-1'>
-                          <PlacementBadge rec={r} />
+                        <span className='flex flex-wrap items-center gap-1.5 pt-1'>
+                          {r.placement !== 'exact' && (
+                            <span className='text-kapwa-text-muted inline-flex items-center gap-1 text-xs'>
+                              <MapPinIcon
+                                aria-hidden='true'
+                                className='h-3.5 w-3.5'
+                              />
+                              {r.placement === 'approximate'
+                                ? 'Approximate location'
+                                : 'Not on map'}
+                            </span>
+                          )}
                           {r.layer === 'event' && (
                             <Badge
                               variant={
@@ -621,11 +641,11 @@ export default function TourismExplore() {
               </ul>
             )}
             {visible.length < filtered.length && (
-              <div className='border-kapwa-border-weak border-t p-3 text-center'>
+              <div className='border-kapwa-border-weak border-t p-2'>
                 <button
                   type='button'
                   onClick={() => setPageSize(s => s + RESULTS_PAGE)}
-                  className='text-kapwa-text-brand text-sm font-bold hover:underline'
+                  className='text-kapwa-text-brand hover:bg-kapwa-bg-hover min-h-11 w-full rounded-lg text-sm font-bold'
                 >
                   Show{' '}
                   {Math.min(RESULTS_PAGE, filtered.length - visible.length)}{' '}
@@ -648,7 +668,7 @@ export default function TourismExplore() {
               type='button'
               aria-expanded={sheetOpen}
               onClick={() => setSheetOpen(o => !o)}
-              className='text-kapwa-text-support flex w-full items-center justify-center gap-2 py-1 text-xs font-bold lg:hidden'
+              className='text-kapwa-text-support flex w-full items-center justify-center gap-2 min-h-11 text-xs font-bold lg:hidden'
             >
               {sheetOpen ? (
                 <ChevronDownIcon aria-hidden='true' className='h-4 w-4' />
@@ -735,22 +755,33 @@ export default function TourismExplore() {
                     ).length;
                     const Icon = LAYER_ICON[k];
                     return (
-                      <li
-                        key={k}
-                        className='flex items-center justify-between gap-3 py-3'
-                      >
-                        <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
-                          <Icon
-                            aria-hidden='true'
-                            className='text-kapwa-text-support h-6 w-6'
-                          />
-                          {LAYER_LABEL[k]}
-                        </span>
-                        <span className='text-kapwa-text-support text-sm'>
-                          {n
-                            ? `${n} record${n === 1 ? '' : 's'}`
-                            : 'No records yet'}
-                        </span>
+                      <li key={k}>
+                        <button
+                          type='button'
+                          disabled={!n}
+                          aria-pressed={layer === k}
+                          onClick={() => update({ layer: k, sel: '' })}
+                          className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left enabled:hover:bg-kapwa-bg-hover disabled:cursor-default ${layer === k ? 'bg-kapwa-bg-brand-weak' : ''}`}
+                        >
+                          <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
+                            <Icon
+                              aria-hidden='true'
+                              className='text-kapwa-text-support h-6 w-6'
+                            />
+                            {LAYER_LABEL[k]}
+                          </span>
+                          <span className='text-kapwa-text-support text-sm'>
+                            {n
+                              ? `${n} record${n === 1 ? '' : 's'}`
+                              : 'No records yet'}
+                            {n ? (
+                              <ArrowRightIcon
+                                aria-hidden='true'
+                                className='text-kapwa-text-brand ml-2 inline h-4 w-4'
+                              />
+                            ) : null}
+                          </span>
+                        </button>
                       </li>
                     );
                   })}
