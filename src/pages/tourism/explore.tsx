@@ -17,8 +17,6 @@ import {
   CircleDashedIcon,
   BedDoubleIcon,
   CalendarDaysIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
   ExternalLinkIcon,
   InfoIcon,
   LandmarkIcon,
@@ -52,6 +50,7 @@ import {
 import { type BoundaryFeature } from '@/lib/tourism/geo';
 
 import AklanMap3D, { type MapPin } from './components/AklanMap3D';
+import { useBottomSheet } from './components/useBottomSheet';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
 import boundaryData from '@/data/geo/municipalities-boundaries.json';
@@ -335,8 +334,6 @@ export default function TourismExplore() {
   }, [touring, town, update]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(true);
-  useEffect(() => setSheetOpen(true), [sel, town]);
   // The town card waits for the map to finish flying there (list view needs no wait).
   const [settledTown, setSettledTown] = useState<string | null>(null);
   useEffect(() => {
@@ -354,15 +351,16 @@ export default function TourismExplore() {
   // user picks a result below desktop width, bring the details into view and
   // move focus there so the change is noticed by touch and screen-reader users.
   const detailRef = useRef<HTMLElement>(null);
-  // While the phone bottom sheet is open, keep focused elements from scrolling under it.
+  const bs = useBottomSheet(sheet, `${sel}|${town}`, detailRef);
+  // While the phone bottom sheet is up, keep focused elements from scrolling under it.
   useEffect(() => {
-    if (!(sheet && sheetOpen)) return;
+    if (!bs.visible) return;
     const root = document.documentElement;
-    root.style.scrollPaddingBottom = '55vh';
+    root.style.scrollPaddingBottom = `${bs.visible}px`;
     return () => {
       root.style.scrollPaddingBottom = '';
     };
-  }, [sheet, sheetOpen]);
+  }, [bs.visible]);
   const prevSel = useRef(sel);
   useEffect(() => {
     if (
@@ -389,7 +387,8 @@ export default function TourismExplore() {
 
   return (
     <div
-      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${sheet && sheetOpen ? 'max-lg:pb-[55vh]' : 'pb-8'}`}
+      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${bs.active ? '' : 'pb-8'}`}
+      style={bs.active ? { paddingBottom: bs.visible + 16 } : undefined}
     >
       <header
         style={intro ? rise(0) : undefined}
@@ -772,180 +771,194 @@ export default function TourismExplore() {
           ref={detailRef}
           tabIndex={-1}
           aria-label='Details'
-          className={`space-y-4 outline-none lg:sticky lg:top-4 lg:self-start ${sheet ? 'max-lg:bg-kapwa-bg-surface max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:space-y-3 max-lg:overflow-y-auto max-lg:rounded-t-card max-lg:p-3 max-lg:motion-safe:animate-[explore-sheet-up_var(--dur-base)_var(--ease-out-expo)_both] max-lg:shadow-[0_-8px_24px_rgb(15_35_75/0.22)] ' + (sheetOpen ? 'max-lg:max-h-[52vh]' : 'max-lg:max-h-14 max-lg:overflow-hidden') : ''}`}
+          style={bs.sheetStyle}
+          onFocus={bs.onFocus}
+          className={`outline-none lg:sticky lg:top-4 lg:self-start ${bs.active ? 'bg-kapwa-bg-surface fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-card shadow-[0_-8px_24px_rgb(15_35_75/0.22)] transition-transform duration-(--dur-base) ease-out-expo motion-reduce:transition-none' : ''}`}
         >
-          {sheet && (
+          {bs.active && (
             <button
               type='button'
-              aria-expanded={sheetOpen}
-              onClick={() => setSheetOpen(o => !o)}
-              className='text-kapwa-text-support flex w-full items-center justify-center gap-2 min-h-11 type-meta font-semibold lg:hidden'
+              {...bs.handleProps}
+              className='flex h-11 w-full shrink-0 cursor-grab touch-none items-center justify-center active:cursor-grabbing'
             >
-              {sheetOpen ? (
-                <ChevronDownIcon aria-hidden='true' className='h-4 w-4' />
-              ) : (
-                <ChevronUpIcon aria-hidden='true' className='h-4 w-4' />
-              )}
-              {sheetOpen ? 'Hide details' : 'Show details'}
+              <span
+                aria-hidden='true'
+                className='bg-kapwa-border-strong h-1.5 w-10 rounded-full'
+              />
             </button>
           )}
-          {selected ? (
-            <Card hover={false}>
-              <CardContent className='space-y-3 p-5'>
-                <p className='text-kapwa-text-muted type-meta font-semibold tracking-wider uppercase'>
-                  {LAYER_LABEL[selected.layer]}
-                </p>
-                <h2 className='text-kapwa-text-strong type-title'>
-                  {selected.name}
-                </h2>
-                <p className='text-kapwa-text-support type-body'>
-                  {selected.description}
-                </p>
-                <dl className='type-meta space-y-2'>
-                  {selected.layer === 'event' && (
+          <div
+            inert={bs.bodyInert}
+            style={bs.bodyStyle}
+            className={
+              bs.active
+                ? 'space-y-3 overflow-y-auto overscroll-contain px-3 pb-3'
+                : 'space-y-4'
+            }
+          >
+            {selected ? (
+              <Card hover={false}>
+                <CardContent className='space-y-3 p-5'>
+                  <p className='text-kapwa-text-muted type-meta font-semibold tracking-wider uppercase'>
+                    {LAYER_LABEL[selected.layer]}
+                  </p>
+                  <h2 className='text-kapwa-text-strong type-title'>
+                    {selected.name}
+                  </h2>
+                  <p className='text-kapwa-text-support type-body'>
+                    {selected.description}
+                  </p>
+                  <dl className='type-meta space-y-2'>
+                    {selected.layer === 'event' && (
+                      <div className='flex flex-wrap items-center gap-2'>
+                        <dt className='font-semibold'>Date</dt>
+                        <dd>
+                          <DatePill rec={selected} />
+                        </dd>
+                      </div>
+                    )}
                     <div className='flex flex-wrap items-center gap-2'>
-                      <dt className='font-semibold'>Date</dt>
-                      <dd>
-                        <DatePill rec={selected} />
+                      <dt className='font-semibold'>Location</dt>
+                      <dd className='flex flex-wrap items-center gap-2'>
+                        <LocationPill placement={selected.placement} />
+                        {selected.placementNote && (
+                          <span className='text-kapwa-text-support'>
+                            {selected.placementNote}
+                          </span>
+                        )}
                       </dd>
                     </div>
+                    <div>
+                      <dt className='inline font-semibold'>Last checked: </dt>
+                      <dd className='inline'>
+                        {selected.dates?.lastCheckedAt ?? 'Not recorded'}
+                      </dd>
+                    </div>
+                  </dl>
+                  {selected.dates?.sourceUrl && (
+                    <a
+                      href={selected.dates.sourceUrl}
+                      target='_blank'
+                      rel='noreferrer'
+                      className='text-kapwa-text-brand type-meta inline-flex items-center gap-1 font-semibold hover:underline'
+                    >
+                      Source{' '}
+                      <ExternalLinkIcon
+                        aria-hidden='true'
+                        className='h-3 w-3'
+                      />
+                    </a>
                   )}
-                  <div className='flex flex-wrap items-center gap-2'>
-                    <dt className='font-semibold'>Location</dt>
-                    <dd className='flex flex-wrap items-center gap-2'>
-                      <LocationPill placement={selected.placement} />
-                      {selected.placementNote && (
-                        <span className='text-kapwa-text-support'>
-                          {selected.placementNote}
-                        </span>
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className='inline font-semibold'>Last checked: </dt>
-                    <dd className='inline'>
-                      {selected.dates?.lastCheckedAt ?? 'Not recorded'}
-                    </dd>
-                  </div>
-                </dl>
-                {selected.dates?.sourceUrl && (
-                  <a
-                    href={selected.dates.sourceUrl}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='text-kapwa-text-brand type-meta inline-flex items-center gap-1 font-semibold hover:underline'
+                  <button
+                    type='button'
+                    onClick={() => update({ sel: '' })}
+                    className='text-kapwa-text-support type-meta block underline'
                   >
-                    Source{' '}
-                    <ExternalLinkIcon aria-hidden='true' className='h-3 w-3' />
-                  </a>
-                )}
-                <button
-                  type='button'
-                  onClick={() => update({ sel: '' })}
-                  className='text-kapwa-text-support type-meta block underline'
-                >
-                  Clear selection
-                </button>
-              </CardContent>
-            </Card>
-          ) : null}
+                    Clear selection
+                  </button>
+                </CardContent>
+              </Card>
+            ) : null}
 
-          {townInfo && cardReady && (
-            <Card
-              key={townInfo.slug}
-              hover={false}
-              className='rounded-card lg:motion-safe:animate-[explore-slide-in_var(--dur-base)_var(--ease-out-expo)_both]'
-            >
-              <CardContent className='space-y-4 p-5'>
-                <div>
-                  <h2 className='text-kapwa-text-strong type-display'>
-                    {townInfo.name}
-                  </h2>
-                  <p className='text-kapwa-text-support type-meta font-semibold'>
-                    Municipality overview
-                  </p>
-                </div>
-                <ul className='divide-kapwa-border-weak border-kapwa-border-weak divide-y border-y'>
-                  {(['place', 'event', 'stay', 'product'] as const).map(k => {
-                    const n = ALL_RECORDS.filter(
-                      r => r.town === townInfo.slug && r.layer === k
-                    ).length;
-                    const Icon = LAYER_ICON[k];
-                    return (
-                      <li key={k}>
-                        <button
-                          type='button'
-                          disabled={!n}
-                          aria-pressed={layer === k}
-                          onClick={() => update({ layer: k, sel: '' })}
-                          className={`flex min-h-12 w-full items-center transition-colors duration-(--dur-fast) justify-between gap-3 rounded-control px-2 py-3 text-left enabled:hover:bg-kapwa-bg-hover disabled:cursor-default ${layer === k ? 'bg-kapwa-bg-brand-weak' : ''}`}
-                        >
-                          <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
-                            <Icon
-                              aria-hidden='true'
-                              className='text-kapwa-text-support h-6 w-6'
-                            />
-                            {LAYER_LABEL[k]}
-                          </span>
-                          <span className='text-kapwa-text-support type-meta'>
-                            {n
-                              ? `${n} record${n === 1 ? '' : 's'}`
-                              : 'No records yet'}
-                            {n ? (
-                              <ArrowRightIcon
-                                aria-hidden='true'
-                                className='text-kapwa-text-brand ml-2 inline h-4 w-4'
-                              />
-                            ) : null}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div>
-                  <h3 className='text-kapwa-text-strong type-title'>Notices</h3>
-                  {advisoriesFor(townInfo.slug).length ? (
-                    <ul className='type-body mt-2 space-y-2'>
-                      {advisoriesFor(townInfo.slug).map(a => (
-                        <li key={a.id}>
-                          <strong>{a.title}</strong> · {a.issuer} · published{' '}
-                          {a.publishedAt}
-                          {a.endsAt ? ` · until ${a.endsAt}` : ''}
-                          <a
-                            href={a.sourceUrl}
-                            target='_blank'
-                            rel='noreferrer'
-                            className='text-kapwa-text-brand type-meta block hover:underline'
-                          >
-                            Source
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className='text-kapwa-text-support type-body mt-2'>
-                      No verified notices published.
+            {townInfo && cardReady && (
+              <Card
+                key={townInfo.slug}
+                hover={false}
+                className='rounded-card lg:motion-safe:animate-[explore-slide-in_var(--dur-base)_var(--ease-out-expo)_both]'
+              >
+                <CardContent className='space-y-4 p-5'>
+                  <div>
+                    <h2 className='text-kapwa-text-strong type-display'>
+                      {townInfo.name}
+                    </h2>
+                    <p className='text-kapwa-text-support type-meta font-semibold'>
+                      Municipality overview
                     </p>
-                  )}
-                </div>
-                <Link
-                  to={`/tourism/${townInfo.slug}`}
-                  className='text-kapwa-text-brand type-body inline-flex items-center gap-2 font-bold hover:underline'
-                >
-                  View municipality page
-                  <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+                  </div>
+                  <ul className='divide-kapwa-border-weak border-kapwa-border-weak divide-y border-y'>
+                    {(['place', 'event', 'stay', 'product'] as const).map(k => {
+                      const n = ALL_RECORDS.filter(
+                        r => r.town === townInfo.slug && r.layer === k
+                      ).length;
+                      const Icon = LAYER_ICON[k];
+                      return (
+                        <li key={k}>
+                          <button
+                            type='button'
+                            disabled={!n}
+                            aria-pressed={layer === k}
+                            onClick={() => update({ layer: k, sel: '' })}
+                            className={`flex min-h-12 w-full items-center transition-colors duration-(--dur-fast) justify-between gap-3 rounded-control px-2 py-3 text-left enabled:hover:bg-kapwa-bg-hover disabled:cursor-default ${layer === k ? 'bg-kapwa-bg-brand-weak' : ''}`}
+                          >
+                            <span className='text-kapwa-text-strong flex items-center gap-3 font-bold'>
+                              <Icon
+                                aria-hidden='true'
+                                className='text-kapwa-text-support h-6 w-6'
+                              />
+                              {LAYER_LABEL[k]}
+                            </span>
+                            <span className='text-kapwa-text-support type-meta'>
+                              {n
+                                ? `${n} record${n === 1 ? '' : 's'}`
+                                : 'No records yet'}
+                              {n ? (
+                                <ArrowRightIcon
+                                  aria-hidden='true'
+                                  className='text-kapwa-text-brand ml-2 inline h-4 w-4'
+                                />
+                              ) : null}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div>
+                    <h3 className='text-kapwa-text-strong type-title'>
+                      Notices
+                    </h3>
+                    {advisoriesFor(townInfo.slug).length ? (
+                      <ul className='type-body mt-2 space-y-2'>
+                        {advisoriesFor(townInfo.slug).map(a => (
+                          <li key={a.id}>
+                            <strong>{a.title}</strong> · {a.issuer} · published{' '}
+                            {a.publishedAt}
+                            {a.endsAt ? ` · until ${a.endsAt}` : ''}
+                            <a
+                              href={a.sourceUrl}
+                              target='_blank'
+                              rel='noreferrer'
+                              className='text-kapwa-text-brand type-meta block hover:underline'
+                            >
+                              Source
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className='text-kapwa-text-support type-body mt-2'>
+                        No verified notices published.
+                      </p>
+                    )}
+                  </div>
+                  <Link
+                    to={`/tourism/${townInfo.slug}`}
+                    className='text-kapwa-text-brand type-body inline-flex items-center gap-2 font-bold hover:underline'
+                  >
+                    View municipality page
+                    <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
 
-          {!selected && !townInfo && (
-            <p className='text-kapwa-text-support type-body'>
-              Select a result on the map or in the list to see its details,
-              source, and location precision.
-            </p>
-          )}
+            {!selected && !townInfo && (
+              <p className='text-kapwa-text-support type-body'>
+                Select a result on the map or in the list to see its details,
+                source, and location precision.
+              </p>
+            )}
+          </div>
         </aside>
       </div>
 
