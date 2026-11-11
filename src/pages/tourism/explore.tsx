@@ -38,6 +38,7 @@ import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
 import { DatePill, LocationPill, Pill } from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
+import { useSaved } from './components/useSaved';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
 import boundaryData from '@/data/geo/municipalities-boundaries.json';
@@ -285,9 +286,39 @@ export default function TourismExplore() {
   const selIndex = filtered.findIndex(r => r.id === sel);
   const visible = filtered.slice(0, Math.max(pageSize, selIndex + 1));
 
+  // Filter changes crossfade the list: the old results fade out over the new.
+  const filterKey = `${q}|${town}|${layer}|${from}|${to}`;
+  const lastVisible = useRef(visible);
+  const lastKey = useRef(filterKey);
+  const [ghost, setGhost] = useState<Rec[] | null>(null);
+  useEffect(() => {
+    if (lastKey.current === filterKey) return;
+    lastKey.current = filterKey;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setGhost(lastVisible.current);
+    const id = window.setTimeout(() => setGhost(null), 150);
+    return () => window.clearTimeout(id);
+  }, [filterKey]);
+  useEffect(() => {
+    lastVisible.current = visible;
+  });
+
+  const { saved, toggle: toggleSaved } = useSaved();
+  const [squash, setSquash] = useState<{ k: string; n: number } | null>(null);
+
+  // Copy-link toast.
+  const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
+  const showToast = (text: string) =>
+    setToast(t => ({ text, n: (t?.n ?? 0) + 1 }));
+  useEffect(() => {
+    if (!toast) return;
+    const id = window.setTimeout(() => setToast(null), 2500);
+    return () => window.clearTimeout(id);
+  }, [toast]);
+
   return (
     <div
-      className={`[&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${bs.active ? '' : 'pb-8'}`}
+      className={`motion-safe:[&_button:not(:disabled):active]:scale-[.97] [&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${bs.active ? '' : 'pb-8'}`}
       style={bs.active ? { paddingBottom: bs.visible + 16 } : undefined}
     >
       <header
@@ -324,9 +355,19 @@ export default function TourismExplore() {
             type='button'
             onClick={() => {
               const url = window.location.href;
-              if (navigator.share)
+              const touch = window.matchMedia('(pointer: coarse)').matches;
+              if (touch && navigator.share) {
                 void navigator.share({ url }).catch(() => {});
-              else void navigator.clipboard?.writeText(url);
+                return;
+              }
+              navigator.clipboard
+                ?.writeText(url)
+                .then(() => showToast('Link copied'))
+                .catch(() =>
+                  showToast(
+                    "Couldn't copy. Copy the link from the address bar."
+                  )
+                );
             }}
             className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-control bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-elev-2 sm:px-5'
           >
@@ -504,14 +545,20 @@ export default function TourismExplore() {
                         key={k}
                         type='button'
                         aria-pressed={on}
-                        onClick={() =>
+                        onClick={() => {
                           setHiddenLayers(h =>
                             on ? [...h, k] : h.filter(x => x !== k)
-                          )
-                        }
+                          );
+                          setSquash(s => ({ k, n: (s?.n ?? 0) + 1 }));
+                        }}
                         className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
                       >
-                        <LayerGlyph layer={k} hollow={!on} />
+                        <span
+                          key={squash?.k === k ? squash.n : 0}
+                          className={`inline-flex ${squash?.k === k ? 'motion-safe:animate-[chip-squash_200ms_var(--ease-out-expo)]' : ''}`}
+                        >
+                          <LayerGlyph layer={k} hollow={!on} />
+                        </span>
                         {LAYER_LABEL[k]}
                       </button>
                     );
@@ -615,17 +662,42 @@ export default function TourismExplore() {
             {filtered.length === 0 ? (
               <p className='text-kapwa-text-support type-body p-6'>{reason}</p>
             ) : (
-              <ul className='grid gap-3 p-3 sm:grid-cols-2 lg:max-h-[70vh] lg:overflow-y-auto'>
-                {visible.map(r => (
-                  <li key={r.id}>
-                    <RecordCard
-                      rec={r}
-                      selected={sel === r.id}
-                      onSelect={select}
-                    />
-                  </li>
-                ))}
-              </ul>
+              <div className='relative'>
+                <ul
+                  key={filterKey}
+                  className='grid gap-3 p-3 motion-safe:animate-[list-fade-in_150ms_linear_both] sm:grid-cols-2 lg:max-h-[70vh] lg:overflow-y-auto'
+                >
+                  {visible.map(r => (
+                    <li key={r.id}>
+                      <RecordCard
+                        rec={r}
+                        selected={sel === r.id}
+                        onSelect={select}
+                        saved={saved.has(r.id)}
+                        onToggleSave={toggleSaved}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                {/* The previous results fade out over the new ones. */}
+                {ghost && (
+                  <ul
+                    aria-hidden='true'
+                    inert
+                    className='pointer-events-none absolute inset-x-0 top-0 grid max-h-full gap-3 overflow-hidden p-3 animate-[list-fade-out_150ms_linear_both] sm:grid-cols-2'
+                  >
+                    {ghost.map(r => (
+                      <li key={r.id}>
+                        <RecordCard
+                          rec={r}
+                          selected={false}
+                          onSelect={() => {}}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
             {visible.length < filtered.length && (
               <div className='border-kapwa-border-weak border-t p-2'>
@@ -942,6 +1014,21 @@ export default function TourismExplore() {
           addresses and may not be exact.
         </p>
       </section>
+      {/* Always mounted so screen readers announce the message when it appears. */}
+      <div role='status' aria-live='polite' className='sr-only'>
+        {toast?.text}
+      </div>
+      {toast && (
+        <div
+          key={toast.n}
+          aria-hidden='true'
+          style={{ bottom: (bs.active ? bs.visible : 0) + 24 }}
+          className='type-meta fixed left-1/2 z-50 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#0f234b] px-4 py-2.5 font-semibold text-white shadow-elev-3 motion-safe:animate-[toast-in_var(--dur-base)_var(--ease-out-expo)_both]'
+        >
+          <Share2Icon className='h-4 w-4' />
+          {toast.text}
+        </div>
+      )}
     </div>
   );
 }

@@ -77,6 +77,37 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 
 const CLUSTER_MAX_ZOOM = 12;
 
+/** Province outline as an SVG path (flat projection), shown while the map loads. */
+const SILHOUETTE = (() => {
+  const g = outline.geometry as
+    | { type: 'Polygon'; coordinates: number[][][] }
+    | { type: 'MultiPolygon'; coordinates: number[][][][] };
+  const rings =
+    g.type === 'Polygon' ? [g.coordinates[0]] : g.coordinates.map(p => p[0]);
+  const pts = rings.flat();
+  const minX = Math.min(...pts.map(p => p[0]));
+  const maxY = Math.max(...pts.map(p => p[1]));
+  // Shrink longitude so the shape keeps its proportions near 11.7°N.
+  const kx = Math.cos((11.7 * Math.PI) / 180);
+  const w = (Math.max(...pts.map(p => p[0])) - minX) * kx;
+  const h = maxY - Math.min(...pts.map(p => p[1]));
+  const d = rings
+    .map(
+      r =>
+        'M' +
+        r
+          .map(([x, y]) =>
+            [(((x - minX) * kx) / w) * 1000, ((maxY - y) / w) * 1000]
+              .map(v => v.toFixed(1))
+              .join(' ')
+          )
+          .join('L') +
+        'Z'
+    )
+    .join('');
+  return { d, viewBox: `0 0 1000 ${((h / w) * 1000).toFixed(0)}` };
+})();
+
 const reducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Same curve as the --ease-out-expo CSS token.
@@ -707,11 +738,28 @@ export default function AklanMap3D({
   }, [ready, selected]);
 
   return (
-    <div
-      ref={el}
-      role='region'
-      aria-label='Map of Aklan. Use the list below to select records with a keyboard.'
-      className='h-full w-full bg-[#eef1f5] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
-    />
+    <>
+      <div
+        ref={el}
+        role='region'
+        aria-label='Map of Aklan. Use the list below to select records with a keyboard.'
+        className='h-full w-full bg-[#eef1f5] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
+      />
+      {!ready && (
+        <div
+          role='status'
+          className='skeleton-shimmer absolute inset-0 z-[400] flex items-center justify-center bg-[#e7ecf2]'
+        >
+          <svg
+            aria-hidden='true'
+            viewBox={SILHOUETTE.viewBox}
+            className='h-3/4 w-3/4 text-[#c9d4e3]'
+          >
+            <path d={SILHOUETTE.d} fill='currentColor' />
+          </svg>
+          <span className='sr-only'>Loading map</span>
+        </div>
+      )}
+    </>
   );
 }
