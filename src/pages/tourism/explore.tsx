@@ -11,6 +11,7 @@ import {
   InfoIcon,
   CompassIcon,
   PauseIcon,
+  RouteIcon,
   PlayIcon,
   XIcon,
   Share2Icon,
@@ -33,6 +34,12 @@ import {
   tierBounds,
 } from '@/lib/tourism/explore';
 import { findMunicipalityAt, type BoundaryFeature } from '@/lib/tourism/geo';
+import {
+  MAX_STOPS,
+  moveStop,
+  parseTrip,
+  serializeTrip,
+} from '@/lib/tourism/trip';
 
 import AklanMap3D, {
   type MapPin,
@@ -45,9 +52,9 @@ import LayerGlyph from './components/LayerGlyph';
 import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
 import SearchBar from './components/SearchBar';
+import TripTray from './components/TripTray';
 import { DatePill, LocationPill, Pill } from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
-import { useSaved } from './components/useSaved';
 import ViewToggle from './components/ViewToggle';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
@@ -65,6 +72,8 @@ const SOURCES: Sources = {
   boundaries: (boundaryData as { features: BoundaryFeature[] }).features,
 };
 const ALL_RECORDS = buildRecords(SOURCES);
+const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
+const KNOWN_IDS = new Set(BY_ID.keys());
 const MUNICIPALITIES = [...SOURCES.municipalities].sort((a, b) =>
   a.name.localeCompare(b.name)
 );
@@ -367,7 +376,41 @@ export default function TourismExplore() {
     lastVisible.current = visible;
   });
 
-  const { saved, toggle: toggleSaved } = useSaved();
+  // My trip: saved places, in order, kept in the URL (`trip=id1,id2`) so the
+  // link itself is the shareable trip.
+  const tripIds = useMemo(
+    () => parseTrip(params.get('trip'), KNOWN_IDS),
+    [params]
+  );
+  const tripSet = useMemo(() => new Set(tripIds), [tripIds]);
+  const tripStops = tripIds.map(id => BY_ID.get(id)!);
+  const route = useMemo(
+    () =>
+      tripIds
+        .map(id => BY_ID.get(id)!)
+        .filter(r => r.lat != null && r.lon != null)
+        .map(r => ({ id: r.id, lat: r.lat!, lon: r.lon! })),
+    [tripIds]
+  );
+  const setTrip = (ids: string[]) => update({ trip: serializeTrip(ids) });
+  const toggleSaved = (id: string) => {
+    if (tripSet.has(id)) {
+      setTrip(tripIds.filter(x => x !== id));
+      return;
+    }
+    if (tripIds.length >= MAX_STOPS) {
+      showToast(
+        `Your trip is full (${MAX_STOPS} stops). Remove one to add more.`
+      );
+      return;
+    }
+    setTrip([...tripIds, id]);
+    showToast(
+      `Added to My trip · ${tripIds.length + 1} stop${tripIds.length ? 's' : ''}`
+    );
+  };
+  const [tripOpen, setTripOpen] = useState(false);
+  const [fitRouteKey, setFitRouteKey] = useState(0);
   const [squash, setSquash] = useState<{ k: string; n: number } | null>(null);
 
   // Copy-link toast.
@@ -379,6 +422,21 @@ export default function TourismExplore() {
     const id = window.setTimeout(() => setToast(null), 2500);
     return () => window.clearTimeout(id);
   }, [toast]);
+
+  // Share a link: native share sheet on touch devices, copy + toast elsewhere.
+  const shareLink = (url: string, copied: string) => {
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    if (touch && navigator.share) {
+      void navigator.share({ url }).catch(() => {});
+      return;
+    }
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => showToast(copied))
+      .catch(() =>
+        showToast("Couldn't copy. Copy the link from the address bar.")
+      );
+  };
 
   // Filters sheet: count of active filters and a one-tap reset.
   const activeFilters =
@@ -546,22 +604,7 @@ export default function TourismExplore() {
           </div>
           <button
             type='button'
-            onClick={() => {
-              const url = window.location.href;
-              const touch = window.matchMedia('(pointer: coarse)').matches;
-              if (touch && navigator.share) {
-                void navigator.share({ url }).catch(() => {});
-                return;
-              }
-              navigator.clipboard
-                ?.writeText(url)
-                .then(() => showToast('Link copied'))
-                .catch(() =>
-                  showToast(
-                    "Couldn't copy. Copy the link from the address bar."
-                  )
-                );
-            }}
+            onClick={() => shareLink(window.location.href, 'Link copied')}
             className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-control bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-elev-2 sm:px-5'
           >
             <Share2Icon aria-hidden='true' className='h-4 w-4' />
@@ -624,10 +667,49 @@ export default function TourismExplore() {
             Clear all
           </button>
         )}
+        <button
+          type='button'
+          onClick={() => setTripOpen(true)}
+          aria-haspopup='dialog'
+          aria-label={`My trip, ${tripIds.length} stop${tripIds.length === 1 ? '' : 's'}`}
+          className='field-control inline-flex items-center gap-2 font-bold'
+        >
+          <RouteIcon aria-hidden='true' className='h-4 w-4' />
+          My trip
+          {tripIds.length > 0 && (
+            <span
+              aria-hidden='true'
+              className='flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1D4FB0] px-1.5 text-xs text-white'
+            >
+              {tripIds.length}
+            </span>
+          )}
+        </button>
         <div ref={toggleRef} className='ml-auto'>
           <ViewToggle view={view} onChange={switchView} />
         </div>
       </div>
+      <TripTray
+        open={tripOpen}
+        onClose={() => setTripOpen(false)}
+        stops={tripStops}
+        onMove={(i, dir) => setTrip(moveStop(tripIds, i, dir))}
+        onRemove={id => setTrip(tripIds.filter(x => x !== id))}
+        onClear={() => setTrip([])}
+        onShowRoute={() => {
+          setTripOpen(false);
+          stopTour();
+          if (view !== 'map') switchView('map');
+          update({ town: '', sel: '' });
+          setFitRouteKey(k => k + 1);
+        }}
+        onShare={() => {
+          const url = new URL(window.location.pathname, window.location.origin);
+          url.searchParams.set('trip', serializeTrip(tripIds));
+          url.searchParams.set('view', 'map');
+          shareLink(url.toString(), 'Trip link copied');
+        }}
+      />
       <FiltersSheet
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
@@ -684,6 +766,8 @@ export default function TourismExplore() {
                   }}
                   hoverId={hoverRec}
                   pulse={pulse}
+                  route={route}
+                  fitRouteKey={fitRouteKey}
                   onLoadError={() => {
                     setMapFailed(true);
                     update({ view: 'list' });
@@ -1031,7 +1115,7 @@ export default function TourismExplore() {
                         rec={r}
                         selected={sel === r.id}
                         onSelect={select}
-                        saved={saved.has(r.id)}
+                        saved={tripSet.has(r.id)}
                         onToggleSave={toggleSaved}
                         onHover={setHoverRec}
                       />

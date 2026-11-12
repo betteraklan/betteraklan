@@ -52,6 +52,10 @@ interface Props {
   hoverId?: string | null;
   /** The map can't start (no WebGL) or its style failed to load. */
   onLoadError?: () => void;
+  /** My trip: stops in order, drawn as a numbered, dashed route. */
+  route?: { id: string; lat: number; lon: number }[];
+  /** A new value fits the camera to the route. */
+  fitRouteKey?: number;
   /** Pins to pulse twice; a new `key` replays the pulse. */
   pulse?: { ids: string[]; key: number } | null;
   townCount: Map<string, number>;
@@ -97,6 +101,24 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 const CLUSTER_MAX_ZOOM = 12;
 const LOAD_TIMEOUT_MS = 15_000;
 const PULSE_MS = 700;
+const DASH_STEP_MS = 100;
+// Marching-ants dash cycle (dash, gap) for the trip route.
+const DASHES: number[][] = [
+  [0, 4, 3],
+  [0.5, 4, 2.5],
+  [1, 4, 2],
+  [1.5, 4, 1.5],
+  [2, 4, 1],
+  [2.5, 4, 0.5],
+  [3, 4, 0],
+  [0, 0.5, 3, 3.5],
+  [0, 1, 3, 3],
+  [0, 1.5, 3, 2.5],
+  [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5],
+  [0, 3, 3, 1],
+  [0, 3.5, 3, 0.5],
+];
 const FILL_MS = 700;
 const FILL_STAGGER_MS = 500;
 const COMPASS_PATH = 'M22 4 L25 22 L22 20 L19 22 Z'; // north needle; the south half is drawn plain
@@ -186,6 +208,8 @@ export default function AklanMap3D({
   hoverId = null,
   onLoadError,
   pulse = null,
+  route = [],
+  fitRouteKey = 0,
   townCount,
   town,
   pins,
@@ -704,6 +728,64 @@ export default function AklanMap3D({
         else cb.current.onBackground?.();
       });
 
+      // My trip: casing + dashed line + numbered stops, above everything else.
+      map.addSource('route', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+      map.addLayer({
+        id: 'route-casing',
+        type: 'line',
+        source: 'route',
+        filter: ['==', ['geometry-type'], 'LineString'],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': 7,
+          'line-opacity': 0.9,
+        },
+      });
+      map.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        filter: ['==', ['geometry-type'], 'LineString'],
+        layout: { 'line-cap': 'butt', 'line-join': 'round' },
+        paint: {
+          'line-color': '#1D4FB0',
+          'line-width': 3.5,
+          'line-dasharray': DASHES[0],
+        },
+      });
+      map.addLayer({
+        id: 'route-stops',
+        type: 'circle',
+        source: 'route',
+        filter: ['==', ['geometry-type'], 'Point'],
+        // White disc with a navy edge and number: unlike the blue, filled
+        // cluster bubbles, so a stop number never reads as a record count.
+        paint: {
+          'circle-radius': 12,
+          'circle-color': '#ffffff',
+          'circle-stroke-color': '#0f234b',
+          'circle-stroke-width': 3,
+        },
+      });
+      map.addLayer({
+        id: 'route-num',
+        type: 'symbol',
+        source: 'route',
+        filter: ['==', ['geometry-type'], 'Point'],
+        layout: {
+          'text-field': ['to-string', ['get', 'n']],
+          'text-font': ['Noto Sans Bold'],
+          'text-size': 12,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        paint: { 'text-color': '#0f234b' },
+      });
+
       setReady(true);
     });
 
@@ -939,6 +1021,92 @@ export default function AklanMap3D({
         : [],
     });
   }, [ready, hoverId, pins]);
+
+  // My trip route data, and a marching-dash animation while it has a line.
+  const routeKey = route.map(r => r.id).join();
+  useEffect(() => {
+    const map = mapRef.current;
+    const src = map?.getSource('route') as GeoJSONSource | undefined;
+    if (!ready || !map || !src) return;
+    src.setData({
+      type: 'FeatureCollection',
+      features: [
+        ...(route.length > 1
+          ? [
+              {
+                type: 'Feature' as const,
+                properties: {},
+                geometry: {
+                  type: 'LineString' as const,
+                  coordinates: route.map(r => [r.lon, r.lat]),
+                },
+              },
+            ]
+          : []),
+        ...route.map((r, i) => ({
+          type: 'Feature' as const,
+          properties: { n: i + 1 },
+          geometry: { type: 'Point' as const, coordinates: [r.lon, r.lat] },
+        })),
+      ],
+    });
+    if (route.length < 2 || reducedMotion()) {
+      map.setPaintProperty('route-line', 'line-dasharray', DASHES[0]);
+      return;
+    }
+    // ~10 steps a second via rAF, so it stops by itself in hidden tabs.
+    let raf = 0;
+    let last = 0;
+    let step = 0;
+    const frame = (now: number) => {
+      if (now - last >= DASH_STEP_MS) {
+        last = now;
+        step = (step + 1) % DASHES.length;
+        map.setPaintProperty('route-line', 'line-dasharray', DASHES[step]);
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+    // routeKey captures every change to the stop list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, routeKey]);
+
+  // "Show route": fit the camera to the stops.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !fitRouteKey || route.length === 0) return;
+    if (route.length === 1) {
+      map.flyTo({ center: [route[0].lon, route[0].lat], zoom: 13 });
+      return;
+    }
+    const lons = route.map(r => r.lon);
+    const lats = route.map(r => r.lat);
+    // Fit top-down, with room for the layer panel on the left (wider screens).
+    const wide = map.getContainer().clientWidth >= 640;
+    const cam = map.cameraForBounds(
+      [
+        [Math.min(...lons), Math.min(...lats)],
+        [Math.max(...lons), Math.max(...lats)],
+      ],
+      {
+        padding: wide
+          ? { top: 70, right: 70, bottom: 90, left: 230 }
+          : { top: 110, right: 40, bottom: 90, left: 40 },
+        maxZoom: 14,
+      }
+    );
+    if (cam)
+      map.flyTo({
+        ...cam,
+        zoom: Math.max(cam.zoom ?? 10, map.getMinZoom()),
+        pitch: 0,
+        bearing: 0,
+        duration: 1400,
+      });
+    // Only a new fitRouteKey should move the camera.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, fitRouteKey]);
 
   // Pulse the calendar's matching pins twice (skipped with reduced motion).
   useEffect(() => {

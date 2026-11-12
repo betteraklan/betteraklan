@@ -123,7 +123,9 @@ export default function RecordCard({
           type='button'
           aria-pressed={saved}
           aria-label={
-            saved ? `Remove ${rec.name} from saved` : `Save ${rec.name}`
+            saved
+              ? `Remove ${rec.name} from my trip`
+              : `Add ${rec.name} to my trip`
           }
           onClick={() => {
             onToggleSave(rec.id);
