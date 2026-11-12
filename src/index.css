@@ -357,3 +357,42 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* --- TOURISM OVERVIEW: reveal on scroll + Ken Burns hero ---
+   Items rise 12px over 350ms once, as they enter view. They are only hidden
+   after the page script adds .reveal-ready, and never with reduced motion. */
+.reveal-ready [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  translate: 0 12px;
+}
+.reveal-ready [data-reveal] {
+  transition:
+    opacity 350ms var(--ease-out-expo),
+    translate 350ms var(--ease-out-expo);
+  /* Siblings in a grid start 40ms apart, capped so late items don't lag. */
+  transition-delay: calc(min(var(--i, 0), 6) * 40ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.1) translate(-2%, -1.5%);
+  }
+}
+.ken-burns {
+  animation: ken-burns 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns {
+    animation: none;
+  }
+}
