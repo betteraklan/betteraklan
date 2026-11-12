@@ -42,6 +42,10 @@ interface Props {
   townTier: Map<string, number>;
   /** Colour for each tier, lowest first. */
   tierColors: string[];
+  /** 'town': each municipality in its own colour; 'density': shade by record tier. */
+  colorMode?: 'town' | 'density';
+  /** Colour per municipality slug, for 'town' mode. */
+  townColors?: Record<string, string>;
   /** Pointer over a municipality (null when it leaves). */
   onHoverTown?: (slug: string | null) => void;
   /** Guided tour stop: varies how the camera arrives. */
@@ -202,6 +206,8 @@ export default function AklanMap3D({
   boundaries,
   townTier,
   tierColors,
+  colorMode = 'density',
+  townColors = {},
   onHoverTown,
   tourMove = null,
   onUserMove,
@@ -818,6 +824,32 @@ export default function AklanMap3D({
       }),
     });
   }, [ready, boundaries, townCount, town]);
+
+  // Fill colour follows the mode: one colour per municipality, or the
+  // animated record-density tier blended across the tier colours.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    map.setPaintProperty(
+      'town-fill',
+      'fill-color',
+      (colorMode === 'town'
+        ? [
+            'match',
+            ['get', 'slug'],
+            ...Object.entries(townColors).flat(),
+            '#94a3b8',
+          ]
+        : [
+            'interpolate',
+            ['linear'],
+            ['coalesce', ['feature-state', 'tier'], 0],
+            ...tierColorsRef.current.flatMap((c, i) => [i, c]),
+          ]) as unknown as maplibregl.ExpressionSpecification
+    );
+    // townColors is a stable module constant.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, colorMode]);
 
   // Shading tiers fill in from the lowest tier: 700 ms per town, north to south
   // on first load; later changes tween from the current shade with no stagger.

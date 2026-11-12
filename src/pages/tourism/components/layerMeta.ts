@@ -64,22 +64,58 @@ export function shapePoints(
   });
 }
 
-// Civic tints for photo-less cards, picked per municipality so each town keeps its colour.
-const TINTS = [
-  '#1D4FB0',
-  '#0F766E',
-  '#B45309',
-  '#6D28D9',
-  '#0E7490',
-  '#BE123C',
-  '#4D7C0F',
-  '#9A3412',
-];
+// Aklan's 17 municipalities, alphabetical.
+export const TOWN_SLUGS = [
+  'altavas',
+  'balete',
+  'banga',
+  'batan',
+  'buruanga',
+  'ibajay',
+  'kalibo',
+  'lezo',
+  'libacao',
+  'madalag',
+  'makato',
+  'malay',
+  'malinao',
+  'nabas',
+  'new-washington',
+  'numancia',
+  'tangalan',
+] as const;
 
-/** Stable tint for a municipality slug (or a neutral slate when unknown). */
+/**
+ * Hue per municipality: 17 evenly spaced hues, arranged so towns that share a
+ * border are at least 85° apart (found by search over the boundary data's
+ * shared edges; see layerMeta.test.ts).
+ */
+const TOWN_HUE: Record<string, number> = {
+  altavas: 85,
+  balete: 0,
+  banga: 254,
+  batan: 191,
+  buruanga: 127,
+  ibajay: 212,
+  kalibo: 21,
+  lezo: 169,
+  libacao: 233,
+  madalag: 148,
+  makato: 64,
+  malay: 296,
+  malinao: 339,
+  nabas: 42,
+  'new-washington': 106,
+  numancia: 275,
+  tangalan: 318,
+};
+
+/** One colour per municipality, used on the map and on photo-less cards. */
+export const TOWN_COLOR: Record<string, string> = Object.fromEntries(
+  TOWN_SLUGS.map(slug => [slug, `hsl(${TOWN_HUE[slug]}, 58%, 44%)`])
+);
+
+/** A municipality's colour (or a neutral slate when unknown). */
 export function townTint(slug: string | null): string {
-  if (!slug) return '#475569';
-  let h = 0;
-  for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return TINTS[h % TINTS.length];
+  return (slug && TOWN_COLOR[slug]) || '#475569';
 }

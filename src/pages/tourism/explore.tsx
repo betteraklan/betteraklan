@@ -49,7 +49,7 @@ import EmptyState from './components/EmptyState';
 import FestivalStrip from './components/FestivalStrip';
 import FiltersSheet from './components/FiltersSheet';
 import LayerGlyph from './components/LayerGlyph';
-import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
+import { LAYER_COLOR, LAYER_ICON, TOWN_COLOR } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
 import SearchBar from './components/SearchBar';
 import TripTray from './components/TripTray';
@@ -193,7 +193,8 @@ export default function TourismExplore() {
 
   // Client-only map display toggles (the Layer filter above still drives the list).
   const [hiddenLayers, setHiddenLayers] = useState<Layer[]>([]);
-  const [shade, setShade] = useState(true);
+  // Off: each municipality in its own colour. On: shade by record density.
+  const [shade, setShade] = useState(false);
   const counts = useMemo(() => {
     const c = new Map<string, number>();
     filtered.forEach(r => r.town && c.set(r.town, (c.get(r.town) ?? 0) + 1));
@@ -749,6 +750,8 @@ export default function TourismExplore() {
                   boundaries={SOURCES.boundaries}
                   townTier={townTier}
                   tierColors={TIER_COLOR}
+                  colorMode={shade ? 'density' : 'town'}
+                  townColors={TOWN_COLOR}
                   onHoverTown={setHoverTown}
                   tourMove={tourMove}
                   onUserMove={pauseTour}
@@ -1000,29 +1003,56 @@ export default function TourismExplore() {
                 aria-label='Map legend'
                 className='border-kapwa-border-weak text-kapwa-text-support type-meta flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3'
               >
-                <span className='flex flex-wrap items-center gap-1.5'>
-                  Fewer records
-                  {TIER_COLOR.slice(1).map((c, i) => {
-                    const t = i + 1;
-                    const on = hoverTier === t;
-                    return (
-                      <span
-                        key={c}
-                        title={`${tierRange(t)} records`}
-                        aria-hidden='true'
-                        className={`h-2.5 w-5 origin-bottom rounded-[2px] transition-transform duration-(--dur-fast) ease-out-expo ${on ? 'scale-y-[1.8] ring-2 ring-[#0f234b] ring-offset-1' : ''}`}
-                        style={{ background: c }}
-                      />
-                    );
-                  })}
-                  More
-                  {hoverTown && (
-                    <span className='text-kapwa-text-strong ml-1 font-semibold'>
-                      {MUNICIPALITIES.find(m => m.slug === hoverTown)?.name}:{' '}
-                      {hoverCount} record{hoverCount === 1 ? '' : 's'}
+                {shade ? (
+                  <span className='flex flex-wrap items-center gap-1.5'>
+                    Fewer records
+                    {TIER_COLOR.slice(1).map((c, i) => {
+                      const t = i + 1;
+                      const on = hoverTier === t;
+                      return (
+                        <span
+                          key={c}
+                          title={`${tierRange(t)} records`}
+                          aria-hidden='true'
+                          className={`h-2.5 w-5 origin-bottom rounded-[2px] transition-transform duration-(--dur-fast) ease-out-expo ${on ? 'scale-y-[1.8] ring-2 ring-[#0f234b] ring-offset-1' : ''}`}
+                          style={{ background: c }}
+                        />
+                      );
+                    })}
+                    More
+                    {hoverTown && (
+                      <span className='text-kapwa-text-strong ml-1 font-semibold'>
+                        {MUNICIPALITIES.find(m => m.slug === hoverTown)?.name}:{' '}
+                        {hoverCount} record{hoverCount === 1 ? '' : 's'}
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  <span className='flex w-full flex-wrap items-center gap-x-1'>
+                    <span className='text-kapwa-text-strong font-semibold'>
+                      Municipalities
                     </span>
-                  )}
-                </span>
+                    {MUNICIPALITIES.map(m => (
+                      <button
+                        key={m.slug}
+                        type='button'
+                        onClick={() => {
+                          stopTour();
+                          update({ town: m.slug, sel: '' });
+                        }}
+                        aria-pressed={town === m.slug}
+                        className={`inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 transition-colors duration-(--dur-fast) ${hoverTown === m.slug || town === m.slug ? 'bg-kapwa-bg-brand-weak text-kapwa-text-strong font-semibold' : ''}`}
+                      >
+                        <span
+                          aria-hidden='true'
+                          className='h-3 w-3 rounded-[3px]'
+                          style={{ background: TOWN_COLOR[m.slug] }}
+                        />
+                        {m.name}
+                      </button>
+                    ))}
+                  </span>
+                )}
                 <span className='flex items-center gap-1.5'>
                   <LayerGlyph layer='stay' hollow />
                   Dashed outline = approximate location
