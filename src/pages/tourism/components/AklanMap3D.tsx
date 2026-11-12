@@ -104,7 +104,10 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 
 const CLUSTER_MAX_ZOOM = 12;
 const LOAD_TIMEOUT_MS = 15_000;
-const SEA = '#eef1f5';
+// Soft tropical sea around Aklan (from the ui-ux-pro-max travel palette's
+// sky family, between #F0F9FF and #BAE6FD): bluer than the warm land so the
+// province reads as an island, light enough for pins and labels to stay clear.
+const SEA = '#D3EAF8';
 const PULSE_MS = 700;
 const DASH_STEP_MS = 100;
 // Marching-ants dash cycle (dash, gap) for the trip route.
@@ -473,7 +476,7 @@ export default function AklanMap3D({
             },
           },
         },
-        paint: { 'fill-color': SEA, 'fill-opacity': 0.94 },
+        paint: { 'fill-color': SEA, 'fill-opacity': 1 },
       });
 
       // Entrance only: a solid Aklan silhouette that fades as the camera settles.
@@ -1217,7 +1220,7 @@ export default function AklanMap3D({
         ref={el}
         role='region'
         aria-label='Map of Aklan. Use the list below to select records with a keyboard.'
-        className='h-full w-full bg-[#eef1f5] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
+        className='h-full w-full bg-[#D3EAF8] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
       />
       {/* Atmosphere: decorative only, never intercepts taps. */}
       <div
@@ -1281,12 +1284,12 @@ export default function AklanMap3D({
       {!ready && (
         <div
           role='status'
-          className='skeleton-shimmer absolute inset-0 z-[400] flex items-center justify-center bg-[#e7ecf2]'
+          className='skeleton-shimmer absolute inset-0 z-[400] flex items-center justify-center bg-[#D3EAF8]'
         >
           <svg
             aria-hidden='true'
             viewBox={SILHOUETTE.viewBox}
-            className='h-3/4 w-3/4 text-[#c9d4e3]'
+            className='h-3/4 w-3/4 text-[#F4F1EA]'
           >
             <path d={SILHOUETTE.d} fill='currentColor' />
           </svg>
