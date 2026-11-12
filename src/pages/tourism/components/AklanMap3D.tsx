@@ -48,6 +48,10 @@ interface Props {
   tourMove?: TourMove | null;
   /** The viewer dragged, zoomed, rotated or tilted the map themselves. */
   onUserMove?: () => void;
+  /** Record hovered in the list: its pin gets a soft highlight. */
+  hoverId?: string | null;
+  /** The map can't start (no WebGL) or its style failed to load. */
+  onLoadError?: () => void;
   townCount: Map<string, number>;
   town: string;
   pins: MapPin[];
@@ -89,6 +93,7 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 ];
 
 const CLUSTER_MAX_ZOOM = 12;
+const LOAD_TIMEOUT_MS = 15_000;
 const FILL_MS = 700;
 const FILL_STAGGER_MS = 500;
 const COMPASS_PATH = 'M22 4 L25 22 L22 20 L19 22 Z'; // north needle; the south half is drawn plain
@@ -175,6 +180,8 @@ export default function AklanMap3D({
   onHoverTown,
   tourMove = null,
   onUserMove,
+  hoverId = null,
+  onLoadError,
   townCount,
   town,
   pins,
@@ -212,6 +219,7 @@ export default function AklanMap3D({
     onSettled,
     onHoverTown,
     onUserMove,
+    onLoadError,
   });
   useEffect(() => {
     cb.current = {
@@ -221,6 +229,7 @@ export default function AklanMap3D({
       onSettled,
       onHoverTown,
       onUserMove,
+      onLoadError,
     };
   });
   const tourMoveRef = useRef(tourMove);
@@ -232,22 +241,53 @@ export default function AklanMap3D({
     if (!el.current) return;
     const province = boundsOf(boundaries);
     const lowEnd = (navigator.hardwareConcurrency ?? 4) <= 4;
-    const map = new maplibregl.Map({
-      container: el.current,
-      style: STYLE,
-      bounds: province as LngLatBoundsLike,
-      fitBoundsOptions: { padding: PAD },
-      maxBounds: [
-        [province[0][0] - 0.05, province[0][1] - 0.05],
-        [province[1][0] + 0.05, province[1][1] + 0.05],
-      ],
-      maxPitch: MAX_PITCH + 5,
-      // On touch screens one finger scrolls the page; two fingers move the map.
-      cooperativeGestures: window.matchMedia('(pointer: coarse)').matches,
-      canvasContextAttributes: { antialias: !lowEnd },
-      attributionControl: { compact: true },
-    });
+    let map: MLMap;
+    try {
+      map = new maplibregl.Map({
+        container: el.current,
+        style: STYLE,
+        bounds: province as LngLatBoundsLike,
+        fitBoundsOptions: { padding: PAD },
+        maxBounds: [
+          [province[0][0] - 0.05, province[0][1] - 0.05],
+          [province[1][0] + 0.05, province[1][1] + 0.05],
+        ],
+        maxPitch: MAX_PITCH + 5,
+        // On touch screens one finger scrolls the page; two fingers move the map.
+        cooperativeGestures: window.matchMedia('(pointer: coarse)').matches,
+        canvasContextAttributes: { antialias: !lowEnd },
+        attributionControl: { compact: true },
+      });
+    } catch {
+      // No WebGL (or similar): the page falls back to the list.
+      cb.current.onLoadError?.();
+      return;
+    }
     mapRef.current = map;
+    // Only the style itself failing to arrive counts as a map failure; tile
+    // errors later do not. 'style.load' needs no rendered frame, and the
+    // timer never fails while the tab is hidden (background tabs don't render).
+    let loaded = false;
+    let failTimer = 0;
+    const fail = () => {
+      if (!loaded) cb.current.onLoadError?.();
+    };
+    const arm = () => {
+      window.clearTimeout(failTimer);
+      failTimer = window.setTimeout(() => {
+        if (document.hidden) arm();
+        else fail();
+      }, LOAD_TIMEOUT_MS);
+    };
+    arm();
+    map.on('error', (e: { error?: { url?: string } }) => {
+      // Sprite or glyph hiccups don't stop the map; only the style request does.
+      if (!loaded && (!e.error?.url || e.error.url === STYLE)) fail();
+    });
+    map.once('style.load', () => {
+      loaded = true;
+      window.clearTimeout(failTimer);
+    });
     map
       .getCanvas()
       .setAttribute(
@@ -476,6 +516,25 @@ export default function AklanMap3D({
         },
         paint: { 'text-color': '#ffffff' },
       });
+      // List hover: a soft halo at the record's position. Its own one-point
+      // source, so it shows even while the pin sits inside a cluster bubble.
+      map.addSource('pin-hover', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+      map.addLayer({
+        id: 'pin-hover',
+        type: 'circle',
+        source: 'pin-hover',
+        paint: {
+          // Wider than the largest cluster bubble, so it reads as a ring around it.
+          'circle-radius': 26,
+          'circle-color': 'rgba(29,79,176,0.12)',
+          'circle-stroke-color': '#1D4FB0',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-opacity': 0.8,
+        },
+      });
       // Selected pin: a brand ring under the enlarged icon.
       map.addLayer({
         id: 'pin-ring',
@@ -628,6 +687,7 @@ export default function AklanMap3D({
     });
 
     return () => {
+      window.clearTimeout(failTimer);
       map.remove();
       mapRef.current = null;
     };
@@ -840,6 +900,24 @@ export default function AklanMap3D({
       map.off('moveend', onEnd);
     };
   }, [ready, boundaries, town, selected]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const pin = hoverId ? pins.find(p => p.id === hoverId) : null;
+    (map.getSource('pin-hover') as GeoJSONSource | undefined)?.setData({
+      type: 'FeatureCollection',
+      features: pin
+        ? [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'Point', coordinates: [pin.lon, pin.lat] },
+            },
+          ]
+        : [],
+    });
+  }, [ready, hoverId, pins]);
 
   // Selected pin grows and gains a ring; the label is anchored above it.
   useEffect(() => {

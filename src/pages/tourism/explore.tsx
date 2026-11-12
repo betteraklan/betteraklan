@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import {
@@ -8,13 +9,10 @@ import {
   CalendarX2Icon,
   ExternalLinkIcon,
   InfoIcon,
-  ListIcon,
-  MapIcon,
   CompassIcon,
   PauseIcon,
   PlayIcon,
   XIcon,
-  SearchIcon,
   Share2Icon,
   SlidersHorizontalIcon,
 } from 'lucide-react';
@@ -26,7 +24,7 @@ import { DATE_STATUS_LABEL } from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
   densityTier,
-  emptyReason,
+  emptyState,
   filterRecords,
   LAYER_LABEL,
   type Layer,
@@ -34,18 +32,22 @@ import {
   type Sources,
   tierBounds,
 } from '@/lib/tourism/explore';
-import { type BoundaryFeature } from '@/lib/tourism/geo';
+import { findMunicipalityAt, type BoundaryFeature } from '@/lib/tourism/geo';
 
 import AklanMap3D, {
   type MapPin,
   type TourMove,
 } from './components/AklanMap3D';
+import EmptyState from './components/EmptyState';
+import FiltersSheet from './components/FiltersSheet';
 import LayerGlyph from './components/LayerGlyph';
 import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
+import SearchBar from './components/SearchBar';
 import { DatePill, LocationPill, Pill } from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
 import { useSaved } from './components/useSaved';
+import ViewToggle from './components/ViewToggle';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
 import boundaryData from '@/data/geo/municipalities-boundaries.json';
@@ -166,8 +168,14 @@ export default function TourismExplore() {
     [selected]
   );
   const townInfo = MUNICIPALITIES.find(m => m.slug === town) ?? null;
-  const reason =
-    filtered.length === 0 ? emptyReason(ALL_RECORDS, filters) : null;
+  const empty =
+    filtered.length === 0
+      ? emptyState(
+          ALL_RECORDS,
+          filters,
+          MUNICIPALITIES.find(m => m.slug === town)?.name ?? null
+        )
+      : null;
   const mapped = filtered.filter(
     (r): r is Rec & { lat: number; lon: number } =>
       r.lat != null && r.lon != null
@@ -371,6 +379,119 @@ export default function TourismExplore() {
     return () => window.clearTimeout(id);
   }, [toast]);
 
+  // Filters sheet: count of active filters and a one-tap reset.
+  const activeFilters =
+    (town ? 1 : 0) + (layer !== 'all' ? 1 : 0) + (from || to ? 1 : 0);
+  const clearAll = () => {
+    stopTour();
+    update({ town: '', layer: '', from: '', to: '', sel: '' });
+  };
+
+  // Near me: asks for location only when tapped; the position never leaves the device.
+  const [locating, setLocating] = useState(false);
+  const nearMe = () => {
+    if (!navigator.geolocation) {
+      showToast(
+        "This browser can't share your location. Pick a municipality in Filters."
+      );
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setLocating(false);
+        const slug = findMunicipalityAt(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          SOURCES.boundaries
+        );
+        if (!slug) {
+          showToast(
+            'You seem to be outside Aklan. Pick a municipality in Filters instead.'
+          );
+          return;
+        }
+        stopTour();
+        update({ town: slug, sel: '', view: 'map' });
+        showToast(
+          `Showing ${MUNICIPALITIES.find(m => m.slug === slug)?.name}, near you`
+        );
+      },
+      err => {
+        setLocating(false);
+        showToast(
+          err.code === err.PERMISSION_DENIED
+            ? 'Location is off for this site. You can still pick a municipality in Filters.'
+            : "We couldn't find your location. Try again, or pick a municipality in Filters."
+        );
+      },
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 }
+    );
+  };
+
+  // Map failure: fall back to the list automatically, with a way back.
+  const [mapFailed, setMapFailed] = useState(false);
+
+  // List and map as one: hovering a card highlights its pin; tapping a pin
+  // scrolls its card into view where the list scrolls on its own (desktop).
+  const [hoverRec, setHoverRec] = useState<string | null>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const pinTapped = useRef(false);
+  useEffect(() => {
+    if (!sel || !pinTapped.current) return;
+    pinTapped.current = false;
+    const list = listRef.current;
+    const card = list?.querySelector<HTMLElement>(
+      `[data-rec="${CSS.escape(sel)}"]`
+    );
+    if (!list || !card || list.scrollHeight <= list.clientHeight) return;
+    list.scrollTo({
+      top: card.offsetTop - list.offsetTop - 12,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
+  }, [sel]);
+
+  // Switching views: remember each view's page scroll, and morph between
+  // them with a view transition where the browser supports it.
+  const scrollMemory = useRef<Record<'map' | 'list', number | null>>({
+    map: null,
+    list: null,
+  });
+  const switchView = (next: 'map' | 'list') => {
+    if (next === view) return;
+    if (next === 'map') setMapFailed(false);
+    scrollMemory.current[view] = window.scrollY;
+    const apply = () => {
+      flushSync(() => update({ view: next }));
+      const y = scrollMemory.current[next];
+      if (y !== null) window.scrollTo({ top: y });
+    };
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => unknown;
+    };
+    if (
+      doc.startViewTransition &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      doc.startViewTransition(apply);
+    else apply();
+  };
+
+  // A floating toggle appears once the inline one scrolls out of sight.
+  const toggleRef = useRef<HTMLDivElement>(null);
+  const [toggleOffscreen, setToggleOffscreen] = useState(false);
+  useEffect(() => {
+    const el = toggleRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) =>
+      setToggleOffscreen(!e.isIntersecting)
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
       className={`motion-safe:[&_button:not(:disabled):active]:scale-[.97] [&_:is(h1,h2,h3)]:text-balance [&_:is(a,button,input,select):focus-visible]:outline-2 [&_:is(a,button,input,select):focus-visible]:outline-offset-2 [&_:is(a,button,input,select):focus-visible]:outline-[#1D4FB0] space-y-6 ${intro ? '' : 'animate-in fade-in duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'} ${bs.active ? '' : 'pb-8'}`}
@@ -378,17 +499,19 @@ export default function TourismExplore() {
     >
       <header
         style={intro ? rise(0) : undefined}
-        className='[&_button:focus-visible]:!outline-white relative overflow-hidden rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'
+        className='[&_button:focus-visible]:!outline-white relative z-[20] rounded-card bg-gradient-to-br from-[#0B3FAE] via-[#1556D6] to-[#2F7BEA] p-4 text-white shadow-elev-2 sm:p-8'
       >
+        {/* Decoration is clipped on its own so the search dropdown can overflow the hero. */}
         <div
           aria-hidden='true'
-          className='absolute inset-0 opacity-25'
-          style={{ backgroundImage: WAVES, backgroundSize: '160px 32px' }}
-        />
-        <div
-          aria-hidden='true'
-          className='absolute -top-16 -right-10 h-56 w-56 rounded-full bg-[#FCD116]/25 blur-3xl'
-        />
+          className='absolute inset-0 overflow-hidden rounded-card'
+        >
+          <div
+            className='absolute inset-0 opacity-25'
+            style={{ backgroundImage: WAVES, backgroundSize: '160px 32px' }}
+          />
+          <div className='absolute -top-16 -right-10 h-56 w-56 rounded-full bg-[#FCD116]/25 blur-3xl' />
+        </div>
         <div className='relative flex items-center justify-between gap-4 sm:items-end'>
           <div className='flex items-stretch gap-4'>
             <span
@@ -430,128 +553,84 @@ export default function TourismExplore() {
             <span className='sr-only sm:not-sr-only'>Share view</span>
           </button>
         </div>
+        <div className='relative mt-4 sm:mt-6'>
+          <SearchBar
+            value={q}
+            onChange={v => update({ q: v, sel: '' })}
+            records={ALL_RECORDS}
+            towns={MUNICIPALITIES}
+            onPickRecord={r => {
+              stopTour();
+              update({ sel: r.id, town: r.town ?? '', q: '' });
+            }}
+            onPickTown={slug => {
+              stopTour();
+              update({ town: slug, sel: '', q: '' });
+            }}
+            onNearMe={nearMe}
+            locating={locating}
+          />
+        </div>
       </header>
 
-      {/* Controls card: search stays visible; the rest folds away on phones. */}
+      {/* Controls: filters sheet (with active count), clear all, and view. */}
       <div
         style={intro ? rise(1) : undefined}
-        className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-end gap-3 rounded-card border p-3 shadow-elev-1 sm:p-4'
+        className='bg-kapwa-bg-surface border-kapwa-border-weak flex flex-wrap items-center gap-2 rounded-card border p-2 shadow-elev-1 sm:p-3'
       >
-        <label className='relative min-w-[200px] flex-1'>
-          <span className='sr-only'>Search records</span>
-          <SearchIcon
-            aria-hidden='true'
-            className='text-kapwa-text-disabled absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2'
-          />
-          <input
-            type='search'
-            value={q}
-            onChange={e => update({ q: e.target.value, sel: '' })}
-            placeholder='Search records'
-            className='field-control w-full pl-9'
-          />
-        </label>
         <button
           type='button'
-          aria-expanded={filtersOpen}
-          aria-controls='explore-filters'
-          onClick={() => setFiltersOpen(o => !o)}
-          className='field-control inline-flex items-center gap-2 font-bold sm:hidden'
+          onClick={() => setFiltersOpen(true)}
+          aria-haspopup='dialog'
+          aria-label={
+            activeFilters
+              ? `Filters, ${activeFilters} active`
+              : 'Filters, none active'
+          }
+          className='field-control inline-flex items-center gap-2 font-bold'
         >
           <SlidersHorizontalIcon aria-hidden='true' className='h-4 w-4' />
           Filters
+          {activeFilters > 0 && (
+            <span
+              aria-hidden='true'
+              className='flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1D4FB0] px-1.5 text-xs text-white'
+            >
+              {activeFilters}
+            </span>
+          )}
         </button>
-        <div
-          id='explore-filters'
-          className={`${filtersOpen ? 'flex' : 'hidden'} w-full flex-wrap items-end gap-3 sm:contents`}
-        >
-          <label className='text-kapwa-text-strong type-meta font-semibold'>
-            Municipality
-            <select
-              value={town}
-              onChange={e => {
-                stopTour();
-                update({ town: e.target.value, sel: '' });
-              }}
-              className='field-control mt-1 block font-normal'
-            >
-              <option value=''>All municipalities</option>
-              {MUNICIPALITIES.map(m => (
-                <option key={m.slug} value={m.slug}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className='text-kapwa-text-strong type-meta font-semibold'>
-            Layer
-            <select
-              value={layer}
-              onChange={e => update({ layer: e.target.value, sel: '' })}
-              className='field-control mt-1 block font-normal'
-            >
-              <option value='all'>All records</option>
-              {(Object.keys(LAYER_LABEL) as Exclude<Layer, 'all'>[]).map(k => (
-                <option key={k} value={k}>
-                  {LAYER_LABEL[k]}
-                </option>
-              ))}
-            </select>
-          </label>
-          {HAS_DATED && (layer === 'event' || layer === 'all') && (
-            <fieldset className='type-meta flex flex-wrap gap-2 font-semibold'>
-              <legend className='sr-only'>Festival date range</legend>
-              <label>
-                From
-                <input
-                  type='date'
-                  value={from}
-                  onChange={e => update({ from: e.target.value })}
-                  className='field-control mt-1 block px-2 font-normal'
-                />
-              </label>
-              <label>
-                To
-                <input
-                  type='date'
-                  value={to}
-                  onChange={e => update({ to: e.target.value })}
-                  className='field-control mt-1 block px-2 font-normal'
-                />
-              </label>
-            </fieldset>
-          )}
-          {!HAS_DATED && layer === 'event' && (
-            <p className='text-kapwa-text-support type-meta self-center'>
-              No festival dates are recorded yet, so there is no date filter.
-            </p>
-          )}
-        </div>
-        <div
-          role='group'
-          aria-label='View'
-          className='border-kapwa-border-weak flex overflow-hidden rounded-control border text-sm font-bold'
-        >
-          {(['map', 'list'] as const).map(v => (
-            <button
-              key={v}
-              type='button'
-              aria-pressed={view === v}
-              onClick={() => update({ view: v })}
-              className={`inline-flex min-h-11 items-center gap-2 px-4 capitalize ${view === v ? 'bg-kapwa-bg-brand-default text-kapwa-text-inverse' : 'bg-kapwa-bg-surface text-kapwa-text-strong'}`}
-            >
-              {v === 'map' ? (
-                <MapIcon aria-hidden='true' className='h-4 w-4' />
-              ) : (
-                <ListIcon aria-hidden='true' className='h-4 w-4' />
-              )}
-              {v}
-            </button>
-          ))}
+        {activeFilters > 0 && (
+          <button
+            type='button'
+            onClick={clearAll}
+            className='text-kapwa-text-brand min-h-11 px-2 text-sm font-bold'
+          >
+            Clear all
+          </button>
+        )}
+        <div ref={toggleRef} className='ml-auto'>
+          <ViewToggle view={view} onChange={switchView} />
         </div>
       </div>
+      <FiltersSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        town={town}
+        layer={layer}
+        from={from}
+        to={to}
+        towns={MUNICIPALITIES}
+        hasDated={HAS_DATED}
+        resultCount={filtered.length}
+        update={patch => {
+          stopTour();
+          update(patch);
+        }}
+        onClearAll={clearAll}
+      />
 
-      {!reason &&
+      {!empty &&
         (filters.from || filters.to) &&
         filtered.some(r => r.dateStatus === 'unavailable') && (
           <p className='text-kapwa-text-muted type-meta'>
@@ -563,7 +642,10 @@ export default function TourismExplore() {
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]'>
         <div className='min-w-0 space-y-4'>
           {view === 'map' ? (
-            <Card className='overflow-hidden p-0' hover={false}>
+            <Card
+              className='overflow-hidden p-0 [view-transition-name:explore-map]'
+              hover={false}
+            >
               <div className='relative isolate h-[55vh] min-h-[320px] w-full sm:h-[62vh] sm:min-h-[360px] lg:h-[70vh] [&_.maplibregl-ctrl-group_button]:!h-11 [&_.maplibregl-ctrl-group_button]:!w-11'>
                 <AklanMap3D
                   intro={intro}
@@ -581,7 +663,15 @@ export default function TourismExplore() {
                     stopTour();
                     update({ town: slug, sel: '' });
                   }}
-                  onPin={select}
+                  onPin={id => {
+                    pinTapped.current = true;
+                    select(id);
+                  }}
+                  hoverId={hoverRec}
+                  onLoadError={() => {
+                    setMapFailed(true);
+                    update({ view: 'list' });
+                  }}
                   onSettled={setSettledTown}
                   onBackground={() => {
                     stopTour();
@@ -858,7 +948,23 @@ export default function TourismExplore() {
           ) : null}
 
           {/* Results: always rendered so keyboard users can reach them in both views. */}
-          <Card className='overflow-hidden rounded-card p-0' hover={false}>
+          {mapFailed && view === 'list' && (
+            <Card className='rounded-card p-0' hover={false}>
+              <EmptyState
+                tone='error'
+                title="The map didn't load"
+                body='Your connection may be slow, so we switched to the list. Everything is still here.'
+                action={{
+                  label: 'Try the map again',
+                  onClick: () => switchView('map'),
+                }}
+              />
+            </Card>
+          )}
+          <Card
+            className='overflow-hidden rounded-card p-0 [view-transition-name:explore-list]'
+            hover={false}
+          >
             <h2
               aria-live='polite'
               className='text-kapwa-text-strong border-kapwa-border-weak type-title border-b px-4 pt-4 pb-3'
@@ -867,10 +973,18 @@ export default function TourismExplore() {
               {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
             </h2>
             {filtered.length === 0 ? (
-              <p className='text-kapwa-text-support type-body p-6'>{reason}</p>
+              <EmptyState
+                title={empty!.title}
+                body={empty!.body}
+                action={{
+                  label: empty!.action.label,
+                  onClick: () => update({ ...empty!.action.patch, sel: '' }),
+                }}
+              />
             ) : (
               <div className='relative'>
                 <ul
+                  ref={listRef}
                   key={filterKey}
                   className='grid gap-3 p-3 motion-safe:animate-[list-fade-in_150ms_linear_both] sm:grid-cols-2 lg:max-h-[70vh] lg:overflow-y-auto'
                 >
@@ -882,6 +996,7 @@ export default function TourismExplore() {
                         onSelect={select}
                         saved={saved.has(r.id)}
                         onToggleSave={toggleSaved}
+                        onHover={setHoverRec}
                       />
                     </li>
                   ))}
@@ -1221,6 +1336,14 @@ export default function TourismExplore() {
           addresses and may not be exact.
         </p>
       </section>
+      {toggleOffscreen && (
+        <div
+          className='fixed left-1/2 z-[45] -translate-x-1/2 motion-safe:animate-[list-fade-in_var(--dur-fast)_linear_both]'
+          style={{ bottom: (bs.active ? bs.visible : 0) + 16 }}
+        >
+          <ViewToggle view={view} onChange={switchView} floating />
+        </div>
+      )}
       {/* Always mounted so screen readers announce the message when it appears. */}
       <div role='status' aria-live='polite' className='sr-only'>
         {toast?.text}

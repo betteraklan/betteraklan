@@ -14,6 +14,8 @@ interface Props {
   onSelect: (id: string) => void;
   saved?: boolean;
   onToggleSave?: (id: string) => void;
+  /** Pointer or focus on the card (null when it leaves), to highlight its pin. */
+  onHover?: (id: string | null) => void;
 }
 
 /**
@@ -28,6 +30,7 @@ export default function RecordCard({
   onSelect,
   saved = false,
   onToggleSave,
+  onHover,
 }: Props) {
   const [loaded, setLoaded] = useState(false);
   // Spring only in response to a tap, never on first render.
@@ -36,7 +39,14 @@ export default function RecordCard({
   const Icon = LAYER_ICON[rec.layer];
 
   return (
-    <div className='relative h-full'>
+    <div
+      data-rec={rec.id}
+      className='relative h-full'
+      onMouseEnter={() => onHover?.(rec.id)}
+      onMouseLeave={() => onHover?.(null)}
+      onFocus={() => onHover?.(rec.id)}
+      onBlur={() => onHover?.(null)}
+    >
       <button
         type='button'
         aria-pressed={selected}

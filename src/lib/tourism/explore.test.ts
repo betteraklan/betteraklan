@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest';
 import {
   buildRecords,
   densityTier,
+  emptyState,
   emptyReason,
   filterRecords,
+  searchSuggestions,
   type Sources,
   teaser,
   tierBounds,
@@ -166,6 +168,62 @@ describe('densityTier', () => {
       const [lo, hi] = tierBounds(densityTier(n, 454), 454);
       expect(n).toBeGreaterThanOrEqual(lo);
       expect(n).toBeLessThanOrEqual(hi);
+    }
+  });
+});
+
+describe('emptyState', () => {
+  const recs = buildRecords(sources);
+  const none = { q: '', town: '', layer: 'all' as const };
+
+  it('says when a category has no records anywhere', () => {
+    const s = emptyState(recs, { ...none, layer: 'product' }, null);
+    expect(s.title).toBe('No local products listed yet');
+    expect(s.action.patch.layer).toBe('');
+  });
+
+  it('offers to drop the search but keep the town and layer', () => {
+    const town = recs.find(r => r.town)!;
+    const s = emptyState(
+      recs,
+      { ...none, q: 'zzz', town: town.town!, layer: town.layer },
+      town.townName
+    );
+    expect(s.title).toBe('No matches for "zzz"');
+    expect(s.action.label).toMatch(/^Show all .+ in /);
+    expect(s.action.patch).toEqual({ q: '' });
+  });
+
+  it('just clears the search when nothing else is filtered', () => {
+    expect(emptyState(recs, { ...none, q: 'zzz' }, null).action.label).toBe(
+      'Clear search'
+    );
+  });
+});
+
+describe('searchSuggestions', () => {
+  const recs = buildRecords(sources);
+  const towns = [
+    { slug: 'testville', name: 'Testville' },
+    { slug: 'malay', name: 'Malay' },
+  ];
+
+  it('needs two characters', () => {
+    expect(searchSuggestions(recs, towns, 't')).toEqual({
+      towns: [],
+      groups: [],
+    });
+  });
+
+  it('matches towns and groups records by layer, capped per group', () => {
+    const s = searchSuggestions(recs, towns, 'te', 1);
+    expect(s.towns.map(t => t.slug)).toEqual(['testville']);
+    expect(searchSuggestions(recs, towns, 'fest').groups[0].items).toHaveLength(
+      2
+    );
+    for (const g of s.groups) {
+      expect(g.items.length).toBeLessThanOrEqual(1);
+      expect(g.items.every(r => r.layer === g.layer)).toBe(true);
     }
   });
 });

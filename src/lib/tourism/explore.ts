@@ -228,3 +228,112 @@ export function tierBounds(tier: number, max: number): [number, number] {
   const hi = Math.floor(Math.expm1((tier * L) / 5) + 1e-9);
   return [lo, Math.max(lo, hi)];
 }
+
+/** A designed empty state: what happened, why, and one action (a URL patch). */
+export interface EmptyState {
+  title: string;
+  body: string;
+  action: { label: string; patch: Record<string, string> };
+}
+
+/**
+ * Empty-results copy in plain Philippine English, with one suggested action.
+ * `townName` is the display name of `f.town`.
+ */
+export function emptyState(
+  all: Rec[],
+  f: Filters,
+  townName: string | null
+): EmptyState {
+  const what =
+    f.layer === 'all'
+      ? 'records'
+      : LAYER_LABEL[f.layer as Exclude<Layer, 'all'>].toLowerCase();
+  const inLayer = all.filter(r => f.layer === 'all' || r.layer === f.layer);
+  if (inLayer.length === 0)
+    return {
+      title: `No ${what} listed yet`,
+      body: `BetterAklan hasn't added any ${what} for Aklan yet. We'll list them once we have a reliable source.`,
+      action: {
+        label: 'Show all records',
+        patch: { layer: '', q: '', from: '', to: '' },
+      },
+    };
+  const inTown = inLayer.filter(r => !f.town || r.town === f.town);
+  if (f.town && inTown.length === 0)
+    return {
+      title: `No ${what} listed in ${townName} yet`,
+      body: `We don't have ${what} for ${townName} yet. You can still see what else is listed there.`,
+      action: {
+        label: `Show everything in ${townName}`,
+        patch: { layer: '', q: '', from: '', to: '' },
+      },
+    };
+  if (f.q.trim())
+    return {
+      title: `No matches for "${f.q.trim()}"`,
+      body: 'Check the spelling, or try a shorter word like a town or place name.',
+      action:
+        f.town || f.layer !== 'all'
+          ? {
+              label: `Show all ${what} in ${townName ?? 'Aklan'}`,
+              patch: { q: '' },
+            }
+          : { label: 'Clear search', patch: { q: '' } },
+    };
+  if (f.from || f.to)
+    return {
+      title: 'No festivals with dates in this range',
+      body: 'Festivals without a recorded date are still listed.',
+      action: { label: 'Remove dates', patch: { from: '', to: '' } },
+    };
+  return {
+    title: 'Nothing matches these filters',
+    body: 'Try removing a filter.',
+    action: {
+      label: 'Clear all filters',
+      patch: { q: '', town: '', layer: '', from: '', to: '' },
+    },
+  };
+}
+
+export interface Suggestions {
+  towns: { slug: string; name: string }[];
+  groups: { layer: Exclude<Layer, 'all'>; items: Rec[] }[];
+}
+
+/**
+ * Search suggestions: matching municipalities, then records grouped by layer
+ * (up to `perGroup` each). Names that start with the query rank first.
+ */
+export function searchSuggestions(
+  recs: Rec[],
+  towns: { slug: string; name: string }[],
+  query: string,
+  perGroup = 3
+): Suggestions {
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return { towns: [], groups: [] };
+  const rank = (name: string) => {
+    const n = name.toLowerCase();
+    return n.startsWith(q) ? 0 : n.includes(q) ? 1 : 2;
+  };
+  const byRank = <T extends { name: string }>(a: T, b: T) =>
+    rank(a.name) - rank(b.name) || a.name.localeCompare(b.name);
+  const order: Exclude<Layer, 'all'>[] = ['place', 'event', 'stay', 'product'];
+  return {
+    towns: towns
+      .filter(t => rank(t.name) < 2)
+      .sort(byRank)
+      .slice(0, 3),
+    groups: order
+      .map(layer => ({
+        layer,
+        items: recs
+          .filter(r => r.layer === layer && rank(r.name) < 2)
+          .sort(byRank)
+          .slice(0, perGroup),
+      }))
+      .filter(g => g.items.length > 0),
+  };
+}
