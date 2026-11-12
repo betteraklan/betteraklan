@@ -60,6 +60,8 @@ interface Props {
   route?: { id: string; lat: number; lon: number }[];
   /** A new value fits the camera to the route. */
   fitRouteKey?: number;
+  /** Where to centre each town's view (lon, lat), e.g. its exactly located records. */
+  townCentres?: Map<string, [number, number]>;
   /** Pins to pulse twice; a new `key` replays the pulse. */
   pulse?: { ids: string[]; key: number } | null;
   townCount: Map<string, number>;
@@ -84,11 +86,9 @@ const DEM =
 const PAD = 24;
 const MAX_PITCH = 55;
 const INTRO_MS = 1200;
-// Town focus: 2s curved flight, the chosen town lifts while the others dim to 35%.
+// Town focus: 2s curved flight; the chosen town stands out while the others dim to 35%.
 const TOWN_FLIGHT_MS = 2000;
 const REVERSE_MS = 600;
-// Tall enough to read at town zoom (~100 m per pixel); translucent so the map shows through.
-const LIFT_M = 1200;
 const TOWN_PITCH = 40;
 const DIM_VEIL = 0.65;
 /** Icon scale by zoom; the selected pin is drawn 40% larger. */
@@ -104,6 +104,7 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 
 const CLUSTER_MAX_ZOOM = 12;
 const LOAD_TIMEOUT_MS = 15_000;
+const SEA = '#eef1f5';
 const PULSE_MS = 700;
 const DASH_STEP_MS = 100;
 // Marching-ants dash cycle (dash, gap) for the trip route.
@@ -214,6 +215,7 @@ export default function AklanMap3D({
   hoverId = null,
   onLoadError,
   pulse = null,
+  townCentres,
   route = [],
   fitRouteKey = 0,
   townCount,
@@ -394,26 +396,35 @@ export default function AklanMap3D({
         data: { type: 'FeatureCollection', features: [] },
         promoteId: 'slug',
       });
-      map.addLayer({
-        id: 'town-fill',
-        type: 'fill',
-        source: 'towns',
-        paint: {
-          // Animated tier (feature-state) blended across the tier colours.
-          'fill-color': [
-            'interpolate',
-            ['linear'],
-            ['coalesce', ['feature-state', 'tier'], 0],
-            ...tierColorsRef.current.flatMap((c, i) => [i, c]),
-          ] as unknown as maplibregl.ExpressionSpecification,
-          'fill-opacity': [
-            'case',
-            ['boolean', ['feature-state', 'hover'], false],
-            0.62,
-            ['get', 'opacity'],
-          ],
+      // Town colours, borders and the focus veil go under the basemap's water,
+      // so the sea covers the parts of each boundary that run out over it.
+      const UNDER_WATER = () => (map.getLayer('water') ? 'water' : undefined);
+      // One even sea: basemap water takes the same colour as the outside mask.
+      if (map.getLayer('water'))
+        map.setPaintProperty('water', 'fill-color', SEA);
+      map.addLayer(
+        {
+          id: 'town-fill',
+          type: 'fill',
+          source: 'towns',
+          paint: {
+            // Animated tier (feature-state) blended across the tier colours.
+            'fill-color': [
+              'interpolate',
+              ['linear'],
+              ['coalesce', ['feature-state', 'tier'], 0],
+              ...tierColorsRef.current.flatMap((c, i) => [i, c]),
+            ] as unknown as maplibregl.ExpressionSpecification,
+            'fill-opacity': [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              0.62,
+              ['get', 'opacity'],
+            ],
+          },
         },
-      });
+        UNDER_WATER()
+      );
 
       // 3D buildings from OpenStreetMap heights, from street-level zoom.
       map.addLayer({
@@ -462,7 +473,7 @@ export default function AklanMap3D({
             },
           },
         },
-        paint: { 'fill-color': '#eef1f5', 'fill-opacity': 0.94 },
+        paint: { 'fill-color': SEA, 'fill-opacity': 0.94 },
       });
 
       // Entrance only: a solid Aklan silhouette that fades as the camera settles.
@@ -478,15 +489,18 @@ export default function AklanMap3D({
           },
         });
 
-      map.addLayer({
-        id: 'town-line',
-        type: 'line',
-        source: 'towns',
-        paint: {
-          'line-color': ['case', ['get', 'selected'], '#1D4FB0', '#8a9bb5'],
-          'line-width': ['case', ['get', 'selected'], 2.5, 0.8],
+      map.addLayer(
+        {
+          id: 'town-line',
+          type: 'line',
+          source: 'towns',
+          paint: {
+            'line-color': ['case', ['get', 'selected'], '#1D4FB0', '#8a9bb5'],
+            'line-width': ['case', ['get', 'selected'], 2.5, 0.8],
+          },
         },
-      });
+        UNDER_WATER()
+      );
 
       // Pins cluster at low zoom; count bubbles expand on tap.
       addPinIcons(map);
@@ -618,26 +632,17 @@ export default function AklanMap3D({
         },
       });
 
-      // Chosen town rises as a translucent slab; height tweens via paint transition.
-      map.addLayer({
-        id: 'town-lift',
-        type: 'fill-extrusion',
-        source: 'towns',
-        filter: ['==', ['get', 'slug'], ''],
-        paint: {
-          'fill-extrusion-color': '#3B78DB',
-          'fill-extrusion-opacity': 0.2,
-          'fill-extrusion-height': 0,
-        },
-      });
       // Veil over every other town (and its pins): opacity 0.65 leaves them at 35%.
-      map.addLayer({
-        id: 'town-dim',
-        type: 'fill',
-        source: 'towns',
-        filter: ['!=', ['get', 'slug'], ''],
-        paint: { 'fill-color': '#eef1f5', 'fill-opacity': 0 },
-      });
+      map.addLayer(
+        {
+          id: 'town-dim',
+          type: 'fill',
+          source: 'towns',
+          filter: ['!=', ['get', 'slug'], ''],
+          paint: { 'fill-color': '#eef1f5', 'fill-opacity': 0 },
+        },
+        UNDER_WATER()
+      );
 
       // Hover: municipality highlight and a name tooltip.
       const tip = new maplibregl.Popup({
@@ -817,7 +822,7 @@ export default function AklanMap3D({
             name: f.properties.name,
             count: townCount.get(slug) ?? 0,
             selected: slug === town,
-            opacity: town && slug !== town ? 0.12 : town ? 0.28 : 0.42,
+            opacity: town && slug !== town ? 0.12 : town ? 0.6 : 0.42,
           },
           geometry: f.geometry,
         };
@@ -910,7 +915,8 @@ export default function AklanMap3D({
     });
   }, [ready, pins]);
 
-  // Town focus: dim the others and lift the chosen one; reverse when cleared.
+  // Town focus: dim the others (the chosen town keeps a stronger fill and a bold
+  // border, both under the water so they stop at the coast); reverse when cleared.
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
@@ -920,32 +926,20 @@ export default function AklanMap3D({
       duration: ms,
       delay: 0,
     });
-    map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
-      duration: ms,
-      delay: 0,
-    });
     if (!town) {
       map.setPaintProperty('town-dim', 'fill-opacity', 0);
-      map.setPaintProperty('town-lift', 'fill-extrusion-height', 0);
+      map.setPaintProperty('pins', 'icon-opacity', 1);
       return;
     }
     map.setFilter('town-dim', ['!=', ['get', 'slug'], town]);
     map.setPaintProperty('town-dim', 'fill-opacity', DIM_VEIL);
-    // Start the new town flat so its lift always tweens up from the ground.
-    map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
-      duration: 0,
-      delay: 0,
-    });
-    map.setPaintProperty('town-lift', 'fill-extrusion-height', 0);
-    map.setFilter('town-lift', ['==', ['get', 'slug'], town]);
-    const raf = requestAnimationFrame(() => {
-      map.setPaintProperty('town-lift', 'fill-extrusion-height-transition', {
-        duration: ms,
-        delay: 0,
-      });
-      map.setPaintProperty('town-lift', 'fill-extrusion-height', LIFT_M);
-    });
-    return () => cancelAnimationFrame(raf);
+    // The veil sits under the water now, so other towns' pins fade directly.
+    map.setPaintProperty('pins', 'icon-opacity', [
+      'case',
+      ['==', ['get', 'town'], town],
+      1,
+      0.35,
+    ]);
   }, [ready, town]);
 
   // Camera: fly to the record (street level, tilted), the town, or the province.
@@ -969,11 +963,17 @@ export default function AklanMap3D({
       ) as LngLatBoundsLike;
       const cam = map.cameraForBounds(bounds, { padding: f ? 48 : PAD });
       if (!cam) return;
-      const zoom = Math.max(cam.zoom ?? 10, map.getMinZoom());
+      // Boundaries reach out over the sea, so when a town has exactly located
+      // records, centre on them (the town proper) and come in a little closer.
+      const centre = f ? townCentres?.get(f.properties.slug) : undefined;
+      const zoom = Math.max(
+        (cam.zoom ?? 10) + (centre ? 0.4 : 0),
+        map.getMinZoom()
+      );
       target = {
-        center: cam.center,
+        center: centre ?? cam.center,
         zoom,
-        // Tilt town views so the lifted town reads as raised.
+        // Tilt town views for a sense of terrain.
         pitch: f ? Math.max(pitchFor(zoom), TOWN_PITCH) : pitchFor(zoom),
         bearing: f ? -12 : 0,
         duration: f ? TOWN_FLIGHT_MS : 1600,
@@ -1034,7 +1034,7 @@ export default function AklanMap3D({
     return () => {
       map.off('moveend', onEnd);
     };
-  }, [ready, boundaries, town, selected]);
+  }, [ready, boundaries, town, selected, townCentres]);
 
   useEffect(() => {
     const map = mapRef.current;

@@ -74,6 +74,23 @@ const SOURCES: Sources = {
 const ALL_RECORDS = buildRecords(SOURCES);
 const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
 const KNOWN_IDS = new Set(BY_ID.keys());
+// Town view centre: mean of the town's exactly located records (the town
+// proper). Boundaries extend over the sea, so their middle can be offshore.
+const TOWN_CENTRES = (() => {
+  const sum = new Map<string, { lon: number; lat: number; n: number }>();
+  for (const r of ALL_RECORDS) {
+    if (r.placement !== 'exact' || !r.town || r.lat == null || r.lon == null)
+      continue;
+    const t = sum.get(r.town) ?? { lon: 0, lat: 0, n: 0 };
+    sum.set(r.town, { lon: t.lon + r.lon, lat: t.lat + r.lat, n: t.n + 1 });
+  }
+  return new Map(
+    [...sum].map(([slug, t]) => [
+      slug,
+      [t.lon / t.n, t.lat / t.n] as [number, number],
+    ])
+  );
+})();
 const MUNICIPALITIES = [...SOURCES.municipalities].sort((a, b) =>
   a.name.localeCompare(b.name)
 );
@@ -769,6 +786,7 @@ export default function TourismExplore() {
                   }}
                   hoverId={hoverRec}
                   pulse={pulse}
+                  townCentres={TOWN_CENTRES}
                   route={route}
                   fitRouteKey={fitRouteKey}
                   onLoadError={() => {
