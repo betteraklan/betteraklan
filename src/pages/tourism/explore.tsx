@@ -10,6 +10,8 @@ import {
   ExternalLinkIcon,
   InfoIcon,
   CompassIcon,
+  LayersIcon,
+  Minimize2Icon,
   PauseIcon,
   RouteIcon,
   PlayIcon,
@@ -106,6 +108,7 @@ const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
 };
 
 const TOUR_STEP_MS = 5000;
+const LAYERS_KEY = 'betteraklan:layers-minimized';
 const RING_LEN = 2 * Math.PI * 21;
 // Shading ramp for record counts: brighter means more BetterAklan records.
 const TIER_COLOR = [
@@ -509,6 +512,34 @@ export default function TourismExplore() {
   // Map failure: fall back to the list automatically, with a way back.
   const [mapFailed, setMapFailed] = useState(false);
 
+  // Layer panel minimize: remembered in this browser; phones start minimized.
+  const [layersMin, setLayersMin] = useState(() => {
+    try {
+      const v = localStorage.getItem(LAYERS_KEY);
+      if (v !== null) return v === '1';
+    } catch {
+      // Storage blocked: fall back to the screen-size default.
+    }
+    return window.matchMedia('(max-width: 639px)').matches;
+  });
+  const layersPillRef = useRef<HTMLButtonElement>(null);
+  const layersMinRef = useRef<HTMLButtonElement>(null);
+  const layersToggled = useRef(false);
+  const setLayersMinimized = (v: boolean) => {
+    layersToggled.current = true;
+    setLayersMin(v);
+    try {
+      localStorage.setItem(LAYERS_KEY, v ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  };
+  // Keep keyboard focus on the control that replaced the one just pressed.
+  useEffect(() => {
+    if (!layersToggled.current) return;
+    (layersMin ? layersPillRef : layersMinRef).current?.focus();
+  }, [layersMin]);
+
   // Festival calendar: picking a month sets the date range and pulses its pins.
   const EVENTS = useMemo(
     () => ALL_RECORDS.filter(r => r.layer === 'event'),
@@ -800,47 +831,88 @@ export default function TourismExplore() {
                   }}
                 />
 
-                {/* Layer widget: show or hide each pin type, and the municipality shading. */}
-                <div
-                  role='group'
-                  aria-label='Map layers'
-                  className='surface-glass absolute top-3 left-3 z-[500] flex max-w-[calc(100%-1.5rem)] gap-1.5 overflow-x-auto p-2 sm:flex-col'
-                >
-                  {(
-                    Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
-                  ).map(k => {
-                    const on = !hiddenLayers.includes(k);
-                    return (
-                      <button
-                        key={k}
-                        type='button'
-                        aria-pressed={on}
-                        onClick={() => {
-                          setHiddenLayers(h =>
-                            on ? [...h, k] : h.filter(x => x !== k)
-                          );
-                          setSquash(s => ({ k, n: (s?.n ?? 0) + 1 }));
-                        }}
-                        className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${on ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
-                      >
-                        <span
-                          key={squash?.k === k ? squash.n : 0}
-                          className={`inline-flex ${squash?.k === k ? 'motion-safe:animate-[chip-squash_200ms_var(--ease-out-expo)]' : ''}`}
-                        >
-                          <LayerGlyph layer={k} hollow={!on} />
+                {/* Layer panel: show or hide each pin type and the shading; it
+                    minimizes to a small pill so the map stays clear. */}
+                <div className='absolute top-3 left-3 z-[500]'>
+                  {layersMin ? (
+                    <button
+                      ref={layersPillRef}
+                      type='button'
+                      aria-expanded={false}
+                      aria-controls='map-layers'
+                      onClick={() => setLayersMinimized(false)}
+                      className='inline-flex min-h-11 origin-top-left items-center gap-2 rounded-full border border-white/10 bg-[#0f234b]/90 px-4 text-sm font-semibold text-white shadow-elev-3 backdrop-blur-md motion-safe:animate-[panel-pop_var(--dur-fast)_var(--ease-out-expo)_both]'
+                    >
+                      <LayersIcon aria-hidden='true' className='h-4 w-4' />
+                      Layers
+                      <span className='text-xs text-white/70'>
+                        {4 - hiddenLayers.length}/4
+                      </span>
+                    </button>
+                  ) : (
+                    <div
+                      id='map-layers'
+                      role='group'
+                      aria-label='Map layers'
+                      className='flex w-56 origin-top-left flex-col gap-1 rounded-panel border border-white/10 bg-[#0f234b]/90 p-2 text-white shadow-elev-3 backdrop-blur-md motion-safe:animate-[panel-pop_var(--dur-fast)_var(--ease-out-expo)_both]'
+                    >
+                      <div className='flex items-center justify-between pl-2'>
+                        <span className='type-meta font-bold tracking-wider text-white/70 uppercase'>
+                          Layers
                         </span>
-                        {LAYER_LABEL[k]}
+                        <button
+                          ref={layersMinRef}
+                          type='button'
+                          aria-expanded={true}
+                          aria-controls='map-layers'
+                          aria-label='Minimize layers'
+                          onClick={() => setLayersMinimized(true)}
+                          className='flex h-11 w-11 items-center justify-center rounded-full text-white/80 hover:bg-white/10'
+                        >
+                          <Minimize2Icon
+                            aria-hidden='true'
+                            className='h-4 w-4'
+                          />
+                        </button>
+                      </div>
+                      {(
+                        Object.keys(LAYER_COLOR) as (keyof typeof LAYER_COLOR)[]
+                      ).map(k => {
+                        const on = !hiddenLayers.includes(k);
+                        return (
+                          <button
+                            key={k}
+                            type='button'
+                            aria-pressed={on}
+                            onClick={() => {
+                              setHiddenLayers(h =>
+                                on ? [...h, k] : h.filter(x => x !== k)
+                              );
+                              setSquash(s => ({ k, n: (s?.n ?? 0) + 1 }));
+                            }}
+                            className={`type-meta flex min-h-11 items-center gap-2.5 rounded-control px-3 font-semibold transition-colors duration-(--dur-fast) ${on ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'}`}
+                          >
+                            <span
+                              key={squash?.k === k ? squash.n : 0}
+                              className={`inline-flex ${squash?.k === k ? 'motion-safe:animate-[chip-squash_200ms_var(--ease-out-expo)]' : ''}`}
+                            >
+                              <LayerGlyph layer={k} hollow={!on} onDark />
+                            </span>
+                            {LAYER_LABEL[k]}
+                          </button>
+                        );
+                      })}
+                      <div className='my-1 border-t border-white/10' />
+                      <button
+                        type='button'
+                        aria-pressed={shade}
+                        onClick={() => setShade(v => !v)}
+                        className={`type-meta flex min-h-11 items-center rounded-control px-3 font-semibold transition-colors duration-(--dur-fast) ${shade ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'}`}
+                      >
+                        Shade by records
                       </button>
-                    );
-                  })}
-                  <button
-                    type='button'
-                    aria-pressed={shade}
-                    onClick={() => setShade(v => !v)}
-                    className={`flex min-h-11 flex-none items-center transition-colors duration-(--dur-fast) gap-2 rounded-control px-3 type-meta font-semibold ${shade ? 'bg-kapwa-bg-brand-weak' : 'text-kapwa-text-support'}`}
-                  >
-                    Shade by records
-                  </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Tour controls: start, or pause/resume with a progress ring, and skip. */}

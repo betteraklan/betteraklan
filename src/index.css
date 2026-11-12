@@ -396,3 +396,11 @@
     animation: none;
   }
 }
+
+/* Map layer panel: pops in from its top-left corner when opened or minimized. */
+@keyframes panel-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
