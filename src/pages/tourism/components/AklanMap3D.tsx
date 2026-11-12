@@ -52,6 +52,8 @@ interface Props {
   hoverId?: string | null;
   /** The map can't start (no WebGL) or its style failed to load. */
   onLoadError?: () => void;
+  /** Pins to pulse twice; a new `key` replays the pulse. */
+  pulse?: { ids: string[]; key: number } | null;
   townCount: Map<string, number>;
   town: string;
   pins: MapPin[];
@@ -94,6 +96,7 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 
 const CLUSTER_MAX_ZOOM = 12;
 const LOAD_TIMEOUT_MS = 15_000;
+const PULSE_MS = 700;
 const FILL_MS = 700;
 const FILL_STAGGER_MS = 500;
 const COMPASS_PATH = 'M22 4 L25 22 L22 20 L19 22 Z'; // north needle; the south half is drawn plain
@@ -182,6 +185,7 @@ export default function AklanMap3D({
   onUserMove,
   hoverId = null,
   onLoadError,
+  pulse = null,
   townCount,
   town,
   pins,
@@ -533,6 +537,23 @@ export default function AklanMap3D({
           'circle-stroke-color': '#1D4FB0',
           'circle-stroke-width': 2.5,
           'circle-stroke-opacity': 0.8,
+        },
+      });
+      // Calendar pick: expanding rings on the matching pins, played twice.
+      map.addSource('pin-pulse', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+      map.addLayer({
+        id: 'pin-pulse',
+        type: 'circle',
+        source: 'pin-pulse',
+        paint: {
+          'circle-radius': 10,
+          'circle-color': 'rgba(0,0,0,0)',
+          'circle-stroke-color': '#b45309',
+          'circle-stroke-width': 3,
+          'circle-stroke-opacity': 0,
         },
       });
       // Selected pin: a brand ring under the enlarged icon.
@@ -918,6 +939,40 @@ export default function AklanMap3D({
         : [],
     });
   }, [ready, hoverId, pins]);
+
+  // Pulse the calendar's matching pins twice (skipped with reduced motion).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !pulse || reducedMotion()) return;
+    const want = new Set(pulse.ids);
+    (map.getSource('pin-pulse') as GeoJSONSource | undefined)?.setData({
+      type: 'FeatureCollection',
+      features: pins
+        .filter(p => want.has(p.id))
+        .map(p => ({
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
+        })),
+    });
+    const t0 = performance.now();
+    let raf = 0;
+    const frame = (now: number) => {
+      const t = (now - t0) / PULSE_MS;
+      if (t >= 2) {
+        map.setPaintProperty('pin-pulse', 'circle-stroke-opacity', 0);
+        return;
+      }
+      const p = t % 1;
+      map.setPaintProperty('pin-pulse', 'circle-radius', 10 + 24 * p);
+      map.setPaintProperty('pin-pulse', 'circle-stroke-opacity', 1 - p);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+    // Replays only when a new pulse is requested.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, pulse?.key]);
 
   // Selected pin grows and gains a ring; the label is anchored above it.
   useEffect(() => {

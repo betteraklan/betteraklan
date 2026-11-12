@@ -53,3 +53,79 @@ export function formatDateRange(start: string, end?: string): string {
     ? `${a} – ${DAY.format(new Date(`${end}T00:00:00Z`))}`
     : a;
 }
+
+export interface MonthCell {
+  key: string; // 'YYYY-MM'
+  label: string; // 'Jan'
+  year: number;
+  month: number; // 1–12
+  from: string; // first day, ISO
+  to: string; // last day, ISO
+}
+
+const MON = new Intl.DateTimeFormat('en-PH', {
+  month: 'short',
+  timeZone: 'UTC',
+});
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+/** The next `count` months starting with the month of `today` (UTC dates). */
+export function monthsFrom(today: Date, count = 12): MonthCell[] {
+  return Array.from({ length: count }, (_, i) => {
+    const first = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + i, 1)
+    );
+    const last = new Date(
+      Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)
+    );
+    return {
+      key: iso(first).slice(0, 7),
+      label: MON.format(first),
+      year: first.getUTCFullYear(),
+      month: first.getUTCMonth() + 1,
+      from: iso(first),
+      to: iso(last),
+    };
+  });
+}
+
+interface Dated {
+  dates?: { start?: string; end?: string };
+  dateStatus: DateStatus;
+}
+
+/** Recorded (confirmed or tentative) dates that overlap [from, to]. Never inferred. */
+export function overlaps(e: Dated, from: string, to: string): boolean {
+  if (e.dateStatus === 'unavailable' || !e.dates?.start) return false;
+  const end = e.dates.end ?? e.dates.start;
+  return e.dates.start <= to && end >= from;
+}
+
+/**
+ * Festivals with recorded dates, sorted into happening now, later this month,
+ * and upcoming (after this month, within `aheadDays`). Undated ones are left out.
+ */
+export function festivalBuckets<T extends Dated>(
+  events: T[],
+  today: Date,
+  aheadDays = 90
+) {
+  const t = iso(today);
+  const [month] = monthsFrom(today, 1);
+  const horizon = iso(new Date(today.getTime() + aheadDays * 86_400_000));
+  const dayAfterMonth = iso(new Date(Date.UTC(month.year, month.month, 1)));
+  const now = events.filter(e => overlaps(e, t, t));
+  const thisMonth = events.filter(
+    e => !now.includes(e) && overlaps(e, t, month.to) && e.dates!.start! > t
+  );
+  const upcoming = events.filter(
+    e => overlaps(e, dayAfterMonth, horizon) && e.dates!.start! >= dayAfterMonth
+  );
+  const byStart = (a: T, b: T) =>
+    a.dates!.start!.localeCompare(b.dates!.start!);
+  return {
+    now: now.sort(byStart),
+    thisMonth: thisMonth.sort(byStart),
+    upcoming: upcoming.sort(byStart),
+  };
+}

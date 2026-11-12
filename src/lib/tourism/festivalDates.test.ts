@@ -3,9 +3,12 @@ import { describe, expect, it } from 'vitest';
 import type { TourismEntry } from '@/types/tourism';
 
 import {
+  festivalBuckets,
   filterByDateRange,
   formatDateRange,
   getDateStatus,
+  monthsFrom,
+  overlaps,
 } from './festivalDates';
 
 const plain: TourismEntry = { name: 'No dates', description: '' };
@@ -70,5 +73,58 @@ describe('formatDateRange', () => {
       /Jan 10, 2027 – Jan 16, 2027/
     );
     expect(formatDateRange('2027-01-10', '2027-01-10')).not.toContain('–');
+  });
+});
+
+describe('festival calendar helpers', () => {
+  const today = new Date('2027-01-14T03:00:00Z');
+  const ev = (
+    start: string,
+    end?: string,
+    status: DateStatus = 'confirmed'
+  ) => ({
+    dates: { start, end },
+    dateStatus: status,
+  });
+
+  it('lists twelve months from the current one, across a year end', () => {
+    const m = monthsFrom(new Date('2026-11-12T00:00:00Z'));
+    expect(m).toHaveLength(12);
+    expect(m[0]).toMatchObject({
+      key: '2026-11',
+      from: '2026-11-01',
+      to: '2026-11-30',
+    });
+    expect(m[2]).toMatchObject({
+      key: '2027-01',
+      label: 'Jan',
+      to: '2027-01-31',
+    });
+    expect(m[3].to).toBe('2027-02-28');
+  });
+
+  it('only counts recorded dates when checking overlap', () => {
+    expect(
+      overlaps(ev('2027-01-10', '2027-01-16'), '2027-01-01', '2027-01-31')
+    ).toBe(true);
+    expect(overlaps(ev('2027-03-01'), '2027-01-01', '2027-01-31')).toBe(false);
+    expect(
+      overlaps(
+        { dateStatus: 'unavailable' as const },
+        '2027-01-01',
+        '2027-12-31'
+      )
+    ).toBe(false);
+  });
+
+  it('sorts festivals into now, this month and upcoming', () => {
+    const now = ev('2027-01-10', '2027-01-16');
+    const later = ev('2027-01-25', undefined, 'tentative');
+    const soon = ev('2027-03-02');
+    const far = ev('2027-09-01');
+    const b = festivalBuckets([far, soon, later, now], today);
+    expect(b.now).toEqual([now]);
+    expect(b.thisMonth).toEqual([later]);
+    expect(b.upcoming).toEqual([soon]);
   });
 });

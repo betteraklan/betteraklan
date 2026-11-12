@@ -20,7 +20,7 @@ import {
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor } from '@/lib/tourism/advisories';
-import { DATE_STATUS_LABEL } from '@/lib/tourism/festivalDates';
+import { DATE_STATUS_LABEL, overlaps } from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
   densityTier,
@@ -39,6 +39,7 @@ import AklanMap3D, {
   type TourMove,
 } from './components/AklanMap3D';
 import EmptyState from './components/EmptyState';
+import FestivalStrip from './components/FestivalStrip';
 import FiltersSheet from './components/FiltersSheet';
 import LayerGlyph from './components/LayerGlyph';
 import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
@@ -432,6 +433,20 @@ export default function TourismExplore() {
   // Map failure: fall back to the list automatically, with a way back.
   const [mapFailed, setMapFailed] = useState(false);
 
+  // Festival calendar: picking a month sets the date range and pulses its pins.
+  const EVENTS = useMemo(
+    () => ALL_RECORDS.filter(r => r.layer === 'event'),
+    []
+  );
+  const [today] = useState(() => new Date());
+  const [pulse, setPulse] = useState<{ ids: string[]; key: number } | null>(
+    null
+  );
+  const pickedMonth =
+    from && to && from.endsWith('-01') && from.slice(0, 7) === to.slice(0, 7)
+      ? from.slice(0, 7)
+      : null;
+
   // List and map as one: hovering a card highlights its pin; tapping a pin
   // scrolls its card into view where the list scrolls on its own (desktop).
   const [hoverRec, setHoverRec] = useState<string | null>(null);
@@ -668,6 +683,7 @@ export default function TourismExplore() {
                     select(id);
                   }}
                   hoverId={hoverRec}
+                  pulse={pulse}
                   onLoadError={() => {
                     setMapFailed(true);
                     update({ view: 'list' });
@@ -972,6 +988,27 @@ export default function TourismExplore() {
               {filtered.length} record{filtered.length === 1 ? '' : 's'}
               {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
             </h2>
+            {(layer === 'all' || layer === 'event') && (
+              <FestivalStrip
+                events={EVENTS}
+                today={today}
+                selected={pickedMonth}
+                onOpen={id => {
+                  stopTour();
+                  update({ sel: id });
+                }}
+                onSelect={m => {
+                  update({ from: m?.from ?? '', to: m?.to ?? '', sel: '' });
+                  if (m)
+                    setPulse(p => ({
+                      ids: EVENTS.filter(e => overlaps(e, m.from, m.to)).map(
+                        e => e.id
+                      ),
+                      key: (p?.key ?? 0) + 1,
+                    }));
+                }}
+              />
+            )}
             {filtered.length === 0 ? (
               <EmptyState
                 title={empty!.title}
