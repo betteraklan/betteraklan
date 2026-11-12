@@ -8,6 +8,8 @@ import maplibregl, {
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+import { aklanHour, skyWash } from '@/lib/tourism/atmosphere';
+
 import { addPinIcons } from './pinIcons';
 
 import type { Layer } from '@/lib/tourism/explore';
@@ -15,7 +17,10 @@ import type { BoundaryFeature } from '@/lib/tourism/geo';
 
 // Province outline: union of the municipality boundaries, precomputed so the
 // mask has one clean hole (overlapping per-town holes triangulate badly).
+import outlineTowns from '@/data/geo/municipalities-boundaries.json';
 import outline from '@/data/geo/aklan-outline.json';
+
+export type TourMove = 'fly' | 'orbit' | 'tilt';
 
 export interface MapPin {
   id: string;
@@ -33,8 +38,16 @@ export interface MapPin {
 
 interface Props {
   boundaries: BoundaryFeature[];
-  /** Fill colour per municipality slug (shading by record count). */
-  townFill: Map<string, string>;
+  /** Shading tier (0–5) per municipality slug, by record count. */
+  townTier: Map<string, number>;
+  /** Colour for each tier, lowest first. */
+  tierColors: string[];
+  /** Pointer over a municipality (null when it leaves). */
+  onHoverTown?: (slug: string | null) => void;
+  /** Guided tour stop: varies how the camera arrives. */
+  tourMove?: TourMove | null;
+  /** The viewer dragged, zoomed, rotated or tilted the map themselves. */
+  onUserMove?: () => void;
   townCount: Map<string, number>;
   town: string;
   pins: MapPin[];
@@ -76,6 +89,28 @@ const pinSize = (selectedId: string): maplibregl.ExpressionSpecification => [
 ];
 
 const CLUSTER_MAX_ZOOM = 12;
+const FILL_MS = 700;
+const FILL_STAGGER_MS = 500;
+const COMPASS_PATH = 'M22 4 L25 22 L22 20 L19 22 Z'; // north needle; the south half is drawn plain
+
+/** Municipality slugs from the northernmost to the southernmost (by centre latitude). */
+const NORTH_TO_SOUTH = (
+  outlineTowns as { features: BoundaryFeature[] }
+).features
+  .map(f => {
+    const [[s], [n]] = (() => {
+      const pts = (
+        f.geometry.type === 'Polygon'
+          ? f.geometry.coordinates
+          : f.geometry.coordinates.flat()
+      ).flat();
+      const lats = pts.map(p => p[1]);
+      return [[Math.min(...lats)], [Math.max(...lats)]];
+    })();
+    return { slug: f.properties.slug, mid: (s + n) / 2 };
+  })
+  .sort((a, b) => b.mid - a.mid)
+  .map(t => t.slug);
 
 /** Province outline as an SVG path (flat projection), shown while the map loads. */
 const SILHOUETTE = (() => {
@@ -135,7 +170,11 @@ function boundsOf(features: BoundaryFeature[]): LL {
 
 export default function AklanMap3D({
   boundaries,
-  townFill,
+  townTier,
+  tierColors,
+  onHoverTown,
+  tourMove = null,
+  onUserMove,
   townCount,
   town,
   pins,
@@ -149,13 +188,44 @@ export default function AklanMap3D({
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
+  const needle = useRef<SVGGElement>(null);
+  // Decorative loops pause while the tab is hidden.
+  const [tabHidden, setTabHidden] = useState(() => document.hidden);
+  useEffect(() => {
+    const on = () => setTabHidden(document.hidden);
+    document.addEventListener('visibilitychange', on);
+    return () => document.removeEventListener('visibilitychange', on);
+  }, []);
+  // Time-of-day wash in Aklan; checked every 10 minutes (no animation cost).
+  const [wash, setWash] = useState(() => skyWash(aklanHour()));
+  useEffect(() => {
+    const id = window.setInterval(() => setWash(skyWash(aklanHour())), 600_000);
+    return () => window.clearInterval(id);
+  }, []);
   // Read once at mount: the entrance plays only on the first camera move.
   const introRef = useRef(intro);
   // Latest callbacks for map event handlers registered once.
-  const cb = useRef({ onTown, onPin, onBackground, onSettled });
-  useEffect(() => {
-    cb.current = { onTown, onPin, onBackground, onSettled };
+  const cb = useRef({
+    onTown,
+    onPin,
+    onBackground,
+    onSettled,
+    onHoverTown,
+    onUserMove,
   });
+  useEffect(() => {
+    cb.current = {
+      onTown,
+      onPin,
+      onBackground,
+      onSettled,
+      onHoverTown,
+      onUserMove,
+    };
+  });
+  const tourMoveRef = useRef(tourMove);
+  tourMoveRef.current = tourMove;
+  const tierColorsRef = useRef(tierColors);
 
   // Create the map once.
   useEffect(() => {
@@ -197,6 +267,17 @@ export default function AklanMap3D({
       if (cam?.zoom != null) map.setMinZoom(cam.zoom);
     };
     map.on('resize', fitMin);
+
+    // A drag, zoom, rotate or tilt by the viewer (not by code) pauses the tour.
+    for (const type of ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart'])
+      map.on(type, (e: { originalEvent?: Event }) => {
+        if (e.originalEvent) cb.current.onUserMove?.();
+      });
+    // The compass needle points to true north as the map turns.
+    map.on('rotate', () => {
+      if (needle.current)
+        needle.current.style.transform = `rotate(${-map.getBearing()}deg)`;
+    });
 
     // User zoom (wheel, pinch, buttons) tilts the camera with the zoom level.
     map.on('zoom', e => {
@@ -244,7 +325,13 @@ export default function AklanMap3D({
         type: 'fill',
         source: 'towns',
         paint: {
-          'fill-color': ['get', 'fill'],
+          // Animated tier (feature-state) blended across the tier colours.
+          'fill-color': [
+            'interpolate',
+            ['linear'],
+            ['coalesce', ['feature-state', 'tier'], 0],
+            ...tierColorsRef.current.flatMap((c, i) => [i, c]),
+          ] as unknown as maplibregl.ExpressionSpecification,
           'fill-opacity': [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
@@ -457,6 +544,7 @@ export default function AklanMap3D({
             { source: 'towns', id: hovered },
             { hover: false }
           );
+        if (hovered !== f.id) cb.current.onHoverTown?.(String(f.id));
         hovered = f.id;
         if (hovered !== undefined)
           map.setFeatureState(
@@ -479,6 +567,7 @@ export default function AklanMap3D({
         hovered = undefined;
         map.getCanvas().style.cursor = '';
         tip.remove();
+        cb.current.onHoverTown?.(null);
       });
       map.on('mouseenter', 'pins', e => {
         map.getCanvas().style.cursor = 'pointer';
@@ -558,7 +647,6 @@ export default function AklanMap3D({
             slug,
             name: f.properties.name,
             count: townCount.get(slug) ?? 0,
-            fill: townFill.get(slug) ?? '#EEF3FB',
             selected: slug === town,
             opacity: town && slug !== town ? 0.12 : town ? 0.28 : 0.42,
           },
@@ -566,7 +654,45 @@ export default function AklanMap3D({
         };
       }),
     });
-  }, [ready, boundaries, townFill, townCount, town]);
+  }, [ready, boundaries, townCount, town]);
+
+  // Shading tiers fill in from the lowest tier: 700 ms per town, north to south
+  // on first load; later changes tween from the current shade with no stagger.
+  const shownTier = useRef(new Map<string, number>());
+  const firstFill = useRef(true);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const target = (slug: string) => townTier.get(slug) ?? 0;
+    const set = (slug: string, tier: number) => {
+      shownTier.current.set(slug, tier);
+      map.setFeatureState({ source: 'towns', id: slug }, { tier });
+    };
+    if (reducedMotion()) {
+      NORTH_TO_SOUTH.forEach(s => set(s, target(s)));
+      return;
+    }
+    const stagger = firstFill.current ? FILL_STAGGER_MS : 0;
+    firstFill.current = false;
+    const from = new Map(
+      NORTH_TO_SOUTH.map(s => [s, shownTier.current.get(s) ?? 0])
+    );
+    const t0 = performance.now();
+    let raf = 0;
+    const frame = (now: number) => {
+      let done = true;
+      NORTH_TO_SOUTH.forEach((s, i) => {
+        const delay = (stagger * i) / Math.max(1, NORTH_TO_SOUTH.length - 1);
+        const p = Math.min(1, Math.max(0, (now - t0 - delay) / FILL_MS));
+        if (p < 1) done = false;
+        const a = from.get(s) ?? 0;
+        set(s, a + (target(s) - a) * (1 - Math.pow(1 - p, 3)));
+      });
+      if (!done) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [ready, townTier]);
 
   // Record pins.
   useEffect(() => {
@@ -656,6 +782,7 @@ export default function AklanMap3D({
         pitch: f ? Math.max(pitchFor(zoom), TOWN_PITCH) : pitchFor(zoom),
         bearing: f ? -12 : 0,
         duration: f ? TOWN_FLIGHT_MS : 1600,
+        ...(f && tourMoveRef.current === 'tilt' ? { pitch: 8 } : {}),
         // Curved path: rise to a slightly wider view mid-flight, then drop in.
         minZoom: f
           ? Math.max(map.getMinZoom(), Math.min(map.getZoom(), zoom) - 0.75)
@@ -664,8 +791,19 @@ export default function AklanMap3D({
     }
 
     const settledOn = selected ? null : town;
+    const move = !selected && town ? tourMoveRef.current : null;
     const onEnd = () => {
       if (settledOn !== null) cb.current.onSettled?.(settledOn);
+      // Tour stops vary how the camera finishes: a slow orbit or a tilt up.
+      if (reducedMotion() || !move) return;
+      if (move === 'orbit')
+        map.easeTo({
+          bearing: map.getBearing() + 40,
+          duration: 2800,
+          easing: t => t,
+        });
+      else if (move === 'tilt')
+        map.easeTo({ pitch: MAX_PITCH, duration: 1800, easing: easeOutExpo });
     };
     // Listen only after starting the move: starting it stops any earlier flight,
     // and that stop fires its own moveend.
@@ -693,7 +831,10 @@ export default function AklanMap3D({
         map.off('moveend', onEnd);
       };
     }
-    map.flyTo({ ...target, curve: selected ? 1.5 : 1.42 });
+    map.flyTo({
+      ...target,
+      curve: selected ? 1.5 : move === 'fly' ? 1.8 : 1.42,
+    });
     listen();
     return () => {
       map.off('moveend', onEnd);
@@ -745,6 +886,65 @@ export default function AklanMap3D({
         aria-label='Map of Aklan. Use the list below to select records with a keyboard.'
         className='h-full w-full bg-[#eef1f5] [&_.maplibregl-canvas:focus]:outline-3 [&_.maplibregl-canvas:focus]:-outline-offset-4 [&_.maplibregl-canvas:focus]:outline-[#1D4FB0]'
       />
+      {/* Atmosphere: decorative only, never intercepts taps. */}
+      <div
+        aria-hidden='true'
+        className='aklan-waves pointer-events-none absolute inset-0 z-[1]'
+        style={{ animationPlayState: tabHidden ? 'paused' : undefined }}
+      />
+      <div
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-0 z-[2] transition-opacity duration-[2s]'
+        data-phase={wash.phase}
+        style={{
+          opacity: wash.opacity,
+          // The sun sets to the west, over Boracay: warmest at the left edge.
+          background: `radial-gradient(120% 90% at 0% 60%, ${wash.color}, transparent 70%)`,
+          mixBlendMode: 'soft-light',
+        }}
+      />
+      <div
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(15,35,75,0.22)_100%)]'
+      />
+      <svg
+        aria-hidden='true'
+        viewBox='0 0 44 44'
+        className='pointer-events-none absolute top-[64px] right-3 z-[4] h-11 w-11 drop-shadow'
+      >
+        <circle cx='22' cy='22' r='20' fill='rgba(255,255,255,0.9)' />
+        <g
+          className='aklan-compass-ring'
+          style={{ animationPlayState: tabHidden ? 'paused' : undefined }}
+        >
+          {Array.from({ length: 24 }, (_, i) => (
+            <line
+              key={i}
+              x1='22'
+              y1='3.5'
+              x2='22'
+              y2={i % 6 === 0 ? 7.5 : 5.5}
+              stroke='#8a9bb5'
+              strokeWidth='1'
+              transform={`rotate(${i * 15} 22 22)`}
+            />
+          ))}
+        </g>
+        <g ref={needle} style={{ transformOrigin: '22px 22px' }}>
+          <path d={COMPASS_PATH} fill='#BE123C' />
+          <path d='M22 40 L25 22 L22 24 L19 22 Z' fill='#8a9bb5' />
+          <text
+            x='22'
+            y='15.5'
+            textAnchor='middle'
+            fontSize='6'
+            fontWeight='700'
+            fill='#0f234b'
+          >
+            N
+          </text>
+        </g>
+      </svg>
       {!ready && (
         <div
           role='status'

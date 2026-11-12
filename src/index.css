@@ -317,3 +317,43 @@
     animation: none;
   }
 }
+
+/* --- EXPLORE ATMOSPHERE ---
+   Stepped animations move at most a few times a second, so they cost almost
+   nothing to repaint; both stop with reduced motion and pause when hidden. */
+@keyframes wave-drift {
+  to {
+    background-position: 120px 0;
+  }
+}
+.aklan-waves {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cpath d='M0 12 Q15 2 30 12 T60 12 T90 12 T120 12' fill='none' stroke='%231D4FB0' stroke-width='1' stroke-opacity='.35'/%3E%3C/svg%3E");
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  animation: wave-drift 40s steps(120) infinite;
+}
+@keyframes compass-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.aklan-compass-ring {
+  transform-origin: 22px 22px;
+  animation: compass-ring 240s steps(240) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aklan-waves,
+  .aklan-compass-ring {
+    animation: none;
+  }
+}
+
+/* Tour progress ring: dash offset runs down over one stop. */
+@keyframes tour-ring {
+  from {
+    stroke-dashoffset: var(--ring-len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

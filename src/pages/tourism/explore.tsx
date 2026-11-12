@@ -10,11 +10,13 @@ import {
   InfoIcon,
   ListIcon,
   MapIcon,
+  CompassIcon,
+  PauseIcon,
   PlayIcon,
+  XIcon,
   SearchIcon,
   Share2Icon,
   SlidersHorizontalIcon,
-  SquareIcon,
 } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/Card';
@@ -23,16 +25,21 @@ import { advisoriesFor } from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL } from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
+  densityTier,
   emptyReason,
   filterRecords,
   LAYER_LABEL,
   type Layer,
   type Rec,
   type Sources,
+  tierBounds,
 } from '@/lib/tourism/explore';
 import { type BoundaryFeature } from '@/lib/tourism/geo';
 
-import AklanMap3D, { type MapPin } from './components/AklanMap3D';
+import AklanMap3D, {
+  type MapPin,
+  type TourMove,
+} from './components/AklanMap3D';
 import LayerGlyph from './components/LayerGlyph';
 import { LAYER_COLOR, LAYER_ICON } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
@@ -70,6 +77,7 @@ const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
 };
 
 const TOUR_STEP_MS = 5000;
+const RING_LEN = 2 * Math.PI * 21;
 // Shading ramp for record counts: brighter means more BetterAklan records.
 const TIER_COLOR = [
   '#EEF3FB',
@@ -193,18 +201,34 @@ export default function TourismExplore() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [shownKey]
   );
-  const townFill = useMemo(
+  const tierOf = (n: number) => (shade ? densityTier(n, maxCount) : 0);
+  const townTier = useMemo(
     () =>
       new Map(
-        [...counts].map(([slug, n]) => [
-          slug,
-          TIER_COLOR[shade && n ? Math.ceil((5 * n) / maxCount) : 0],
+        MUNICIPALITIES.map(m => [
+          m.slug,
+          shade ? densityTier(counts.get(m.slug) ?? 0, maxCount) : 0,
         ])
       ),
     [counts, shade, maxCount]
   );
+  // Legend: the tier under the pointer is highlighted.
+  const [hoverTown, setHoverTown] = useState<string | null>(null);
+  const hoverCount = hoverTown ? (counts.get(hoverTown) ?? 0) : 0;
+  const hoverTier = hoverTown ? tierOf(hoverCount) : null;
+  const tierRange = (t: number) => {
+    const [lo, hi] = tierBounds(t, maxCount);
+    return lo === hi ? `${hi}` : `${lo}–${hi}`;
+  };
 
-  const [touring, setTouring] = useState(false);
+  // Guided tour: one stop per municipality, TOUR_STEP_MS each; paused by any
+  // map gesture or a hidden tab; ends on a "Plan your trip" card.
+  const [tour, setTour] = useState<{ step: number; paused: boolean } | null>(
+    null
+  );
+  // 'done' after the last stop, 'skipped' when cut short; false hides the card.
+  const [tourDone, setTourDone] = useState<false | 'done' | 'skipped'>(false);
+  const stopTour = () => setTour(null);
   const [intro] = useState(introWanted);
   useEffect(() => {
     if (!intro) return;
@@ -215,24 +239,55 @@ export default function TourismExplore() {
     }
   }, [intro]);
   const select = (id: string) => {
-    setTouring(false);
+    stopTour();
     update({ sel: id });
   };
 
-  // Guided tour: fly through each municipality in turn, then return to the overview.
+  const stepLeft = useRef(TOUR_STEP_MS);
+  const stepStart = useRef(0);
+  const goToStop = (step: number) => {
+    stepLeft.current = TOUR_STEP_MS;
+    setTour({ step, paused: false });
+    update({ town: MUNICIPALITIES[step].slug, sel: '' });
+  };
+  const finishTour = (how: 'done' | 'skipped') => {
+    setTour(null);
+    update({ town: '', sel: '' });
+    setTourDone(how);
+  };
+  const pauseTour = () => {
+    setTour(t => {
+      if (!t || t.paused) return t;
+      stepLeft.current = Math.max(
+        0,
+        stepLeft.current - (performance.now() - stepStart.current)
+      );
+      return { ...t, paused: true };
+    });
+  };
   useEffect(() => {
-    if (!touring) return;
-    const id = setTimeout(() => {
-      const next =
-        MUNICIPALITIES[MUNICIPALITIES.findIndex(m => m.slug === town) + 1];
-      if (next) update({ town: next.slug, sel: '' });
-      else {
-        update({ town: '', sel: '' });
-        setTouring(false);
-      }
-    }, TOUR_STEP_MS);
-    return () => clearTimeout(id);
-  }, [touring, town, update]);
+    if (!tour || tour.paused) return;
+    stepStart.current = performance.now();
+    const id = window.setTimeout(() => {
+      if (tour.step + 1 < MUNICIPALITIES.length) goToStop(tour.step + 1);
+      else finishTour('done');
+    }, stepLeft.current);
+    return () => window.clearTimeout(id);
+    // goToStop/finishTour only call setters and `update`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour?.step, tour?.paused]);
+  useEffect(() => {
+    const on = () => document.hidden && pauseTour();
+    document.addEventListener('visibilitychange', on);
+    return () => document.removeEventListener('visibilitychange', on);
+  }, []);
+  const tourMove: TourMove | null = tour
+    ? (['fly', 'orbit', 'tilt'] as const)[tour.step % 3]
+    : null;
+  const ctaRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (tourDone) ctaRef.current?.focus();
+  }, [tourDone]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   // The town card waits for the map to finish flying there (list view needs no wait).
@@ -415,7 +470,7 @@ export default function TourismExplore() {
             <select
               value={town}
               onChange={e => {
-                setTouring(false);
+                stopTour();
                 update({ town: e.target.value, sel: '' });
               }}
               className='field-control mt-1 block font-normal'
@@ -513,19 +568,23 @@ export default function TourismExplore() {
                 <AklanMap3D
                   intro={intro}
                   boundaries={SOURCES.boundaries}
-                  townFill={townFill}
+                  townTier={townTier}
+                  tierColors={TIER_COLOR}
+                  onHoverTown={setHoverTown}
+                  tourMove={tourMove}
+                  onUserMove={pauseTour}
                   townCount={counts}
                   town={town}
                   pins={pins}
                   selected={selectedPin}
                   onTown={slug => {
-                    setTouring(false);
+                    stopTour();
                     update({ town: slug, sel: '' });
                   }}
                   onPin={select}
                   onSettled={setSettledTown}
                   onBackground={() => {
-                    setTouring(false);
+                    stopTour();
                     if (town || sel) update({ town: '', sel: '' });
                   }}
                 />
@@ -573,26 +632,163 @@ export default function TourismExplore() {
                   </button>
                 </div>
 
-                {/* Cinematic overlays: tour control, caption, legend. */}
-                <button
-                  type='button'
-                  aria-pressed={touring}
-                  onClick={() => {
-                    if (touring) setTouring(false);
-                    else {
-                      update({ town: MUNICIPALITIES[0].slug, sel: '' });
-                      setTouring(true);
-                    }
-                  }}
-                  className='bg-kapwa-bg-surface text-kapwa-text-strong absolute top-3 right-3 z-[500] inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold shadow-elev-2'
-                >
-                  {touring ? (
-                    <SquareIcon aria-hidden='true' className='h-4 w-4' />
-                  ) : (
-                    <PlayIcon aria-hidden='true' className='h-4 w-4' />
+                {/* Tour controls: start, or pause/resume with a progress ring, and skip. */}
+                <div className='absolute top-3 right-3 z-[500] flex items-center gap-2'>
+                  {tour && (
+                    <button
+                      type='button'
+                      onClick={() => finishTour('skipped')}
+                      className='surface-glass type-meta min-h-11 rounded-full px-3 font-semibold underline-offset-2 hover:underline'
+                    >
+                      Skip tour
+                    </button>
                   )}
-                  {touring ? 'Stop tour' : 'Tour Aklan'}
-                </button>
+                  {tour ? (
+                    <button
+                      type='button'
+                      aria-label={
+                        tour.paused
+                          ? `Resume tour, stop ${tour.step + 1} of ${MUNICIPALITIES.length}`
+                          : `Pause tour, stop ${tour.step + 1} of ${MUNICIPALITIES.length}`
+                      }
+                      onClick={() =>
+                        tour.paused
+                          ? setTour({ ...tour, paused: false })
+                          : pauseTour()
+                      }
+                      className='bg-kapwa-bg-surface text-kapwa-text-strong relative flex h-12 w-12 items-center justify-center rounded-full shadow-elev-2'
+                    >
+                      <svg
+                        aria-hidden='true'
+                        viewBox='0 0 48 48'
+                        className='absolute inset-0 -rotate-90'
+                      >
+                        <circle
+                          cx='24'
+                          cy='24'
+                          r='21'
+                          fill='none'
+                          stroke='#D6E4FA'
+                          strokeWidth='3'
+                        />
+                        <circle
+                          key={tour.step}
+                          cx='24'
+                          cy='24'
+                          r='21'
+                          fill='none'
+                          stroke='#1D4FB0'
+                          strokeWidth='3'
+                          strokeLinecap='round'
+                          strokeDasharray={RING_LEN}
+                          style={
+                            {
+                              '--ring-len': RING_LEN,
+                              animation: `tour-ring ${TOUR_STEP_MS}ms linear both`,
+                              animationPlayState: tour.paused
+                                ? 'paused'
+                                : 'running',
+                            } as React.CSSProperties
+                          }
+                        />
+                      </svg>
+                      {tour.paused ? (
+                        <PlayIcon aria-hidden='true' className='h-4 w-4' />
+                      ) : (
+                        <PauseIcon aria-hidden='true' className='h-4 w-4' />
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setTourDone(false);
+                        goToStop(0);
+                      }}
+                      className='bg-kapwa-bg-surface text-kapwa-text-strong inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold shadow-elev-2'
+                    >
+                      <PlayIcon aria-hidden='true' className='h-4 w-4' />
+                      Tour Aklan
+                    </button>
+                  )}
+                </div>
+
+                {/* Stop title: cross-fades as the tour moves on. */}
+                {tour && (
+                  <div className='pointer-events-none absolute top-[72px] left-1/2 z-[500] -translate-x-1/2 sm:top-3'>
+                    <p
+                      key={tour.step}
+                      aria-live='polite'
+                      className='surface-glass type-meta motion-safe:animate-[list-fade-in_var(--dur-base)_var(--ease-out-expo)_both] rounded-full px-3 py-1.5 font-semibold whitespace-nowrap'
+                    >
+                      <span className='text-kapwa-text-support'>
+                        {tour.step + 1}/{MUNICIPALITIES.length} ·{' '}
+                      </span>
+                      {MUNICIPALITIES[tour.step].name}
+                      {tour.paused ? ' · paused' : ''}
+                    </p>
+                  </div>
+                )}
+
+                {/* End of tour: next steps, no bookings. */}
+                {tourDone && !tour && (
+                  <section
+                    aria-labelledby='plan-trip'
+                    className='surface-glass absolute inset-x-3 bottom-4 z-[510] p-4 motion-safe:animate-[explore-sheet-up_var(--dur-base)_var(--ease-out-expo)_both] sm:inset-x-auto sm:right-3 sm:w-80'
+                  >
+                    <div className='flex items-start justify-between gap-2'>
+                      <h3
+                        id='plan-trip'
+                        ref={ctaRef}
+                        tabIndex={-1}
+                        className='type-title outline-none'
+                      >
+                        <CompassIcon
+                          aria-hidden='true'
+                          className='text-kapwa-text-brand mr-1.5 inline h-5 w-5 align-[-3px]'
+                        />
+                        Plan your trip
+                      </h3>
+                      <button
+                        type='button'
+                        aria-label='Close'
+                        onClick={() => setTourDone(false)}
+                        className='-mt-2 -mr-2 flex h-11 w-11 items-center justify-center rounded-full'
+                      >
+                        <XIcon aria-hidden='true' className='h-4 w-4' />
+                      </button>
+                    </div>
+                    <p className='text-kapwa-text-support type-meta mt-1'>
+                      {tourDone === 'done'
+                        ? `You've seen all ${MUNICIPALITIES.length} municipalities. Next, look`
+                        : 'Look'}{' '}
+                      up where to stay and which festivals have dates.
+                    </p>
+                    <div className='mt-3 flex flex-wrap gap-2'>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setTourDone(false);
+                          update({ layer: 'stay', view: 'list', sel: '' });
+                        }}
+                        className='bg-kapwa-bg-brand-default text-kapwa-text-inverse min-h-11 rounded-control px-3 text-sm font-bold'
+                      >
+                        Places to stay
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setTourDone(false);
+                          update({ layer: 'event', view: 'list', sel: '' });
+                        }}
+                        className='border-kapwa-border-weak min-h-11 rounded-control border px-3 text-sm font-bold'
+                      >
+                        Festivals
+                      </button>
+                    </div>
+                  </section>
+                )}
+
                 <div
                   key={selected?.id ?? town}
                   className='animate-in fade-in slide-in-from-bottom-2 pointer-events-none absolute bottom-4 left-3 z-[500] max-w-[70%] surface-glass px-4 py-2.5 duration-(--dur-slow) ease-out-expo motion-reduce:animate-none'
@@ -614,17 +810,28 @@ export default function TourismExplore() {
                 aria-label='Map legend'
                 className='border-kapwa-border-weak text-kapwa-text-support type-meta flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3'
               >
-                <span className='flex items-center gap-1.5'>
+                <span className='flex flex-wrap items-center gap-1.5'>
                   Fewer records
-                  {TIER_COLOR.slice(1).map(c => (
-                    <span
-                      key={c}
-                      aria-hidden='true'
-                      className='h-2.5 w-5'
-                      style={{ background: c }}
-                    />
-                  ))}
+                  {TIER_COLOR.slice(1).map((c, i) => {
+                    const t = i + 1;
+                    const on = hoverTier === t;
+                    return (
+                      <span
+                        key={c}
+                        title={`${tierRange(t)} records`}
+                        aria-hidden='true'
+                        className={`h-2.5 w-5 origin-bottom rounded-[2px] transition-transform duration-(--dur-fast) ease-out-expo ${on ? 'scale-y-[1.8] ring-2 ring-[#0f234b] ring-offset-1' : ''}`}
+                        style={{ background: c }}
+                      />
+                    );
+                  })}
                   More
+                  {hoverTown && (
+                    <span className='text-kapwa-text-strong ml-1 font-semibold'>
+                      {MUNICIPALITIES.find(m => m.slug === hoverTown)?.name}:{' '}
+                      {hoverCount} record{hoverCount === 1 ? '' : 's'}
+                    </span>
+                  )}
                 </span>
                 <span className='flex items-center gap-1.5'>
                   <LayerGlyph layer='stay' hollow />

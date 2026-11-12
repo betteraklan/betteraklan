@@ -210,3 +210,21 @@ export function teaser(description: string): string {
   const first = text.match(/^.+?(?<!\b[A-Z])[.!?](?=\s|$)/);
   return (first ? first[0] : text).trim();
 }
+
+/**
+ * Shading tier 0–5 for a municipality's record count. Log scale, so one
+ * very large town (Malay's accommodation list) doesn't flatten the rest into
+ * the lowest tier. 0 means no records.
+ */
+export function densityTier(n: number, max: number): number {
+  if (n <= 0 || max <= 0) return 0;
+  return Math.max(1, Math.ceil((5 * Math.log1p(n)) / Math.log1p(max)));
+}
+
+/** Record-count range [lo, hi] covered by a tier, for the legend. */
+export function tierBounds(tier: number, max: number): [number, number] {
+  const L = Math.log1p(max);
+  const lo = tier <= 1 ? 1 : Math.floor(Math.expm1(((tier - 1) * L) / 5)) + 1;
+  const hi = Math.floor(Math.expm1((tier * L) / 5) + 1e-9);
+  return [lo, Math.max(lo, hi)];
+}

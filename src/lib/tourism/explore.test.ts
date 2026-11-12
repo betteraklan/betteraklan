@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildRecords,
+  densityTier,
   emptyReason,
   filterRecords,
   type Sources,
   teaser,
+  tierBounds,
 } from './explore';
 import type { BoundaryFeature } from './geo';
 
@@ -144,5 +146,26 @@ describe('teaser', () => {
     expect(teaser('  0808 M. Laserna St,\n Kalibo ')).toBe(
       '0808 M. Laserna St, Kalibo'
     );
+  });
+});
+
+describe('densityTier', () => {
+  it('is 0 without records and 5 at the maximum', () => {
+    expect(densityTier(0, 454)).toBe(0);
+    expect(densityTier(454, 454)).toBe(5);
+  });
+
+  it('spreads mid-sized towns above the lowest tier', () => {
+    expect(densityTier(47, 454)).toBe(4);
+    expect(densityTier(5, 454)).toBe(2);
+    expect(densityTier(1, 454)).toBe(1);
+  });
+
+  it('agrees with tierBounds for every count', () => {
+    for (let n = 1; n <= 454; n++) {
+      const [lo, hi] = tierBounds(densityTier(n, 454), 454);
+      expect(n).toBeGreaterThanOrEqual(lo);
+      expect(n).toBeLessThanOrEqual(hi);
+    }
   });
 });
