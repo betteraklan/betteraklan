@@ -2,6 +2,7 @@
  * Shared helpers for tourism advisories (public + admin APIs).
  */
 import municipalities from '../../src/data/tourism/municipalities.json';
+import { endMs, startMs } from '../../src/lib/tourism/advisoryWindow';
 import type { Advisory } from '../../src/types/tourism';
 
 /** KV key for the published advisory list. Admin writes invalidate it. */
@@ -13,10 +14,6 @@ export const MUNICIPALITY_SLUGS = new Set(
   (municipalities as Array<{ slug: string }>).map(m => m.slug)
 );
 
-/** Philippine time; Aklan has no daylight saving. */
-const PH_OFFSET = '+08:00';
-const DAY_MS = 24 * 60 * 60 * 1000;
-export const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 /** Date-only, or a full timestamp with an explicit zone (no ambiguity). */
 const DATE_OR_DATETIME =
   /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2}))?$/;
@@ -73,20 +70,6 @@ export function toAdminAdvisory(row: AdminAdvisoryRow): AdminAdvisory {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
-}
-
-/** Start of an advisory in epoch ms (date-only = local midnight). */
-export function startMs(value: string): number {
-  return Date.parse(
-    DATE_ONLY.test(value) ? `${value}T00:00:00${PH_OFFSET}` : value
-  );
-}
-
-/** End of an advisory in epoch ms (date-only = end of that local day). */
-export function endMs(value: string): number {
-  return DATE_ONLY.test(value)
-    ? Date.parse(`${value}T00:00:00${PH_OFFSET}`) + DAY_MS
-    : Date.parse(value);
 }
 
 /** Editable fields, as accepted from the admin API (camelCase). */

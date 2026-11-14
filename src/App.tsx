@@ -141,6 +141,9 @@ const AdminErrorLog = lazy(() => import('@/pages/admin/ErrorLog'));
 const AdminAuditLog = lazy(() => import('@/pages/admin/AuditLog'));
 const AdminReviewQueue = lazy(() => import('@/pages/admin/ReviewQueue'));
 const AdminReconcile = lazy(() => import('@/pages/admin/Reconcile'));
+const AdminTourismAdvisories = lazy(
+  () => import('@/pages/admin/TourismAdvisories')
+);
 const AdminOpenLguWorkbench = lazy(
   () => import('@/pages/admin/OpenLguWorkbench')
 );
@@ -334,6 +337,10 @@ function AppContent() {
             <Route path='audit-logs' element={<AdminAuditLog />} />
             <Route path='review-queue' element={<AdminReviewQueue />} />
             <Route path='reconcile' element={<AdminReconcile />} />
+            <Route
+              path='tourism/advisories'
+              element={<AdminTourismAdvisories />}
+            />
             <Route
               path='openlgu/workbench'
               element={<AdminOpenLguWorkbench />}

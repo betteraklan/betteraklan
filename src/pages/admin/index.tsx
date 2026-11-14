@@ -179,6 +179,12 @@ export default function AdminDashboard() {
       link: '/admin/reconcile',
       variant: 'outline' as const,
     },
+    {
+      title: 'Tourism Advisories',
+      description: 'Post closures, access changes and events',
+      link: '/admin/tourism/advisories',
+      variant: 'outline' as const,
+    },
   ];
 
   const getDisplayValue = (value: string | number): string => {

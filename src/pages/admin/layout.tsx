@@ -37,6 +37,7 @@ const ADMIN_ROUTES: Record<string, string> = {
   '/admin/persons': 'Persons',
   '/admin/persons/merge': 'Merge',
   '/admin/persons/deletion-queue': 'Deletion Queue',
+  '/admin/tourism/advisories': 'Tourism Advisories',
 };
 
 function getBreadcrumbs(pathname: string): BreadcrumbRoute[] {

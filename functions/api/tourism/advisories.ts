@@ -12,11 +12,10 @@
  * advisory drops off the moment it ends even while the cache is warm.
  */
 import type { Advisory } from '../../../src/types/tourism';
+import { advisoryPhase } from '../../../src/lib/tourism/advisoryWindow';
 import {
   ADVISORIES_CACHE_KEY,
   MUNICIPALITY_SLUGS,
-  endMs,
-  startMs,
   toAdvisory,
   type AdvisoryRow,
 } from '../../lib/tourism-advisories';
@@ -27,11 +26,7 @@ import { CACHE_TTL, createKVCache } from '../../utils/kv-cache';
 
 /** True when the advisory has started and not yet ended at `now`. */
 export function isActive(advisory: Advisory, now: number): boolean {
-  const start = startMs(advisory.publishedAt);
-  if (Number.isNaN(start) || start > now) return false;
-  if (!advisory.endsAt) return true;
-  const end = endMs(advisory.endsAt);
-  return !Number.isNaN(end) && end > now;
+  return advisoryPhase(advisory, now) === 'live';
 }
 
 async function loadPublished(env: Env): Promise<Advisory[]> {
