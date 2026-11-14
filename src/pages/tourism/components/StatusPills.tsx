@@ -6,10 +6,14 @@ import {
   CalendarX2Icon,
   CheckCircle2Icon,
   CircleDashedIcon,
+  ConstructionIcon,
   MapPinOffIcon,
+  OctagonXIcon,
+  PartyPopperIcon,
 } from 'lucide-react';
 
 import type { Rec } from '@/lib/tourism/explore';
+import type { Advisory } from '@/types/tourism';
 import {
   DATE_STATUS_LABEL,
   formatDateRange,
@@ -79,6 +83,23 @@ export function DatePill({ rec }: { rec: Rec }) {
   return (
     <Pill tone='none' icon={CalendarX2Icon}>
       {DATE_STATUS_LABEL.unavailable}
+    </Pill>
+  );
+}
+
+// Closures and access changes affect getting somewhere (warning tone);
+// events are informational (neutral). Icon + text, never colour alone.
+const ADVISORY_KIND_PILL = {
+  closure: { tone: 'warn', icon: OctagonXIcon, text: 'Closure' },
+  access: { tone: 'warn', icon: ConstructionIcon, text: 'Access change' },
+  event: { tone: 'none', icon: PartyPopperIcon, text: 'Event' },
+} as const;
+
+export function AdvisoryKindPill({ kind }: { kind: Advisory['kind'] }) {
+  const p = ADVISORY_KIND_PILL[kind];
+  return (
+    <Pill tone={p.tone} icon={p.icon}>
+      {p.text}
     </Pill>
   );
 }

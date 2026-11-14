@@ -55,7 +55,12 @@ import { LAYER_COLOR, LAYER_ICON, TOWN_COLOR } from './components/layerMeta';
 import RecordCard from './components/RecordCard';
 import SearchBar from './components/SearchBar';
 import TripTray from './components/TripTray';
-import { DatePill, LocationPill, Pill } from './components/StatusPills';
+import {
+  AdvisoryKindPill,
+  DatePill,
+  LocationPill,
+  Pill,
+} from './components/StatusPills';
 import { useBottomSheet } from './components/useBottomSheet';
 import ViewToggle from './components/ViewToggle';
 
@@ -1435,6 +1440,7 @@ export default function TourismExplore() {
                       <ul className='type-body mt-2 space-y-2'>
                         {townNotices.map(a => (
                           <li key={a.id}>
+                            <AdvisoryKindPill kind={a.kind} />{' '}
                             <strong>{a.title}</strong> · {a.issuer} · published{' '}
                             {a.publishedAt}
                             {a.endsAt ? ` · until ${a.endsAt}` : ''}

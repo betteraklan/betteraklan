@@ -31,6 +31,8 @@ import { toTitleCase } from '@/lib/stringUtils';
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
 import { TourismEntry } from '@/types/tourism';
 
+import { AdvisoryKindPill } from './components/StatusPills';
+
 function EntryCard({
   entry,
   dated = false,
@@ -166,8 +168,8 @@ export default function TourismMunicipalityDetail() {
           <ul className='space-y-3'>
             {notices.map(a => (
               <li key={a.id} className='text-sm'>
-                <strong>{a.title}</strong> · {a.issuer} · published{' '}
-                {a.publishedAt}
+                <AdvisoryKindPill kind={a.kind} /> <strong>{a.title}</strong> ·{' '}
+                {a.issuer} · published {a.publishedAt}
                 {a.endsAt ? ` · until ${a.endsAt}` : ''}
                 <a
                   href={a.sourceUrl}
