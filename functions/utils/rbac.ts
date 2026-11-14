@@ -48,6 +48,10 @@ export enum Permission {
   WORKBENCH_READ = 'workbench:read',
   WORKBENCH_WRITE = 'workbench:write',
 
+  // Tourism advisory permissions
+  TOURISM_ADVISORIES_READ = 'tourism_advisories:read',
+  TOURISM_ADVISORIES_WRITE = 'tourism_advisories:write',
+
   // Admin permissions
   ADMIN_SETTINGS = 'admin:settings',
   ADMIN_AUDIT_LOGS = 'admin:audit_logs',
@@ -83,6 +87,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     // Workbench
     Permission.WORKBENCH_READ,
     Permission.WORKBENCH_WRITE,
+    // Tourism advisories
+    Permission.TOURISM_ADVISORIES_READ,
+    Permission.TOURISM_ADVISORIES_WRITE,
     // Admin
     Permission.ADMIN_SETTINGS,
     Permission.ADMIN_AUDIT_LOGS,
@@ -107,6 +114,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     // Workbench - read and write
     Permission.WORKBENCH_READ,
     Permission.WORKBENCH_WRITE,
+    // Tourism advisories - read and write (publish/unpublish)
+    Permission.TOURISM_ADVISORIES_READ,
+    Permission.TOURISM_ADVISORIES_WRITE,
   ],
   [UserRole.VIEWER]: [
     // Read-only permissions
@@ -116,6 +126,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.REVIEW_QUEUE_READ,
     // Workbench - read only
     Permission.WORKBENCH_READ,
+    // Tourism advisories - read only
+    Permission.TOURISM_ADVISORIES_READ,
   ],
 };
 

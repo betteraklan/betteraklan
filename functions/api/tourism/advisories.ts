@@ -11,71 +11,19 @@
  * the time window and municipality filter are applied per request, so an
  * advisory drops off the moment it ends even while the cache is warm.
  */
-import municipalities from '../../../src/data/tourism/municipalities.json';
 import type { Advisory } from '../../../src/types/tourism';
+import {
+  ADVISORIES_CACHE_KEY,
+  MUNICIPALITY_SLUGS,
+  endMs,
+  startMs,
+  toAdvisory,
+  type AdvisoryRow,
+} from '../../lib/tourism-advisories';
 import type { Env } from '../../types';
 import { cachedJson } from '../../utils/cache';
 import { ErrorCodes } from '../../utils/error-response';
 import { CACHE_TTL, createKVCache } from '../../utils/kv-cache';
-
-/** KV key for the published advisory list. Admin writes must invalidate it. */
-export const ADVISORIES_CACHE_KEY = 'tourism:advisories:published';
-
-const MUNICIPALITY_SLUGS = new Set(
-  (municipalities as Array<{ slug: string }>).map(m => m.slug)
-);
-
-/** Philippine time; Aklan has no daylight saving. */
-const PH_OFFSET = '+08:00';
-const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-export interface AdvisoryRow {
-  id: string;
-  kind: Advisory['kind'];
-  title: string;
-  summary: string;
-  municipality: string | null;
-  place: string | null;
-  issuer: string;
-  source_url: string;
-  published_at: string;
-  ends_at: string | null;
-}
-
-/** Map a database row to the frontend `Advisory` shape. */
-export function toAdvisory(row: AdvisoryRow): Advisory {
-  const affects: Advisory['affects'] = {};
-  if (row.municipality) affects.municipality = row.municipality;
-  if (row.place) affects.place = row.place;
-
-  const advisory: Advisory = {
-    id: row.id,
-    kind: row.kind,
-    title: row.title,
-    summary: row.summary,
-    affects,
-    issuer: row.issuer,
-    sourceUrl: row.source_url,
-    publishedAt: row.published_at,
-  };
-  if (row.ends_at) advisory.endsAt = row.ends_at;
-  return advisory;
-}
-
-/** Start of an advisory in epoch ms (date-only = local midnight). */
-function startMs(value: string): number {
-  return Date.parse(
-    DATE_ONLY.test(value) ? `${value}T00:00:00${PH_OFFSET}` : value
-  );
-}
-
-/** End of an advisory in epoch ms (date-only = end of that local day). */
-function endMs(value: string): number {
-  return DATE_ONLY.test(value)
-    ? Date.parse(`${value}T00:00:00${PH_OFFSET}`) + DAY_MS
-    : Date.parse(value);
-}
 
 /** True when the advisory has started and not yet ended at `now`. */
 export function isActive(advisory: Advisory, now: number): boolean {

@@ -6,11 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Env } from '../../../types';
 import {
   ADVISORIES_CACHE_KEY,
-  isActive,
-  onRequestGet,
   toAdvisory,
   type AdvisoryRow,
-} from '../advisories';
+} from '../../../lib/tourism-advisories';
+import { isActive, onRequestGet } from '../advisories';
 
 const row = (overrides: Partial<AdvisoryRow> = {}): AdvisoryRow => ({
   id: 'a1',
