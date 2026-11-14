@@ -93,17 +93,17 @@ async function patch(session: string, id: string, body: unknown) {
 
 function auditActions(): string[] {
   return (
-    db.db
-      .prepare('SELECT action FROM admin_audit_log ORDER BY rowid')
-      .all() as { action: string }[]
+    db.query('SELECT action FROM admin_audit_log ORDER BY rowid') as {
+      action: string;
+    }[]
   ).map(r => r.action);
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   kv = new MockKVNamespace();
-  db = new SqliteD1().loadSql(
-    'db/migrations/archive/003_admin_audit_log.sql',
-    'db/migrations/005_tourism_advisories.sql'
+  db = (await SqliteD1.create()).loadSql(
+    'db/migrations/005_tourism_advisories.sql',
+    'db/migrations/006_admin_audit_log.sql'
   );
   env = {
     WEATHER_KV: kv,
@@ -147,9 +147,9 @@ describe('access control', () => {
       });
       expect(res.status).toBe(403);
     }
-    expect(
-      db.db.prepare('SELECT COUNT(*) n FROM tourism_advisories').get()
-    ).toEqual({ n: 0 });
+    expect(db.query('SELECT COUNT(*) n FROM tourism_advisories')[0]).toEqual({
+      n: 0,
+    });
   });
 });
 
@@ -299,11 +299,9 @@ describe('/api/admin/tourism/advisories/:id', () => {
   it('updates only the sent fields and bumps updatedAt', async () => {
     const ana = await login('ana');
     const { body: created } = await create(ana);
-    db.db
-      .prepare(
-        "UPDATE tourism_advisories SET updated_at = '2000-01-01 00:00:00'"
-      )
-      .run();
+    db.execute(
+      "UPDATE tourism_advisories SET updated_at = '2000-01-01 00:00:00'"
+    );
 
     const { res, body } = await patch(ana, created.advisory.id, {
       title: 'Caticlan port reopening at noon',
