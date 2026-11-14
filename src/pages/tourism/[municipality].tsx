@@ -24,7 +24,7 @@ import {
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 
-import { advisoriesFor } from '@/lib/tourism/advisories';
+import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL, getDateStatus } from '@/lib/tourism/festivalDates';
 import { toTitleCase } from '@/lib/stringUtils';
 
@@ -75,6 +75,7 @@ function EntryCard({
 
 export default function TourismMunicipalityDetail() {
   const { municipality: slug } = useParams();
+  const { advisories, status: advisoriesStatus } = useAdvisories();
   const municipalities = municipalitiesTourism;
   const index = municipalities.findIndex(m => m.slug === slug);
   const municipality = index >= 0 ? municipalities[index] : undefined;
@@ -82,6 +83,7 @@ export default function TourismMunicipalityDetail() {
   if (!municipality)
     return <div className='p-20 text-center'>Municipality not found</div>;
 
+  const notices = advisoriesFor(municipality.slug, advisories);
   const prev =
     municipalities[(index - 1 + municipalities.length) % municipalities.length];
   const next = municipalities[(index + 1) % municipalities.length];
@@ -160,9 +162,9 @@ export default function TourismMunicipalityDetail() {
 
       {/* --- NOTICES --- */}
       <DetailSection title='Notices' icon={CalendarHeart}>
-        {advisoriesFor(municipality.slug).length > 0 ? (
+        {notices.length > 0 ? (
           <ul className='space-y-3'>
-            {advisoriesFor(municipality.slug).map(a => (
+            {notices.map(a => (
               <li key={a.id} className='text-sm'>
                 <strong>{a.title}</strong> · {a.issuer} · published{' '}
                 {a.publishedAt}
@@ -178,9 +180,18 @@ export default function TourismMunicipalityDetail() {
               </li>
             ))}
           </ul>
+        ) : advisoriesStatus === 'loading' ? (
+          <p className='text-kapwa-text-support text-sm'>
+            Checking for notices…
+          </p>
         ) : (
           <p className='text-kapwa-text-support text-sm'>
             No verified notices are published for this municipality yet.
+          </p>
+        )}
+        {advisoriesStatus === 'fallback' && (
+          <p className='text-kapwa-text-muted mt-2 text-xs'>
+            Live notices couldn’t be loaded. Showing the last published list.
           </p>
         )}
       </DetailSection>

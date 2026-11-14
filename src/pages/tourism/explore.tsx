@@ -22,7 +22,7 @@ import {
 
 import { Card, CardContent } from '@/components/ui/Card';
 
-import { advisoriesFor } from '@/lib/tourism/advisories';
+import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL, overlaps } from '@/lib/tourism/festivalDates';
 import {
   buildRecords,
@@ -140,6 +140,7 @@ const rise = (i: number) => ({
 
 export default function TourismExplore() {
   const [params, setParams] = useSearchParams();
+  const { advisories, status: advisoriesStatus } = useAdvisories();
   const q = params.get('q') ?? '';
   const town = params.get('town') ?? '';
   const layerParam = (params.get('layer') ?? 'all') as Layer;
@@ -198,6 +199,7 @@ export default function TourismExplore() {
     [selected]
   );
   const townInfo = MUNICIPALITIES.find(m => m.slug === town) ?? null;
+  const townNotices = townInfo ? advisoriesFor(townInfo.slug, advisories) : [];
   const empty =
     filtered.length === 0
       ? emptyState(
@@ -1429,9 +1431,9 @@ export default function TourismExplore() {
                     <h3 className='text-kapwa-text-strong type-title'>
                       Notices
                     </h3>
-                    {advisoriesFor(townInfo.slug).length ? (
+                    {townNotices.length ? (
                       <ul className='type-body mt-2 space-y-2'>
-                        {advisoriesFor(townInfo.slug).map(a => (
+                        {townNotices.map(a => (
                           <li key={a.id}>
                             <strong>{a.title}</strong> · {a.issuer} · published{' '}
                             {a.publishedAt}
@@ -1447,9 +1449,19 @@ export default function TourismExplore() {
                           </li>
                         ))}
                       </ul>
+                    ) : advisoriesStatus === 'loading' ? (
+                      <p className='text-kapwa-text-support type-body mt-2'>
+                        Checking for notices…
+                      </p>
                     ) : (
                       <p className='text-kapwa-text-support type-body mt-2'>
                         No verified notices published.
+                      </p>
+                    )}
+                    {advisoriesStatus === 'fallback' && (
+                      <p className='text-kapwa-text-muted type-meta mt-1'>
+                        Live notices couldn’t be loaded. Showing the last
+                        published list.
                       </p>
                     )}
                   </div>
