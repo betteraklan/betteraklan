@@ -21,8 +21,9 @@ NC='\033[0m' # No Color
 # Configuration
 MIGRATIONS_DIR="db/migrations"
 DB_BINDING="BETTERLB_DB"
-# Must match database_name in wrangler.jsonc
-DB_NAME="betteraklan"
+# Remote commands also use the binding, so wrangler resolves the exact
+# database_id from wrangler.jsonc (the database the site is bound to).
+DB_NAME="${DB_BINDING}"
 WRANGLER_CMD="npx wrangler d1 execute"
 
 # Functions
