@@ -76,6 +76,7 @@ curl https://betteraklan.gov.ph/api/openlgu/terms
 | [Weather API](./weather-api.md) | Current weather and 3-hour forecast for Aklan | None |
 | [Contribution API](./contribution-api.md) | Create GitHub issues for community contributions | None |
 | [OpenLGU API](./openlgu-api.md) | Legislative documents, persons, terms, sessions, committees | None |
+| [Tourism Advisories API](./tourism-advisories.md) | Active closures, access changes and events; admin endpoints and deploy steps | None (admin endpoints: session) |
 
 ### Admin APIs
 
