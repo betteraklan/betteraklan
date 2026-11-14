@@ -78,4 +78,3 @@ INSERT INTO memberships (id, person_id, term_id, chamber, role, rank) VALUES
   ('mem_sp2025_sk', 'tolentino-edmundo-m-jr', 'sp_2025', 'Sangguniang Panlalawigan', 'SK Provincial Federation President', NULL),
   ('mem_sp2025_secretary', 'solanoy-michael-t', 'sp_2025', 'Sangguniang Panlalawigan', 'Secretary to the Sanggunian', NULL);
 
-INSERT INTO schema_migrations (name) VALUES ('004_aklan_baseline_data.sql');

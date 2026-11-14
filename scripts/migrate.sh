@@ -21,7 +21,8 @@ NC='\033[0m' # No Color
 # Configuration
 MIGRATIONS_DIR="db/migrations"
 DB_BINDING="BETTERLB_DB"
-DB_NAME="betterlb-openlgu"
+# Must match database_name in wrangler.jsonc
+DB_NAME="betteraklan"
 WRANGLER_CMD="npx wrangler d1 execute"
 
 # Functions
@@ -96,15 +97,20 @@ create_schema_table() {
     log_success "Schema migrations table created"
 }
 
+# Extract "name" values (one per line) from `wrangler d1 execute --json` output
+parse_names() {
+    grep -oE '"name": *"[^"]+"' | sed -E 's/^"name": *"(.*)"$/\1/'
+}
+
 # Get applied migrations
 get_applied_migrations() {
     local local_flag=$1
 
     if check_schema_table "$local_flag"; then
         if [ "$local_flag" = "--local" ]; then
-            ${WRANGLER_CMD} ${DB_BINDING} --local --command="SELECT name FROM schema_migrations ORDER BY name;" 2>/dev/null | grep -v "^─" | tail -n +3 | sed 's/^| //' | sed 's/ |$//' || echo ""
+            ${WRANGLER_CMD} ${DB_BINDING} --local --json --command="SELECT name FROM schema_migrations ORDER BY name;" 2>/dev/null | parse_names || echo ""
         else
-            ${WRANGLER_CMD} ${DB_NAME} --remote --command="SELECT name FROM schema_migrations ORDER BY name;" 2>/dev/null | grep -v "^─" | tail -n +3 | sed 's/^| //' | sed 's/ |$//' || echo ""
+            ${WRANGLER_CMD} ${DB_NAME} --remote --json --command="SELECT name FROM schema_migrations ORDER BY name;" 2>/dev/null | parse_names || echo ""
         fi
     else
         echo ""
