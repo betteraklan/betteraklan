@@ -29,7 +29,7 @@ import { DATE_STATUS_LABEL, getDateStatus } from '@/lib/tourism/festivalDates';
 import { toTitleCase } from '@/lib/stringUtils';
 
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
-import { TourismEntry } from '@/types/tourism';
+import { MunicipalityTourism, TourismEntry } from '@/types/tourism';
 
 import { AdvisoryKindPill } from './components/StatusPills';
 
@@ -46,12 +46,18 @@ function EntryCard({
       <CardContent className='space-y-1.5 p-4'>
         {entry.name && (
           <h4 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
-            {toTitleCase(entry.name)}
+            {/* Workbook names are verbatim; only legacy names are re-cased. */}
+            {entry.recordId ? entry.name : toTitleCase(entry.name)}
           </h4>
         )}
         <p className='text-kapwa-text-support text-sm leading-relaxed'>
           {entry.description}
         </p>
+        {entry.location && (
+          <p className='text-kapwa-text-muted text-xs'>
+            Location/barangay: {entry.location}
+          </p>
+        )}
         {dated && (
           <div className='flex flex-wrap items-center gap-2 pt-1 text-xs'>
             <Badge
@@ -78,7 +84,7 @@ function EntryCard({
 export default function TourismMunicipalityDetail() {
   const { municipality: slug } = useParams();
   const { advisories, status: advisoriesStatus } = useAdvisories();
-  const municipalities = municipalitiesTourism;
+  const municipalities = municipalitiesTourism as MunicipalityTourism[];
   const index = municipalities.findIndex(m => m.slug === slug);
   const municipality = index >= 0 ? municipalities[index] : undefined;
 
@@ -124,6 +130,11 @@ export default function TourismMunicipalityDetail() {
           Festivals, spots, and local products of the Municipality of{' '}
           {municipality.name}, Aklan.
         </p>
+        {municipality.overview && (
+          <p className='text-kapwa-text-support mt-2 text-sm leading-relaxed'>
+            {municipality.overview.text}
+          </p>
+        )}
       </header>
 
       {/* --- FESTIVALS & EVENTS --- */}

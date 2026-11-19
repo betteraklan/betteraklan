@@ -1347,6 +1347,14 @@ export default function TourismExplore() {
                         )}
                       </dd>
                     </div>
+                    {selected.location && (
+                      <div>
+                        <dt className='inline font-semibold'>
+                          Location/barangay:{' '}
+                        </dt>
+                        <dd className='inline'>{selected.location}</dd>
+                      </div>
+                    )}
                     <div>
                       <dt className='inline font-semibold'>Last checked: </dt>
                       <dd className='inline'>
@@ -1393,6 +1401,11 @@ export default function TourismExplore() {
                     <p className='text-kapwa-text-support type-meta font-semibold'>
                       Municipality overview
                     </p>
+                    {townInfo.overview && (
+                      <p className='text-kapwa-text-support type-body mt-2'>
+                        {townInfo.overview.text}
+                      </p>
+                    )}
                   </div>
                   <ul className='divide-kapwa-border-weak border-kapwa-border-weak divide-y border-y'>
                     {(['place', 'event', 'stay', 'product'] as const).map(k => {

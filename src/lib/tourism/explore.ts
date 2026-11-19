@@ -38,6 +38,8 @@ export interface Rec {
   dateStatus: DateStatus;
   sourceUrl?: string;
   image?: TourismImage;
+  recordId?: string;
+  location?: string; // workbook Location/barangay text
 }
 
 export interface Centroid {
@@ -80,6 +82,8 @@ export function buildRecords(s: Sources): Rec[] {
     ) =>
       list.forEach((e, i) => {
         if (!e.name) return;
+        // `pin: false` (importer --no-pins) keeps an imported record unmapped.
+        const at = e.pin === false ? undefined : c;
         out.push({
           id: `${prefix}-${m.slug}-${i}`,
           layer,
@@ -87,13 +91,16 @@ export function buildRecords(s: Sources): Rec[] {
           description: e.description,
           town: m.slug,
           townName: m.name,
-          lat: c?.lat ?? null,
-          lon: c?.lon ?? null,
-          placement: c ? 'approximate' : 'none',
-          placementNote: c ? 'Municipality centroid' : null,
+          lat: at?.lat ?? null,
+          lon: at?.lon ?? null,
+          placement: at ? 'approximate' : 'none',
+          placementNote: at ? 'Municipality centroid' : null,
           dates: e.dates,
           dateStatus: getDateStatus(e),
           image: e.image,
+          sourceUrl: e.sourceUrl,
+          recordId: e.recordId,
+          location: e.location,
         });
       });
     place('place', m.attractions, 'place');

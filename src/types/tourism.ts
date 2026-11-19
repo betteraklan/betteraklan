@@ -28,6 +28,22 @@ export interface TourismEntry {
   description: string;
   dates?: TourismDates;
   image?: TourismImage;
+  /** Workbook Record ID (e.g. `AKL-004`) for entries imported from the approved workbook; their text is verbatim. */
+  recordId?: string;
+  /** Workbook `Location/barangay`, verbatim. Text only, never geocoded. */
+  location?: string;
+  /** Workbook `Source URL` (provenance). */
+  sourceUrl?: string;
+  /** `false` keeps an imported record off the map (importer `--no-pins`). */
+  pin?: false;
+}
+
+/** The workbook's `Description` row for a municipality, verbatim. */
+export interface TourismOverview {
+  recordId: string;
+  itemName: string;
+  text: string;
+  sourceUrl: string;
 }
 
 export interface Advisory {
@@ -48,6 +64,7 @@ export interface MunicipalityTourism {
   festivals: TourismEntry[];
   attractions: TourismEntry[];
   products: TourismEntry[];
+  overview?: TourismOverview;
 }
 
 export interface FeaturedAttraction {
