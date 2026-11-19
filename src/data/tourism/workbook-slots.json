@@ -1,0 +1,437 @@
+{
+  "AKL-002": {
+    "municipality": "altavas",
+    "array": "festivals",
+    "index": 1
+  },
+  "AKL-006": {
+    "municipality": "altavas",
+    "array": "attractions",
+    "index": 3
+  },
+  "AKL-010": {
+    "municipality": "altavas",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-011": {
+    "municipality": "altavas",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-012": {
+    "municipality": "altavas",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-013": {
+    "municipality": "altavas",
+    "array": "products",
+    "index": 4
+  },
+  "AKL-020": {
+    "municipality": "balete",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-021": {
+    "municipality": "balete",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-023": {
+    "municipality": "balete",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-024": {
+    "municipality": "balete",
+    "array": "products",
+    "index": 4
+  },
+  "AKL-025": {
+    "municipality": "balete",
+    "array": "products",
+    "index": 5
+  },
+  "AKL-031": {
+    "municipality": "banga",
+    "array": "products",
+    "index": 0
+  },
+  "AKL-041": {
+    "municipality": "batan",
+    "array": "attractions",
+    "index": 11
+  },
+  "AKL-042": {
+    "municipality": "batan",
+    "array": "attractions",
+    "index": 12
+  },
+  "AKL-043": {
+    "municipality": "batan",
+    "array": "attractions",
+    "index": 13
+  },
+  "AKL-047": {
+    "municipality": "batan",
+    "array": "attractions",
+    "index": 14
+  },
+  "AKL-049": {
+    "municipality": "batan",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-050": {
+    "municipality": "batan",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-053": {
+    "municipality": "buruanga",
+    "array": "attractions",
+    "index": 12
+  },
+  "AKL-059": {
+    "municipality": "buruanga",
+    "array": "attractions",
+    "index": 13
+  },
+  "AKL-062": {
+    "municipality": "buruanga",
+    "array": "attractions",
+    "index": 14
+  },
+  "AKL-066": {
+    "municipality": "buruanga",
+    "array": "products",
+    "index": 0
+  },
+  "AKL-067": {
+    "municipality": "buruanga",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-068": {
+    "municipality": "buruanga",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-069": {
+    "municipality": "buruanga",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-072": {
+    "municipality": "ibajay",
+    "array": "attractions",
+    "index": 6
+  },
+  "AKL-075": {
+    "municipality": "ibajay",
+    "array": "attractions",
+    "index": 7
+  },
+  "AKL-076": {
+    "municipality": "ibajay",
+    "array": "attractions",
+    "index": 8
+  },
+  "AKL-077": {
+    "municipality": "ibajay",
+    "array": "attractions",
+    "index": 9
+  },
+  "AKL-078": {
+    "municipality": "ibajay",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-079": {
+    "municipality": "ibajay",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-080": {
+    "municipality": "ibajay",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-081": {
+    "municipality": "ibajay",
+    "array": "products",
+    "index": 4
+  },
+  "AKL-090": {
+    "municipality": "kalibo",
+    "array": "festivals",
+    "index": 9
+  },
+  "AKL-101": {
+    "municipality": "kalibo",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-102": {
+    "municipality": "kalibo",
+    "array": "products",
+    "index": 4
+  },
+  "AKL-103": {
+    "municipality": "kalibo",
+    "array": "products",
+    "index": 5
+  },
+  "AKL-104": {
+    "municipality": "kalibo",
+    "array": "products",
+    "index": 6
+  },
+  "AKL-105": {
+    "municipality": "kalibo",
+    "array": "products",
+    "index": 7
+  },
+  "AKL-108": {
+    "municipality": "lezo",
+    "array": "attractions",
+    "index": 1
+  },
+  "AKL-109": {
+    "municipality": "lezo",
+    "array": "attractions",
+    "index": 2
+  },
+  "AKL-110": {
+    "municipality": "lezo",
+    "array": "attractions",
+    "index": 3
+  },
+  "AKL-111": {
+    "municipality": "lezo",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-112": {
+    "municipality": "lezo",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-113": {
+    "municipality": "lezo",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-117": {
+    "municipality": "libacao",
+    "array": "festivals",
+    "index": 2
+  },
+  "AKL-119": {
+    "municipality": "libacao",
+    "array": "attractions",
+    "index": 6
+  },
+  "AKL-120": {
+    "municipality": "libacao",
+    "array": "attractions",
+    "index": 7
+  },
+  "AKL-122": {
+    "municipality": "libacao",
+    "array": "attractions",
+    "index": 8
+  },
+  "AKL-123": {
+    "municipality": "libacao",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-124": {
+    "municipality": "libacao",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-130": {
+    "municipality": "madalag",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-132": {
+    "municipality": "madalag",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-134": {
+    "municipality": "makato",
+    "array": "festivals",
+    "index": 1
+  },
+  "AKL-136": {
+    "municipality": "makato",
+    "array": "attractions",
+    "index": 3
+  },
+  "AKL-137": {
+    "municipality": "makato",
+    "array": "attractions",
+    "index": 4
+  },
+  "AKL-138": {
+    "municipality": "makato",
+    "array": "attractions",
+    "index": 5
+  },
+  "AKL-140": {
+    "municipality": "makato",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-147": {
+    "municipality": "malay",
+    "array": "attractions",
+    "index": 10
+  },
+  "AKL-153": {
+    "municipality": "malay",
+    "array": "attractions",
+    "index": 11
+  },
+  "AKL-156": {
+    "municipality": "malay",
+    "array": "attractions",
+    "index": 12
+  },
+  "AKL-157": {
+    "municipality": "malay",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-158": {
+    "municipality": "malay",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-159": {
+    "municipality": "malay",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-162": {
+    "municipality": "malinao",
+    "array": "festivals",
+    "index": 3
+  },
+  "AKL-167": {
+    "municipality": "malinao",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-168": {
+    "municipality": "malinao",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-169": {
+    "municipality": "malinao",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-175": {
+    "municipality": "nabas",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-176": {
+    "municipality": "nabas",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-177": {
+    "municipality": "nabas",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-179": {
+    "municipality": "new-washington",
+    "array": "festivals",
+    "index": 1
+  },
+  "AKL-185": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 3
+  },
+  "AKL-186": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 4
+  },
+  "AKL-187": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 5
+  },
+  "AKL-188": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 6
+  },
+  "AKL-189": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 7
+  },
+  "AKL-190": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 8
+  },
+  "AKL-191": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 9
+  },
+  "AKL-192": {
+    "municipality": "new-washington",
+    "array": "products",
+    "index": 10
+  },
+  "AKL-195": {
+    "municipality": "numancia",
+    "array": "attractions",
+    "index": 4
+  },
+  "AKL-196": {
+    "municipality": "numancia",
+    "array": "attractions",
+    "index": 5
+  },
+  "AKL-198": {
+    "municipality": "numancia",
+    "array": "attractions",
+    "index": 6
+  },
+  "AKL-200": {
+    "municipality": "numancia",
+    "array": "products",
+    "index": 1
+  },
+  "AKL-201": {
+    "municipality": "numancia",
+    "array": "products",
+    "index": 2
+  },
+  "AKL-210": {
+    "municipality": "tangalan",
+    "array": "attractions",
+    "index": 7
+  },
+  "AKL-212": {
+    "municipality": "tangalan",
+    "array": "products",
+    "index": 1
+  }
+}

@@ -6,6 +6,13 @@
       {
         "name": "ALTAVAS STO. NIÑO FESTIVAL",
         "description": "It is the day that signifies the end of the Fil-American war in the Municipality of Altavas. From then on, January 22 has become the official date of celebration for the town’s Annual Thanksgiving and Armistice Day. Later, the date was adopted as its municipal town fiesta. This is the continuation of the joyous celebration of peace upon the conclusion of the war that took place in the said town."
+      },
+      {
+        "name": "Santo Niño Festival",
+        "description": "Altavas celebrates the Santo Niño during its town fiesta. The town’s observance also commemorates a local armistice linked to the Philippine-American War. January 22 became the date of thanksgiving and remembrance and was later adopted as the town fiesta date.",
+        "recordId": "AKL-002",
+        "location": "Poblacion / town center",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
@@ -14,66 +21,172 @@
         "description": "The late General Anianas headed the expedition force in Panay in 1899. He was captured in Barangay Dalipdip, Altavas, Aklan during the Philippine-American war in 1901. In recognition of his gallantry and contribution to the katipunan, he was recognized by the Altavas Historical Research Society, Incorporated (AHRS) as a valued historical property of Altavas, Aklan."
       },
       {
-        "name": "TINAGONG DAGAT",
-        "description": "8 kms. in length and 4 kms. wide situated between the municipalities of Altavas and Batan, partly hidden from the Batan Bay view by two islets, fringed with thick mangroves and undergrowth, and rocky beaches."
+        "name": "Tinagong Dagat",
+        "description": "Tinagong Dagat lies between Altavas and Batan. Two islets partly screen it from Batan Bay, and mangroves and rocky stretches line the shore. The provincial tourism profile describes the inlet as about eight kilometers long and four kilometers wide.",
+        "recordId": "AKL-009",
+        "location": "Altavas uplands",
+        "sourceUrl": "https://altavasaklan.gov.ph/wp-content/uploads/2023/05/NATURAL-ATTRACTION.pdf"
       },
       {
         "name": null,
         "description": "Altavas is blessed with natural resources and scenic attractions, potential as tourist destinations once fully developed. Barangay Talon as the name suggests is home to several water falls and even caves. “Talon” means water falls in English. Agtutoe-an and Quinasay-an Water Falls are both found in Barangay Talon. Kipot and Suhot caves are also situated in the same district. Kipot is a local term that means “narrow” while suhot means “to pass through.” Macawiwili Falls on the other hand is in Barangay Cabugao."
+      },
+      {
+        "name": "Macawiwili Falls",
+        "description": "Natural site named in the provincial tourism profile. The recorded location is Cabugao. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-006",
+        "location": "Cabugao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Puto Seko is a dried rice cake delicacy made only in this town."
+      },
+      {
+        "name": "Nito bags",
+        "description": "Nito bags is nito handicrafts listed in municipal tourism inventory. The recorded location is Brgy. Cabugao. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-010",
+        "location": "Brgy. Cabugao",
+        "sourceUrl": "https://altavasaklan.gov.ph/wp-content/uploads/2023/05/tourism-and-communication.pdf"
+      },
+      {
+        "name": "Puto Seko",
+        "description": "Puto seko is named in the provincial tourism profile as a local product; source naming differs from Puto Tostado references. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-011",
+        "location": "Altavas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
+      },
+      {
+        "name": "Puto Tostado",
+        "description": "Puto Tostado is a toasted rice cake documented in Altavas. UP Visayas cultural mapping describes a recipe handed down within a local family and a preparation method that uses charcoal. The toasted cake is one of the foods associated with the municipality.",
+        "recordId": "AKL-012",
+        "location": "Altavas",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/puto-tostado/"
+      },
+      {
+        "name": "Virgin coconut oil",
+        "description": "Virgin coconut oil is sAMAKA community-produced virgin coconut oil listed in the municipal tourism inventory. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-013",
+        "location": "Altavas",
+        "sourceUrl": "https://altavasaklan.gov.ph/wp-content/uploads/2023/05/tourism-and-communication.pdf"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-001",
+      "itemName": "Altavas municipal overview",
+      "text": "An inland municipality in eastern Aklan, formerly called Jemino and renamed in honor of Senator Jose Altavas. Local tourism materials highlight its upland landscape, waterfalls and caves. The town’s January Santo Niño celebration is tied to a local armistice observance. Outside the town center, Barangay Talon has waterfalls and caves, while Tinagong Dagat lies along the boundary with Batan. Altavas is also associated with toasted rice cakes and nito handicrafts.",
+      "sourceUrl": "https://altavasaklan.gov.ph/about-us/"
+    }
   },
   {
     "slug": "balete",
     "name": "Balete",
     "festivals": [
       {
-        "name": "ENCHANTING BALETE",
-        "description": "This is also Balete’s own annual civic and religious fiesta emphasizing on the rich culture and traditions of Baleten-ons."
+        "name": "Enchanting Balete",
+        "description": "Annual civic and religious town fiesta named by the provincial tourism profile. The recorded location is Balete town. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-015",
+        "location": "Balete town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
       },
       {
-        "name": "KULTURA BALETE",
-        "description": "Highlighting the Culture and Arts month and the Enchanting Balete festival, this mixed cultural event is celebrated every February and October. Some of the activities are cultural presentations, art exhibits, agro-fishery and trade fair, symposia, art contest, etc."
+        "name": "Kultura Balete",
+        "description": "Kultura Balete presents local culture and arts as part of the municipality’s civic calendar. The provincial tourism profile associates the program with Culture and Arts Month and the Enchanting Balete festival. Activities have been reported in February and October.",
+        "recordId": "AKL-016",
+        "location": "Balete town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "AGTAWAGON HILL",
-        "description": "It is the area that once served as a camp and the last line of defense of Filipino soldiers and guerillas during World War ll."
+        "name": "Agtawagon Hill",
+        "description": "Agtawagon Hill is hill attraction identified in the municipal tourism profile. Cultural celebrations include Enchanting Balete and Kultura Balete.",
+        "recordId": "AKL-017",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
       },
       {
-        "name": "BASURA GARDEN",
-        "description": "The name of this place is derived from the owner’s collection of artifacts, antiques, including recyclable garbage materials from the native Baleten-on folks. Among those that were transformed into works of arts the observer would gape at are a broken shoe that was subsequently turned into a beautiful flower vase, an ordinary stone framed to portray realities which many oftentimes ignore. The artworks are setup inside the private garden purposely to create a haven of inspiration for the owner’s family, to evoke their innate creative nature or talent. Hence, friends and guests who enter the place likewise get inspiration, announcing to the outside world there is a small haven of art that exists in this town of Balete, for all to see."
+        "name": "Basura Garden",
+        "description": "Garden attraction; privately operated according to tourism profile. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-018",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
       },
       {
-        "name": "KABUHI-AN CENTER",
-        "description": "A brainchild of then Congresswoman and now Vice Governor Gabrielle V. Calizo-Quimpo which serve as a skills training center for livelihood projects, to equip the Aklanon artisans and craftsmen, the women sector, the farmers and fisher-folks alike having an attitude of entrepreneurship, and to make the products of Aklanons competitive for both the local and global market. It also serves as exhibition center or showroom of the best of the Aklan products, and as marketing center purposely to promote Aklan products."
+        "name": "Kabuhi-an Center",
+        "description": "Kabuhi-an Center is community and visitor center listed in the tourism profile. Cultural celebrations include Enchanting Balete and Kultura Balete.",
+        "recordId": "AKL-019",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Agricultural and fishery of which the most notable are piña cloth, nito craft, pinipig, rambutan, oysters, crabs, prawns (both brackish and freshwater)."
+      },
+      {
+        "name": "Limbok",
+        "description": "Limbok is a traditional Balete delicacy made from fresh, mature glutinous rice. UP Visayas documented the practice in Sitio Bangbang, Barangay Feliciano, where it forms part of the community’s knowledge of preparing rice by hand.",
+        "recordId": "AKL-020",
+        "location": "Sitio Bangbang, Feliciano",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/pag-ubra-it-limbok/"
+      },
+      {
+        "name": "Nito crafts",
+        "description": "Nito crafts is nito-based crafts listed among Balete products. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-021",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
+      },
+      {
+        "name": "Piña cloth",
+        "description": "Aklan piña textile and related craft product featured in the provincial tourism profile. The recorded location is Balete / Aklan. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-023",
+        "location": "Balete / Aklan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
+      },
+      {
+        "name": "Pinipig",
+        "description": "Pinipig is pounded young rice listed as a local product. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-024",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
+      },
+      {
+        "name": "Rambutan",
+        "description": "Rambutan is seasonal fruit listed as a local product. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood.",
+        "recordId": "AKL-025",
+        "location": "Balete",
+        "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-014",
+      "itemName": "Balete municipal overview",
+      "text": "A municipality known for its agricultural and coastal setting and community tourism initiatives. The official provincial profile presents local cultural, hill and garden attractions. Agtawagon Hill and the Kabuhi-an Center reflect different sides of local life, from the landscape to community livelihood. Cultural celebrations include Enchanting Balete and Kultura Balete. In Feliciano, local makers prepare limbok from glutinous rice.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/balete/"
+    }
   },
   {
     "slug": "banga",
     "name": "Banga",
     "festivals": [
       {
-        "name": "SAGUIBIN FESTIVAL",
-        "description": "Saguibin is an Aklanon term which means to help one another. It is within this context of reviving the true spirit of cooperation and understanding among Bangahons that gave birth to the celebration of Saguibin festival. This event is geared to promote the tourism potential of Banga, integrate its cultural heritage and sustain economic gains in the future."
+        "name": "Saguibin Festival",
+        "description": "Community festival whose name is associated with helping one another. The recorded location is Banga town. Manduyog Hill and the main campus of Aklan State University are among the town’s prominent landmarks.",
+        "recordId": "AKL-028",
+        "location": "Banga town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/banga/"
       },
       {
-        "name": "PAG AEAW-AEAW",
-        "description": "A re-enactment of Banga Crossing massacre perpetuated by the Japanese Imperial Forces during the Filipino-Japanese war. Hundreds of innocent Filipino died at the hands of Japanese forces trying to invade the Philippines during the world war II. To commemorate the event, it is re-enacted yearly to honor the memory of 223 Banganhon who were victims of Japanese atrocities in the year 1942."
+        "name": "Pag-Aeaw-Aeaw",
+        "description": "Remembrance/re-enactment associated with the Banga Crossing massacre. Manduyog Hill and the main campus of Aklan State University are among the town’s prominent landmarks.",
+        "recordId": "AKL-027",
+        "location": "Banga Crossing",
+        "sourceUrl": "https://aklan.gov.ph/tourism/banga/"
       }
     ],
     "attractions": [
@@ -82,11 +195,28 @@
         "description": "is the oldest agricultural school in Aklan. ASU is considered as one of the institutions of learning in Western Visayas. It started as the Banga Intermediate School in 1917 through a resolution passed by the Provincial Board headed by Governor Simeon Mobo. The school became a farm school with the conversion of the Banga Intermediate School into the Capiz Farm School (Aklan being a part of Capiz then), which was formally opened in June 1918."
       },
       {
-        "name": "MANDUYOG HILL",
-        "description": "Named after an ancient ruler Datu Manduyog, successor of Datu Kalantiaw lll, Manduyog Hill is 500 ft. high and in it are life-size Stations of the Cross that wind upwards the hill. Sprawling below the hillside is situated the beautiful 99.92 hectare campus of the Aklan State University, considered the oldest school in the province now offering tertiary and graduate academic programs."
+        "name": "Manduyog Hill",
+        "description": "Manduyog Hill rises above the Aklan State University campus in Banga. Life-size Stations of the Cross mark the path up the hill, linking the landscape to a local tradition of religious devotion.",
+        "recordId": "AKL-030",
+        "location": "Aklan State University Main Campus, Banga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/banga/"
       }
     ],
-    "products": []
+    "products": [
+      {
+        "name": "Calamansi",
+        "description": "Farm produce purchased from Banga farmers by the provincial government in 2020; listed as agricultural produce, not as a unique specialty food. Manduyog Hill and the main campus of Aklan State University are among the town’s prominent landmarks.",
+        "recordId": "AKL-031",
+        "location": "Banga",
+        "sourceUrl": "https://aklan.gov.ph/plgu-aklan-buys-farmers-produce-to-be-distributed-to-residents-affected-by-quarantine-in-kalibo/"
+      }
+    ],
+    "overview": {
+      "recordId": "AKL-026",
+      "itemName": "Banga municipal overview",
+      "text": "An inland municipality in central Aklan whose local identity includes the Banga Crossing remembrance and community cooperation themes. Manduyog Hill and the main campus of Aklan State University are among the town’s prominent landmarks. The Saguibin Festival draws on the idea of helping one another, while Pag-Aeaw-Aeaw remembers the events at Banga Crossing.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/banga/"
+    }
   },
   {
     "slug": "batan",
@@ -103,40 +233,58 @@
     ],
     "attractions": [
       {
-        "name": "KALANTIAW SHRINE",
-        "description": "It used to be the seat of government of Raja Bendahara Kalantiaw lll, then the third chief of Panay and promulgator of the famous Code of Kalantiaw. Its marker was constructed by the Philippine Historical and Cultural Society."
+        "name": "Kalantiaw Shrine",
+        "description": "Historic site associated with the Kalantiaw story. NHCP has delisted the Code of Kalantiaw marker because the code has no valid historical basis; present the site as a physical landmark only. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-040",
+        "location": "Batan",
+        "sourceUrl": "https://philhistoricsites.nhcp.gov.ph/registry_database/the-code-of-kalantiaw/"
       },
       {
-        "name": "OB-OB HILL",
-        "description": "200 meters high, this hill resembles a lighthouse facing the Sibuyan Sea. Underneath the hill is a beautiful, fine sandy beach."
+        "name": "Ob-Ob Hill",
+        "description": "Ob-Ob Hill is hill viewpoint and natural attraction listed in the municipal tourism profile. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-044",
+        "location": "Batan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       },
       {
         "name": "PRISTINE BEACHES OF BARANGAY SONGCOLAN, MANDONG, NAPTI AND MAMBUQUIAO",
         "description": "Stretches 10 kms. more or less from Barangay Songcolan, Mandong Napti and Mambuquiao. Resto bars, and other facilities and amenities along the the vast expense of Batan Bay, Tinago Lake, Sibuyan Sea offer a relaxing hideaway from the hustle and bustle routines. More so, Mambuquiao has a marine protected area and fish sanctuary. Locally called pito, it has the highest live coral cover in Salian Bay and is ideal for people who enjoys snorkeling and scuba diving."
       },
       {
-        "name": "CAMANCI FALLS",
-        "description": "This body of water attributes the natural scenery of freshness and wilderness."
+        "name": "Camanci Falls",
+        "description": "Camanci Falls is falls listed among the municipality’s natural attractions. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-038",
+        "location": "Batan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       },
       {
         "name": "ANGAS WHITE STONE MOUNTAIN",
         "description": "The place is suited for trekking and mountain climbing. Known to locals as “Puting Bato,” it is also a protected area for wildlife. Puting Bato is the habitat of rare species and mammals, birds, wild flowers and endangered species."
       },
       {
-        "name": "PANDAN HILLS",
-        "description": "Located in Bay-ang, it is a refreshing verdant hills overlooking the Sibuyan Sea."
+        "name": "Pandan Hills",
+        "description": "Pandan Hills is upland attraction listed in the municipal tourism profile. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-045",
+        "location": "Batan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       },
       {
         "name": null,
         "description": "OUR LADY OF THE IMMACULATE CONCEPTION PARISH CHURCH (Eastern Side) – The parish church in Poblacion was established by the Spanish colonizers and friars during the colonization and evangelization of Batang (Batan) and Philippine Archipelago on December 8, 1702 hence considered one of the oldest churches in the province. Nuestra Señora De Immaculada Concepcion was enthroned and venerated in the church of Batang in honor of His Majesty King of Spain. The church celebrated its quadri-centennial (400 years) of parish existence in 2002."
       },
       {
-        "name": "BATAN SEA PORT",
-        "description": "Batan has a port located in Poblacion and considered the oldest in the province of Aklan. It is L-type made up of concrete material having a total length of 130 meters. It can accommodate inter-island shipping. The port is the shortest route entry and exit from Batan to the capital town of Kalibo via Dumaguit. A ferry boat service is available every 15 minutes."
+        "name": "Batan Sea Port",
+        "description": "Batan Sea Port is in Poblacion, near the center of this coastal municipality. The provincial tourism profile identifies it as one of Batan’s historic transport landmarks. It offers a point of reference for understanding the town’s connection to Batan Bay.",
+        "recordId": "AKL-036",
+        "location": "Poblacion",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       },
       {
-        "name": "SAN LORENZO RUIZ DE MANILA PARISH CHURCH",
-        "description": "The parish church in Barangay Camaligan was dedicated to San Ruiz de Manila, the first Filipino Martyr and Saint, at the time of his Beautification and Canonization by His Holiness, Pope John Paul II at Vatican City formal religious ceremonies in Manila, Philippines."
+        "name": "San Lorenzo Ruiz de Manila Parish Church",
+        "description": "Parish church dedicated to San Lorenzo Ruiz. The recorded location is Camaligan. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-046",
+        "location": "Camaligan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       },
       {
         "name": "CORAL GARDEN",
@@ -145,32 +293,89 @@
       {
         "name": "OLD SPANISH RELICS",
         "description": "From the Spanish colonization period, cannons, distilleries and old cemeteries with brick facade can be seen in Batan."
+      },
+      {
+        "name": "Mambuquiao Beach",
+        "description": "Mambuquiao Beach is beach destination listed in the provincial tourism profile. The recorded location is Brgy. Mambuquiao. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-041",
+        "location": "Brgy. Mambuquiao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+      },
+      {
+        "name": "Mandong Beach",
+        "description": "Mandong Beach is beach destination listed in the provincial tourism profile. The recorded location is Brgy. Mandong. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-042",
+        "location": "Brgy. Mandong",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+      },
+      {
+        "name": "Napti Beach",
+        "description": "Napti Beach is beach destination listed in the provincial tourism profile. The recorded location is Brgy. Napti. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-043",
+        "location": "Brgy. Napti",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+      },
+      {
+        "name": "Songcolan Beach",
+        "description": "Songcolan Beach is beach destination listed in the provincial tourism profile. The recorded location is Brgy. Songcolan. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
+        "recordId": "AKL-047",
+        "location": "Brgy. Songcolan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Batan makes this special puto or steamed rice cake of several different flavors such as cheese and buko. A good idea for snacks, it is about 6-8 inches in diameter, big enough to fill the stomachs of a small group."
+      },
+      {
+        "name": "Puto buko",
+        "description": "Batan’s puto buko is a coconut-flavored version of the town’s steamed rice cake. The provincial tourism profile also identifies a cheese variant and describes the cakes as large enough to share.",
+        "recordId": "AKL-049",
+        "location": "Batan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+      },
+      {
+        "name": "Puto cheese",
+        "description": "Batan’s puto cheese is a cheese-flavored steamed rice cake. It is one of the versions made locally, alongside a coconut-flavored puto. The provincial tourism profile describes the cakes as large enough to serve several people.",
+        "recordId": "AKL-050",
+        "location": "Batan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-032",
+      "itemName": "Batan municipal overview",
+      "text": "A coastal municipality with historical heritage sites and beaches. NHCP documents Batang as an early trade center/seat; the separate Kalantiaw-code claim has been formally delisted. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao. Mambuquiao also has a protected coral area. The town celebrates Ati-Ati Malakara, and local makers prepare steamed puto in flavors such as cheese and coconut.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+    }
   },
   {
     "slug": "buruanga",
     "name": "Buruanga",
     "festivals": [
       {
-        "name": "PANAGAT FESTIVAL",
-        "description": "A showcase of Buruanga’s most known product “fish”, being a coastal town. Some of the activities are float contest, cultural shows, & other entertainment to boost the morale of the townsfolk, create awareness to tourists and also advocate conservation of its marine resources."
+        "name": "Panagat Festival",
+        "description": "Buruanga’s Panagat Festival celebrates fishing and the people whose livelihoods depend on the sea. The municipality showcases its fish products during the festivities, connecting the town’s coastal identity with the importance of caring for marine resources.",
+        "recordId": "AKL-052",
+        "location": "Buruanga town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "INGUS-INGUS HILL",
-        "description": "During the Spanish era, it served as the watch point for invading Moro pirates who used to maraud coastal villages. Underneath the hill is a cave, which according to folktales, was used as an ambuscade for English pirates, buccaneers, and other plunderers of Spanish galleons carrying precious cargoes."
+        "name": "Ingus-Ingus Hill",
+        "description": "Ingus-Ingus Hill overlooks the coast of Buruanga and was used as a lookout during the Spanish colonial period, according to the provincial tourism profile. A cave lies below the hill. Local stories connect the cave with raiders who targeted ships carrying valuable cargo.",
+        "recordId": "AKL-057",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "ASHRAM BALAY PAGDUAW",
-        "description": "It is a perfect place for mediation, relaxation, and retreats where one can commune with God, nature and self."
+        "name": "Ashram Balay Pagduaw",
+        "description": "Ashram Balay Pagduaw is a retreat site in Buruanga. Its purpose is quiet reflection and spiritual retreat in a natural setting. It is among the municipality’s faith-related destinations.",
+        "recordId": "AKL-054",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
         "name": "SAINT ANTHONY OF PADUA PARISH CHURCH",
@@ -181,39 +386,116 @@
         "description": "ARIEL’S POINT (formerly Batasan Point) – Touted as the best dive site in Aklan, it has cliff diving sites overlooking turquoise swimming holes, and lush mangrove. Recently featured in Cosmopolitan magazine & TripAdvisor as top Boracay attraction. It is a good stopover for scuba divers, snorkelers, and cliff-board divers for its rich marine life."
       },
       {
-        "name": "SABANG CAVE",
-        "description": "It is an elevated cave, which affords a stunning panoramic view of beaches and seascapes."
+        "name": "Sabang Cave",
+        "description": "Sabang Cave occupies an elevated site in Buruanga. From the area around the cave, the coast opens into views of beaches and the sea. The cave is one of several coastal and limestone features identified in the provincial tourism profile.",
+        "recordId": "AKL-060",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "SAPSAPON CAVE",
-        "description": "It exhibits an array of delicate stalagmites and stalactites built over centuries from minerals deposited by dripping water."
+        "name": "Sapsapon Cave",
+        "description": "Sapsapon Cave in Buruanga is known for its stalactites and stalagmites. These formations develop as minerals carried by dripping water build up on the cave ceiling and floor. The cave shows another side of a municipality better known for its coastline.",
+        "recordId": "AKL-061",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "TIGIS FALLS",
-        "description": "Offering a perfect place for relaxation, Tigis falls has become a venue for themed parties and excursions."
+        "name": "Tigis Falls",
+        "description": "Tigis Falls is waterfall attraction listed by the municipal tourism profile. The Panagat Festival celebrates fishing, and in Bagongbayan, fish drying on rocks is a documented local practice.",
+        "recordId": "AKL-064",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "TALISAY BEACH",
-        "description": "This beach boasts of rather unspoiled, crystal clear waters."
+        "name": "Talisay Beach",
+        "description": "Talisay Beach is beach listed in the provincial tourism profile. The Panagat Festival celebrates fishing, and in Bagongbayan, fish drying on rocks is a documented local practice.",
+        "recordId": "AKL-063",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
         "name": "HINUGTAN WHITE BEACH",
         "description": "This is a perfect place for snorkeling and diving. For adventurous visitors, Hinugtan White Beach provides a multitude of pleasurable experiences in which they can explore the underwater world."
       },
       {
-        "name": "TUBURAN BAYBAY",
-        "description": "It is beach resort with world class facilities where Mother Nature offers unexploited beauty and tranquility. More so, it is perfect sanctuary to reconnect with oneself, enjoy family boding moments, try out exciting activities such as diving, snorkeling & sunbathing."
+        "name": "Tuburan Baybay",
+        "description": "Tuburan Baybay is coastal area listed in the tourism profile. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-065",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "PAGATPAT MANGROVE",
-        "description": "With its lush mangroves, clear water & cool nipa huts built on its boardwalk trail, this place offers a relaxing respite to visitors."
+        "name": "Pagatpat Mangrove",
+        "description": "Pagatpat Mangrove is mangrove site listed as a nature attraction. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-058",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       },
       {
-        "name": "HACIENDA MARIA",
-        "description": "This hacienda is one of Buruanga’s must see attraction. This 14-hectare of unspoiled beauty of nature has three caves, refreshing waterfalls, soothing hot pot Jacuzzi and visitors are also treated to experience the process of lambanog making."
+        "name": "Hacienda Maria",
+        "description": "Hacienda Maria in Buruanga is a nature property with caves and waterfalls. The provincial tourism profile also describes demonstrations of how lambanog is made. Its attractions bring together the area’s landscape and a local coconut-based tradition.",
+        "recordId": "AKL-055",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
+      },
+      {
+        "name": "Ariel’s Point",
+        "description": "Ariel’s Point, formerly known as Batasan Point, is a coastal site in Buruanga. Cliffs overlook clear swimming areas and patches of mangroves. The site is associated with cliff diving and snorkeling, and the surrounding waters support marine life.",
+        "recordId": "AKL-053",
+        "location": "Buruanga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
+      },
+      {
+        "name": "Pagbulad sa Bato",
+        "description": "In Barangay Bagongbayan, Buruanga, fishers use rocks as a surface for sun-drying fish. The practice is known as pagbulad sa bato. UP Visayas documents it as part of the coastal community’s food knowledge and fishing livelihood.",
+        "recordId": "AKL-059",
+        "location": "Brgy. Bagongbayan",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/pagbulad-sa-bato/"
+      },
+      {
+        "name": "St. Anthony Church",
+        "description": "The Saint Anthony of Padua Parish Church is a longtime center of worship in Buruanga. Local religious life honors Saint Anthony and Nuestra Señora de Salvación. The parish church is a landmark in the town center.",
+        "recordId": "AKL-062",
+        "location": "Buruanga poblacion",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
       }
     ],
-    "products": []
+    "products": [
+      {
+        "name": "Bukarilyo",
+        "description": "Bukarilyo is bukarilyo listed among Buruanga fair products. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-066",
+        "location": "Buruanga",
+        "sourceUrl": "https://energyfmkalibo.blogspot.com/2016/09/tinda-turismo-ng-aklan-provincial.html"
+      },
+      {
+        "name": "Buri bags",
+        "description": "Buri bags is buri-weaving products reported at a provincial tourism fair. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-067",
+        "location": "Buruanga",
+        "sourceUrl": "https://energyfmkalibo.blogspot.com/2016/09/tinda-turismo-ng-aklan-provincial.html"
+      },
+      {
+        "name": "Fresh fish and seafood",
+        "description": "Fishing and seafood are part of the municipality’s coastal livelihood and festival identity. The recorded location is Buruanga coast. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-068",
+        "location": "Buruanga coast",
+        "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
+      },
+      {
+        "name": "Puto",
+        "description": "Puto is puto listed among Buruanga fair products. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain.",
+        "recordId": "AKL-069",
+        "location": "Buruanga",
+        "sourceUrl": "https://energyfmkalibo.blogspot.com/2016/09/tinda-turismo-ng-aklan-provincial.html"
+      }
+    ],
+    "overview": {
+      "recordId": "AKL-051",
+      "itemName": "Buruanga municipal overview",
+      "text": "A coastal municipality at the northwestern end of Aklan, with beaches, hills, caves, waterfalls and fishing communities. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain. The Panagat Festival celebrates fishing, and in Bagongbayan, fish drying on rocks is a documented local practice.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
+    }
   },
   {
     "slug": "ibajay",
@@ -230,16 +512,22 @@
         "description": "The Bugtongbato-Naisud basin (inland) mangrove boasts 27 mangrove species. It is the only mangrove community in the country that comprises 77% of the total 35 Philippine species. It has been identified and acknowledged by SEAFDEC-AQD as an ideal site for its various scientific researches on mangrove and aquaculture. With its high level of biodiversity, giant and century-old endemic mangrove species of natural growth will entice eco-tourists to explore what they think is impossible to discover."
       },
       {
-        "name": "CAMPO VERDE",
-        "description": "Situated along the border of the municipalities of Tangalan and Ibajay, Campo Verde is of 28 kms west traveling distance from the capital town of Kalibo. Its altitude of 3,700 feet makes it ideal for retreats especially during summer. It is also known as the hikers’ paradise which abounds with thick tree plantations of green pines, mahogany, acacia, ipil-ipil, and butterfly trees that draws visitors to trek deeper into the woods."
+        "name": "Campo Verde",
+        "description": "Nature attraction near the Tangalan boundary. The recorded location is Ibajay–Tangalan boundary. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-073",
+        "location": "Ibajay–Tangalan boundary",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
       },
       {
         "name": null,
         "description": "ALEJANDRO MELCHOR’S BIRTHPLACE – Ibajay is where a renowned Filipino in history who was distinguished for his work on bridges. Alejandro Melchor (1900-1947) was a civil engineer, mathematician, and educator who functioned as the Secretary of National Defense under President Manuel Quezon. But Melchor’s major claim to fame was designing the pontoon bridges recognized to have contributed much to winning the Second World War for the Allied Forces."
       },
       {
-        "name": "IBAJAY BEACH",
-        "description": "Covering the 10 shoreline barangays, Ibajay Beach stretches from Barangay Bugtongbato to Barangay Aquino. Its pristine blue crystal waters along the shorelines are suitable for picnics and swimming."
+        "name": "Ibajay Beach",
+        "description": "Coastal visitor area along the municipality’s shoreline. The recorded location is Coastal barangays of Ibajay. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-074",
+        "location": "Coastal barangays of Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
       },
       {
         "name": "IBAJAY RIVERS",
@@ -248,14 +536,76 @@
       {
         "name": "IBAJAY FALLS",
         "description": "One of Ibajay’s waterfalls is Snibaa Falls, a fine veil of white reachable after a brief mountain hike. Its cold waters can recharge you after a day’s worth of exploring."
+      },
+      {
+        "name": "Alejandro Melchor birthplace",
+        "description": "Birthplace/heritage site associated with Filipino engineer and public official Alejandro Melchor. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-072",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Ibajay River",
+        "description": "Ibajay River is river attraction included in the provincial tourism profile. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-075",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Katunggan mangrove area",
+        "description": "Katunggan It Ibajay protects a mangrove forest in Ibajay, Aklan. Elevated walkways bring visitors into the forest, where they can see mangrove roots and learn about the plants that support coastal wildlife. The site combines habitat conservation with environmental education.",
+        "recordId": "AKL-076",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Snibaa Falls",
+        "description": "Snibaa Falls is waterfall attraction listed in the municipal tourism profile. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-077",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Ibajay is famous for its nito handicraft made particularly in Barangay Mabusao, Regador and San Jose and has already become an export potential. Pottery has been a traditional industry of Barangay Coloncolong and their intricately-designed jars, vases, flower pots, and bricks have attracted traders, tourists and commuters along the National Highway where their products are displayed. A sumptuous ”linumak” commonly prepared in the households is now commercially available. Pulvoron and other native delicacies are becoming popular as gifts and “pasalubong” abroad."
+      },
+      {
+        "name": "Coloncolong pottery",
+        "description": "Coloncolong pottery is traditional pottery identified in local tourism materials. The recorded location is Brgy. Coloncolong. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-078",
+        "location": "Brgy. Coloncolong",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Linumak",
+        "description": "Linumak is local sticky-rice delicacy listed in the provincial tourism profile. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-079",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Nito crafts",
+        "description": "Nito-based handicrafts produced in Mabusao, Regador and San Jose. The recorded location is Barangays Mabusao, Regador and San Jose. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-080",
+        "location": "Barangays Mabusao, Regador and San Jose",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+      },
+      {
+        "name": "Pulvoron",
+        "description": "Pulvoron is local delicacy listed in the provincial tourism profile. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education.",
+        "recordId": "AKL-081",
+        "location": "Ibajay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-070",
+      "itemName": "Ibajay municipal overview",
+      "text": "A northern coastal municipality known for its coastline, river and mangrove areas, with local craft and food traditions. At Katunggan It Ibajay, boardwalks cross a mangrove forest protected for conservation and education. The municipality also has a devotional Ati-Ati celebration, pottery in Coloncolong and nito handicrafts in several barangays.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/ibajay/"
+    }
   },
   {
     "slug": "kalibo",
@@ -278,24 +628,46 @@
         "description": "A week-long festival simultaneously held during the province’s founding anniversary celebration on the 25th of April each year. It is a product showcase of world class craftsmanship and ingenuity using indigenous raw materials such as abaca, piña fiber, raffia. The festival aims to promote, preserve and develop the loom-weaving industry in the province, hoping to establish Aklan as the handloom-weaving destination in the country."
       },
       {
-        "name": "KALIBO FOOD FESTIVAL",
-        "description": "A yearly event commemorating the Feast of St. John the Baptist from June 12 to 23 under one venue and various kiosks offer a variety of either local or foreign dishes in the manner of local tradition of the town’s local constituents and usually accompanied by live musical bands to entertain guests and visitors and the locals alike."
+        "name": "Kalibo Food Festival",
+        "description": "Kalibo Food Festival is food event listed in the provincial tourism calendar. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-089",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       },
       {
-        "name": "HIGANTE CONTEST",
-        "description": "This event is one of the highlights in the celebration of Kalibo Sto. Niño Ati-atihan wherein locals display their ingenuity in making colorful towering figures made of paper mache, bamboos or other indigenous materials."
+        "name": "Higante contest",
+        "description": "Large-figure contest held as part of town festivities. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-086",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "FEAST OF ST. JOHN THE BAPTIST",
-        "description": "A celebration of the Feast of St.John the Baptist done on June 24 every year wherein people usually go out for the beaches and have fun with picnics. Sports activities like boat racing at the beaches and parlor games at the Pastrana Park are also carried out."
+        "name": "Feast of St. John the Baptist",
+        "description": "Religious feast and community observance. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-085",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "KALIBO DAY",
-        "description": "This is done year by year on November 3 in remembrance of Kalibo’s Foundation Day. Among the highlights are activities like a commemorative program at the Magsaysay Park and a Kalibohian night market."
+        "name": "Kalibo Day",
+        "description": "Town anniversary events. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-088",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "IWAG IT KALIBONHON",
-        "description": "An light-a-tree program is done every year in as early as December 15. This symbolizes a bright and peaceful world for all mankind. It is also intended to draw people to go out, see and enjoy the outdoor Christmas atmosphere or scene at night."
+        "name": "Iwag it Kalibonhon",
+        "description": "Seasonal community celebration and lights/event program. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-087",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      },
+      {
+        "name": "Piña / Fiber events",
+        "description": "Events celebrating Aklan piña and fiber craft, associated with Kalibo’s founding anniversary period. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-090",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       }
     ],
     "attractions": [
@@ -304,28 +676,46 @@
         "description": "It is dedicated to the 19 martyrs of Aklan who initiated the revolt against Spain. Hence, the street where the shrine stands is named X1X Martyrs Street."
       },
       {
-        "name": "TIGAYON HILL & CAVES",
-        "description": "Considered as the highest geographical location in the municipality, Tigayon hill is the former secret sanctuary of the province’s freedom fighters which anyone can hike or trek at present. It has been developed to provide visitors a more convenient tread and see through its lush flora towards the top."
+        "name": "Tigayon Hill and caves",
+        "description": "Hill, caves and viewpoint destination. The recorded location is Tigayon, Kalibo. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-098",
+        "location": "Tigayon, Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "MUSEO IT AKEAN",
-        "description": "It houses age-old artifacts of preserved Aklanon culture, and presently considered one of the most beautiful museums in the country."
+        "name": "Museo it Akean",
+        "description": "Museum documenting Aklan history and culture. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-096",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "PIÑA VILLAGE",
-        "description": "Witness the long, tedious process of transforming a native pineapple leaf into an intricately woven piña cloth. This village is situated in Brgy. New Buswang."
+        "name": "Piña Village",
+        "description": "Craft area associated with piña-fiber weaving. The recorded location is New Buswang, Kalibo. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-097",
+        "location": "New Buswang, Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "ATI-ATIHAN VILLAGE",
-        "description": "Wear an authentic Ati-Atihan costume, darken your face and body by covering your skin with soot or paint it with colors, then dance like an Ati. The Ati-Atihan experience happens only every 3rd week of January which culminates on a Sunday, the last day of the religious festivity."
+        "name": "Ati-Atihan Village",
+        "description": "Cultural and visitor site associated with Ati-Atihan traditions. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-092",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "KALIBO CATHEDRAL",
-        "description": "Originally built in 1581, to this day it stands as the oldest edifice of worship in the province. It was renovated in 1993 with the spiritual and financial support of the Aklanons themselves. The church’s edifice was subsequently renovated immediately after it was slightly wrecked by the 1990 earthquake. Its architectural design was beautifully crafted by the renowned national artist Leandro V. Locsin."
+        "name": "Kalibo Cathedral",
+        "description": "Major church and town landmark. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-095",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       },
       {
-        "name": "BAKHAWAN ECO-PARK",
-        "description": "this 200 hectares mangrove forest is a multi-awarded destination and a recipient of the Golden Eagle Award in the Asia Pacific for the mangrove reforestation project that boasts of an exceptional nature thrill for eco-tourists and visitors. The eco-park has a small mini park and a recreation area, 1 kilometer eco-walk pathway bridge that wind up into the wide stretch of thick mangrove plantation and ends up unto the beach where one could enjoy a breathtaking grasp of nature, try on kayaking water adventure, or have a picnic to unwind into. At Bakhawan Eco-Park, you can try raw tamilok (shipworms), a kind of mollusk that lives in mangrove roots. The park staff can give tips on where to get cooked tamilok dishes such as grilled tamilok, Kalibo Express (Aklan version of the spicy Bicol Express) or the saucy “Tinuom na Tamilok.”"
+        "name": "Bakhawan Eco-Park",
+        "description": "Bakhawan Eco-Park in New Buswang, Kalibo, grew out of a mangrove reforestation project. The forest is both a coastal habitat and a place to learn about mangroves. It gives visitors a view of Kalibo’s coastal environment beyond the town center.",
+        "recordId": "AKL-093",
+        "location": "New Buswang, Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       }
     ],
     "products": [
@@ -340,48 +730,153 @@
       {
         "name": null,
         "description": "Barbecue stalls on several streets in town offer wide varieties of Barbecue products. Compared to other cities and provinces however, one that is noticeably different in these stalls in Kalibo would be “bread” to be barbecued as well."
+      },
+      {
+        "name": "Kalibo longganisa",
+        "description": "Local sausage product associated with Kalibo. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-101",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      },
+      {
+        "name": "Piña textiles",
+        "description": "Handwoven cloth and fiber products made from piña and related fibers. The recorded location is Piña Village, New Buswang. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-102",
+        "location": "Piña Village, New Buswang",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      },
+      {
+        "name": "Processed meats",
+        "description": "Processed meats is chorizo, tocino and embutido listed as local food products. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-103",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      },
+      {
+        "name": "Tamilok",
+        "description": "Marine wood-boring mollusk eaten as a local delicacy. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-104",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      },
+      {
+        "name": "Tinuom na tamilok",
+        "description": "Tinuom na tamilok is tamilok preparation listed in the provincial tourism profile. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers.",
+        "recordId": "AKL-105",
+        "location": "Kalibo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-082",
+      "itemName": "Kalibo municipal overview",
+      "text": "The provincial capital and a central hub for Aklan’s civic, cultural and visitor activities, including the Ati-Atihan tradition and piña-fiber craft. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers. Visitors can learn about provincial history at Museo it Akean or see the mangrove forest at Bakhawan Eco-Park in New Buswang.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+    }
   },
   {
     "slug": "lezo",
     "name": "Lezo",
     "festivals": [
       {
-        "name": "BAYANGAN FESTIVAL",
-        "description": "Bayangan is a local dialect meaning “potter’s wheel.” It is used to mold clay into various pottery products which is the pride of the town of Lezo, but for Lezeños it does not only mean molding of the famous industrial craft but it also symbolizes the molder of true Lezeño values, traditions and cultural heritage. Bayangan Festival is celebrated in line with the Foundation Day of the municipality every 6th of July which showcases cultural dance presentation/showdown with “Pagbayang” concept and street dancing enjoining Lezeños to participate in the merry making around the Poblacion or town center."
+        "name": "Bayangan Festival",
+        "description": "Municipal festival / town celebration. The recorded location is Lezo town. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars.",
+        "recordId": "AKL-107",
+        "location": "Lezo town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
       }
     ],
     "attractions": [
       {
         "name": null,
         "description": "Lezo is a small town, but there are still more than a couple of things to see. First, pay the Lezo Plaza a visit. It is home to most events of the municipality and you will surely see kids of locals playing basketball. Tennis and badminton courts are also available for those who want more physical activity. The Town Hall is situated beside the church, and is a new building. You can go in and up the stairs to the balcony to have a view the whole plaza and other municipal buildings. Just down the road from the plaza is the Church of the town, a beautiful old building. For the brave ones, a climb up the Bell town to see a nice panoramic view of the town is worth a try. Beside the Church is the Lezo Pottery where locals make beautiful clay pots and finish them in their kiln. At the pottery, you can ask if you can try your luck making something. As in most small towns, a walk around is the best thing to do to explore and interact with the locals, who are always friendly and accommodating."
+      },
+      {
+        "name": "Church and bell tower",
+        "description": "Church and bell tower is town church and bell tower listed among local heritage landmarks. The recorded location is Lezo poblacion. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars.",
+        "recordId": "AKL-108",
+        "location": "Lezo poblacion",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
+      },
+      {
+        "name": "Lezo Plaza",
+        "description": "Central public plaza and civic gathering area. The recorded location is Lezo poblacion. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars.",
+        "recordId": "AKL-109",
+        "location": "Lezo poblacion",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
+      },
+      {
+        "name": "Pottery workshops",
+        "description": "Local pottery-making sites and workshops. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars.",
+        "recordId": "AKL-110",
+        "location": "Lezo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Among the municipality of Lezo’s local industries that have helped augmenting the locals’ livelihood and income. Residents living by the river bank make their living making clay pots and jars likewise using indigenous materials found abundant in their area. Buying directly from the pot makers will save you some amount, hence the town is being visited for these beautifully hand-made pots. Meanwhile, the pop-rice squares or better known locally as “ampaw” is made of cooked dried rice, deeply fried, sugar coated, subsequently molded or cut into desired sizes and dried until crispy."
+      },
+      {
+        "name": "Ampaw",
+        "description": "Ampaw is puffed rice snack listed as a local delicacy. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars.",
+        "recordId": "AKL-111",
+        "location": "Lezo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
+      },
+      {
+        "name": "Earthen pots and jars",
+        "description": "Locally made pottery products. UP Visayas also documents inumoe, a fermented rice delicacy associated with holiday gatherings.",
+        "recordId": "AKL-112",
+        "location": "Lezo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
+      },
+      {
+        "name": "Inumoe",
+        "description": "Inumoe is a traditional fermented rice delicacy documented in Lezo by the University of the Philippines Visayas cultural mapping project. Its preparation uses tapay, a fermentation ingredient, and families associate the dish with occasions such as All Souls’ Day, Christmas and New Year.",
+        "recordId": "AKL-113",
+        "location": "Lezo",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/inumoe/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-106",
+      "itemName": "Lezo municipal overview",
+      "text": "A small inland municipality whose tourism profile highlights its plaza, church and pottery-making heritage. Pottery is one of Lezo’s defining crafts, with local makers shaping earthen pots and jars. The plaza, church and bell tower mark the town center. UP Visayas also documents inumoe, a fermented rice delicacy associated with holiday gatherings.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/lezo/"
+    }
   },
   {
     "slug": "libacao",
     "name": "Libacao",
     "festivals": [
       {
-        "name": "BAESA PARADA",
-        "description": "This annual festivity held every November 24 is a contest of colorful and beautifully decorated bamboo rafts in a parade at the Aklan River and ends in Brgy. Poblacion. Moreover, the rafts are loaded with local artifacts and different produce from the farm. Coming first in the parade of bamboo rafts is called the Lead Raft wherein, the image of the town’s Patron, St. Catherine of Alexandria is visibly displayed upon in the sight of all devotees and visitors to see. Thereafter, the icon is transferred to its permanent place in the parish church in a religious procession, and subsequently followed by the Vesper Mass, a day before the culmination day of the annual fiesta celebration."
+        "name": "Baesa Parada",
+        "description": "Baesa Parada is community parade listed in the provincial tourism profile. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-115",
+        "location": "Libacao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
       },
       {
         "name": "KALI-UGYON FESTIVAL",
         "description": "The event is usually participated by 15-20 groups, costumed in modern and indigenous outfits bringing people together on the streets for merry making and to drive away evil spirits in the coming New Year."
+      },
+      {
+        "name": "Kiyaw-kiyaw",
+        "description": "Traditional peace-offering and healing ritual documented by UP Visayas. This is a cultural practice rather than a scheduled public festival. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-117",
+        "location": "Libacao",
+        "sourceUrl": "https://cmpg.upv.edu.ph/cultural-mapping/locations/aklan/"
       }
     ],
     "attractions": [
       {
-        "name": "TAROYTOY",
-        "description": "It is an upland frontier and eyed as the summer capital in the Central Philippines due its high elevation, hilly terrains, thick forest covers and colder weather condition comparable to that in Baguio City, Its 5-6 hour by foot from Manika and ideal destination for mountain climbing."
+        "name": "Taroytoy",
+        "description": "Taroytoy is river recreation site listed in the provincial profile. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-121",
+        "location": "Libacao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
       },
       {
         "name": "THE WILD RIVER",
@@ -402,22 +897,66 @@
       {
         "name": null,
         "description": "Other attractions include flora and fauna and tropical wildlife in the vast mountain ranges and forest of Libacao which had remained undiscovered and unexplored."
+      },
+      {
+        "name": "Manika–Agbatuan trail",
+        "description": "Inland trekking route in the Oyang–Dalagsaan area; use local guides and confirm access. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-119",
+        "location": "Oyang–Dalagsaan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
+      },
+      {
+        "name": "Mt. Nausan and Mt. Nangtud",
+        "description": "Mt. Nausan and Mt. Nangtud is mountain trekking destinations identified in the tourism profile. The recorded location is Libacao uplands. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-120",
+        "location": "Libacao uplands",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
+      },
+      {
+        "name": "Waterfalls of Libacao",
+        "description": "Waterfalls of Libacao is waterfall attractions listed in local tourism materials; individual access varies. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-122",
+        "location": "Libacao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Libacao is loaded with natural resources and minor forest products and is blessed with fertile lands and perfect weather favorable to agriculture year-round, which allowed the town to become the leading producer of abaca fiber in Region 6. The town is also a major producer of rice, cattle, bananas, copra, vegetables, bamboo, root crops, and fruits such as lanzones, durian, marang, mangosteen, seedless pomelo, chico, rambutan, and local oranges. This municipality can potentially produce high-value crops, tropical flowers and vegetables as well."
+      },
+      {
+        "name": "Abaca fiber and handicrafts",
+        "description": "Abaca is a major local agricultural and craft material; profile identifies the municipality as a leading producer. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-123",
+        "location": "Libacao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
+      },
+      {
+        "name": "Local agricultural produce",
+        "description": "Agricultural produce associated with upland communities; specific item list was not stated on the tourism profile. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas.",
+        "recordId": "AKL-124",
+        "location": "Libacao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-114",
+      "itemName": "Libacao municipal overview",
+      "text": "A mountainous inland municipality associated with abaca production, river activities, waterfalls and trekking routes. The Aklan River runs through a landscape of upland communities, waterfalls and trekking areas. Abaca is an important local crop and source of fiber. The Baesa Parada and Kali-Ugyon are among the town’s community celebrations.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/libacao/"
+    }
   },
   {
     "slug": "madalag",
     "name": "Madalag",
     "festivals": [
       {
-        "name": "TINUOM FESTIVAL",
-        "description": "The local word “tinuom” pertains to a local highland dweller’s recipe with native chicken as main original ingredient. Typically wrapped in leaves with other basic ingredients such as salt, pepper, onion, lemongrass and tomatoes. All the ingredients get cooked in the chicken broth itself which in turn becomes a very flavorful soup. This festival paved the way for all the 17 towns in the province to showcase their own take on ‘tinuom.”"
+        "name": "Tinuom Festival",
+        "description": "Festival named for the town’s leaf-wrapped rice and chicken dish. The recorded location is Madalag town. Liktinon White Rocks in Maria Cristina and the hanging bridge in Panipiason are among the town’s distinctive places.",
+        "recordId": "AKL-126",
+        "location": "Madalag town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
@@ -430,16 +969,39 @@
         "description": "Discover the unspoiled and panoramic scenic view of Panipiason, while you are strolling the amazing hanging bridge. Strutting along bridge is something that locals highly recommend. The man-made hanging bridge is perfect for picnic goers. A certified adventurer’s playground, the Panipiason hanging bridge is Madalag’s only hanging bridge."
       },
       {
-        "name": "AGTUGHANGIN FALLS",
-        "description": "Treat yourself to the nature spa of cold spring in Agtughangin. Agtughangin Falls offers a breathtaking view with the forest as backdrop. Marvel on the virginal beauty of Agtughangin Falls. It’s truly a relaxing panoramic view situated in Panipiason."
+        "name": "Agtughangin Falls",
+        "description": "Agtughangin Falls is waterfall attraction listed in the municipal tourism profile. Liktinon White Rocks in Maria Cristina and the hanging bridge in Panipiason are among the town’s distinctive places.",
+        "recordId": "AKL-127",
+        "location": "Madalag",
+        "sourceUrl": "https://aklan.gov.ph/tourism/madalag/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Madalag basically has an agricultural economy. Over 7,000 hectares of the municipality land is devoted to agriculture. Farming and home industries are the key source of livelihood for its people. Most if not all the twenty five (25) barangays grow rice while corn is planted in several upland areas. Other crops grown in this town include pineapple, camote and ube. Fruit trees such as lanzones, rambutan, marang and commercial crops like coconut and abaca are also produced. The mountainous and hilly parts are where high valued forest products such as narra, acacia, and mahogany and minor products like buri, rattan, bamboo, nipa sap and firewood are produced."
+      },
+      {
+        "name": "Chicharon",
+        "description": "Chicharon is chicharon reported among Madalag fair products in 2016. Liktinon White Rocks in Maria Cristina and the hanging bridge in Panipiason are among the town’s distinctive places.",
+        "recordId": "AKL-130",
+        "location": "Madalag",
+        "sourceUrl": "https://energyfmkalibo.blogspot.com/2016/09/tinda-turismo-ng-aklan-provincial.html"
+      },
+      {
+        "name": "Tinuom",
+        "description": "Madalag is known for tinuom, a local dish prepared with chicken and rice in a leaf wrapping. The wrapping holds the ingredients together as they cook and is part of the dish’s presentation. The dish also gives its name to the municipality’s Tinuom Festival.",
+        "recordId": "AKL-132",
+        "location": "Madalag",
+        "sourceUrl": "https://mirror.pia.gov.ph/features/2023/01/03/know-aklans-iconic-delicacies"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-125",
+      "itemName": "Madalag municipal overview",
+      "text": "An upland municipality with river, rock and waterfall attractions and a food tradition associated with tinuom. Liktinon White Rocks in Maria Cristina and the hanging bridge in Panipiason are among the town’s distinctive places. The municipality is also associated with tinuom, a leaf-wrapped chicken and rice dish that gives its name to the local Tinuom Festival.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/madalag/"
+    }
   },
   {
     "slug": "makato",
@@ -448,12 +1010,22 @@
       {
         "name": null,
         "description": "MAKATO Sr. Sto. Niño Ati-atihan Festival – Historically, the Ati-atihan Festival of Makato started prior to the coming of the Spaniards sow the seeds of Christianity into this land. For the duration of the celebration, a huge count of Catholic devotees from everywhere in the country and the world is beckoned to come and join in the uplifting festivity and spiritual avidity of gratefulness to Sto. Niño. The image of the Holy Child Jesus is brought out of the church and is carried around the town. The image is escorted by street dancers who perform to the beat of drums and other instruments. The dancers are dressed in eye-catching costumes of striking colors. It is celebrated every 3rd Friday of January and throughout that day, there are several masses carried out that people can attend. The church also conducts baptisms during the celebration."
+      },
+      {
+        "name": "Sto. Niño Ati-atihan",
+        "description": "Town Ati-atihan celebration. The recorded location is Makato town. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-134",
+        "location": "Makato town",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "AKLAN SPORTS COMPLEX",
-        "description": "This is a 6.5 hectare sports complex equipped with an Olympic standard swimming pool, rubberized track and field oval and other athletic facilities."
+        "name": "Aklan Sports Complex",
+        "description": "Sports venue and public facility. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-135",
+        "location": "Makato",
+        "sourceUrl": "https://aklan.gov.ph/tourism/makato/"
       },
       {
         "name": null,
@@ -462,26 +1034,66 @@
       {
         "name": null,
         "description": "In Makato stands one of the Aklan State University (ASU) campuses which originally served as an extension high school, and was hence named the ASU Annex. As of 2006, the campus is home to the Teacher Education Center (TEC), and occupies 10 hectares in Barangay Castillo."
+      },
+      {
+        "name": "Aklan State University Makato Annex",
+        "description": "University annex and local landmark. The recorded location is Castillo. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-136",
+        "location": "Castillo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/makato/"
+      },
+      {
+        "name": "Baybay Beach",
+        "description": "Beach area accessed through Albasan. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-137",
+        "location": "Albasan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/makato/"
+      },
+      {
+        "name": "Salimuno Falls",
+        "description": "Waterfall attraction in Libang. The recorded location is Brgy. Libang. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-138",
+        "location": "Brgy. Libang",
+        "sourceUrl": "https://aklan.gov.ph/tourism/makato/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "When it comes to copra production, Makato ranks first with 2,770 metric tons produced per year."
+      },
+      {
+        "name": "Nito weaving",
+        "description": "Nito craft-making tradition documented by UP Visayas cultural mapping. The recorded location is Bagong Barrio. The town celebrates the Santo Niño through its Ati-atihan tradition.",
+        "recordId": "AKL-140",
+        "location": "Bagong Barrio",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/pagtahi-it-nito-nito-weaving/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-133",
+      "itemName": "Makato municipal overview",
+      "text": "A coastal municipality with a strong Ati-atihan tradition, community waterfalls and local weaving and copra production. The town celebrates the Santo Niño through its Ati-atihan tradition. Salimuno Falls in Libang and the coast near Albasan reflect the variety of local landscapes, while Bagong Barrio is home to a documented nito weaving tradition.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/makato/"
+    }
   },
   {
     "slug": "malay",
     "name": "Malay",
     "festivals": [
       {
-        "name": "MALAY DAY",
-        "description": "An annual celebration commemorating the formal separation of the municipality of Malay from Buruanga, held every June 15. The celebration is highlighted by various activities such as Discovery Tour, and Paraw Regatta."
+        "name": "Malay Day",
+        "description": "Municipal day and anniversary events. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-143",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "FIESTA DE OBREROS",
-        "description": "This festivity pays tribute to the real wealth of the municipality, the Malaynon workers and St. Joseph the Worker, Malay’s Patron Saint. The highlight is street dancing and merry-making participated by the labor sector, the barangays and the municipal government. The event also features PASADA, a showdown of dance presentations depicting the municipality’s livelihood and source of income of its people. Conceptualized in 2003, Fiesta de Obreros is now known to be among Malay’s attraction as a joyous occasion that brings people together in thanksgiving for the prosperity brought about by their tireless efforts for progress and development."
+        "name": "Fiesta de Obreros",
+        "description": "Fiesta de Obreros is workers’ celebration listed in the provincial calendar. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-142",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       },
       {
         "name": null,
@@ -490,20 +1102,32 @@
     ],
     "attractions": [
       {
-        "name": "BORACAY ISLAND",
-        "description": "So-called paradise island of the Philippines and voted as among the best beaches in the world. It is noted for its palm-fringed, pristine white sand beaches, azure waters, coral reefs and rare sea shells. It has a total land area of 1,083 hectares and consists of three barangays namely, Balabag, Manoc-Manoc and Yapak."
+        "name": "Boracay Island",
+        "description": "Island visitor destination and beaches across the barangays of Balabag, Manoc-Manoc and Yapak. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-146",
+        "location": "Balabag, Manoc-Manoc and Yapak",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "PANGIHAN CAVE",
-        "description": "It has eight magnificent chambers connecting unto each other, and also inhabited by hundreds of bats."
+        "name": "Pangihan Cave",
+        "description": "Pangihan Cave in Malay has eight connected chambers, according to Aklan’s provincial tourism profile. Bats inhabit the cave. The site offers a look at the municipality’s inland landscape beyond the beaches of Boracay.",
+        "recordId": "AKL-155",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "MALAY ECOLOGICAL PARK",
-        "description": "Located in Barangay Argao, it has a scenic view of Boracay Island, planted with a variety of fruit bearing trees. In it may be found a beautiful butterfly farm in the center of the park as its main tourist attractions."
+        "name": "Malay Ecological Park",
+        "description": "Ecological park in Argao. The recorded location is Brgy. Argao. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-149",
+        "location": "Brgy. Argao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "BAT CAVES",
-        "description": "Located on the northern end of the province, these caves serve as dwelling places by fruit eating bats and may simply be reached by hiking, or with the use of bicycle or motorbike. Local volunteers guide tourists to the cave. Entrance fee is P50."
+        "name": "Bat Caves",
+        "description": "Bat Caves is caves and bat habitat identified in the tourism profile. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-145",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
         "name": "PRESERVED DEAD FOREST",
@@ -514,28 +1138,88 @@
         "description": "It is situated 6 kms. from Brgy. Poblacion and locals boasts of it as the greenery area abundant with huge plantation of trees, clean air, and a nature’s refuge they call Little Baguio, with a stretch of clean river winding through it."
       },
       {
-        "name": "AGNAGA MINI FALLS AND COLD SPRING",
-        "description": "Is located in Brgy. Kabulihan, a place where the forest and rocks meet the spring. Truly nature’s gift, this mini-falls and cold spring is deal as picnic place favorably during summer because of its inviting water and beats the summer heat."
+        "name": "Agnaga mini falls and cold spring",
+        "description": "Water and spring attraction in Kabulihan. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-144",
+        "location": "Kabulihan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "NAGATA FALLS",
-        "description": "is a magnificent falls and the highest among the water falls in the municipality. Enjoy the experience going there by crossing five (5) rivers and exploring the scenic, untouched nature. Feel its tranquility and be amazed of the waterfall’s splendor."
+        "name": "Nagata Falls",
+        "description": "Nagata Falls is waterfall attraction listed in the municipal profile. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-154",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "NAASUG POINT",
-        "description": "is a 120- feet vertical cliff adjacent to the sea located in Barangay Naasug. Its white beach and underwater resources is amazing, worthy for sight-seeing, swimming and scuba diving. It’s virgin forest and cave are sanctuary to wildlife."
+        "name": "Naasug Point",
+        "description": "Naasug Point is coastal viewpoint / point listed in the tourism profile. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-151",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       },
       {
-        "name": "MOTAG LIVING MUSEUM",
-        "description": "Showcases Filipino culture through interactive cultural expo centered on traditional farming methods in action, weaving traditional crafts, etc. A visit to this place gives visitors a glimpse of how farming communities of long ago actually lived."
+        "name": "Motag Living Museum",
+        "description": "Community museum presenting local rural life and traditions. The recorded location is Motag. Its food and fishing traditions range from the chori burger in Boracay to the seasonal Panagon practice documented by UP Visayas.",
+        "recordId": "AKL-150",
+        "location": "Motag",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
+      },
+      {
+        "name": "Boracay Wetland Conservation Park (Wetland 2)",
+        "description": "Wetland site recorded in the Aklan cultural heritage catalogue. The recorded location is Boracay Island. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-147",
+        "location": "Boracay Island",
+        "sourceUrl": "https://cmpg.upv.edu.ph/cultural-mapping/catalogue/?province=aklan"
+      },
+      {
+        "name": "Nabaoy River",
+        "description": "Mainland river recorded in the Aklan cultural heritage catalogue. The recorded location is Nabaoy. Its food and fishing traditions range from the chori burger in Boracay to the seasonal Panagon practice documented by UP Visayas.",
+        "recordId": "AKL-153",
+        "location": "Nabaoy",
+        "sourceUrl": "https://cmpg.upv.edu.ph/cultural-mapping/catalogue/?province=aklan"
+      },
+      {
+        "name": "White Beach",
+        "description": "White Beach is a stretch of pale sand on Boracay Island in Malay. The beach is one of the island’s best-known coastal landmarks, with an open waterfront looking out across the sea. It forms part of the beach landscape that has made Boracay a major visitor destination.",
+        "recordId": "AKL-156",
+        "location": "Boracay Island",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Many tourists would say you have never been to Boracay if you have not tried a couple of food products unique to the place. One should get a taste of the famous “calamansi muffins” which is an original creation of a coffee shop in the island. Another must-try is the well known “chori burger,” which is grilled chorizo meat that is smeared with a thick sweet-spicy sauce then placed in a bun."
+      },
+      {
+        "name": "Calamansi muffins",
+        "description": "Local bakery product associated with Malay. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-157",
+        "location": "Malay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
+      },
+      {
+        "name": "Chori burger",
+        "description": "Chorizo burger commonly sold in the Boracay/Malay visitor area. The recorded location is Malay / Boracay. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-158",
+        "location": "Malay / Boracay",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
+      },
+      {
+        "name": "Panagon freshwater catch",
+        "description": "Seasonal freshwater fishing and preparation tradition documented in UP Visayas cultural mapping. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum.",
+        "recordId": "AKL-159",
+        "location": "Malay",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/panagon/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-141",
+      "itemName": "Malay municipal overview",
+      "text": "A northwestern municipality that includes Boracay Island and mainland coastal, forest and community attractions. Boracay’s beaches span Balabag, Manoc-Manoc and Yapak. On the mainland, the municipality includes Pangihan Cave, Nabaoy River and the Motag Living Museum. Its food and fishing traditions range from the chori burger in Boracay to the seasonal Panagon practice documented by UP Visayas.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/malay/"
+    }
   },
   {
     "slug": "malinao",
@@ -546,52 +1230,107 @@
         "description": "MALINAO Ati-Atihan Festival – One of the esteemed elders of the town, who also was significant in the founding of the parish of Malinao in 1796, Capitan Simon Enriquez commanded the mission of saving Fr. Fernando Legaspi, parish priest of Malinao, as the latter was captured by lurking pirates, the Moros. The highly respected priest was on his way to attend the feast of Sto. Niño in the town of Ibajay. Father Legaspi was only released in exchange of gold and he considered the incident a miracle and particularly attributed it to the Sto. Niño of Ibajay. In gratitude, he later instigated an act of devotion to the Holy Child by means of fasting and other penitential rites that is still being followed through this festival by the people of Malinao today. This festival is celebrated every 3rd Friday of January."
       },
       {
-        "name": "EL LEVANTAMIENTO DELOS OCHENTA Y DOS DE LILOAN",
-        "description": "This is a celebration held on April 30 of each year to commemorate the heroes who fought during World War II. During this event, a floral offering is being made to the monument of the heroes."
+        "name": "El Levantamiento de los Ochenta y Dos de Liloan",
+        "description": "Commemoration of the uprising associated with the 82 from Liloan. The recorded location is Lilo-an. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-161",
+        "location": "Lilo-an",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
       },
       {
         "name": "PASCUA SA MALINAO FESTIVAL",
         "description": "The town of Malinao has its own way of celebrating Christmas festivities. Various activities are lined up from December 16th to 30th adding color to the occasion. Among the activities are the Daigon Contest, Paroe Parade and Contest and the Kahayag it Banwa which is the lighting of Christmas Decors."
+      },
+      {
+        "name": "Malinao Ati-atihan",
+        "description": "Town Ati-atihan celebration. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-162",
+        "location": "Malinao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "CANDIDO IBAN MONUMENT",
-        "description": "This historic town is the hometown of Candido Iban, a famous local Katipunero hero born in Barangay Lilo-an. Iban is one of the 19 Martyrs of Aklan who were executed by the Spanish authorities."
+        "name": "Candido Iban Monument",
+        "description": "Monument to revolutionary figure Candido Iban. The recorded location is Lilo-an. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-164",
+        "location": "Lilo-an",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
       },
       {
-        "name": "FATIMA HILL",
-        "description": "Located 9 kms. southwest of Kalibo, it is noted for its Stations of the Cross along the hillside, culminating in a Chapel on top, beautifully made using marble. Fatima Hills is accessible by several means of transportation such as jeepney, tricycle, private car or bus."
+        "name": "Fatima Hill",
+        "description": "Fatima Hill is hill destination listed in the municipal tourism profile. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-165",
+        "location": "Malinao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
       },
       {
-        "name": "MANOMONG FALLS",
-        "description": "Hike upstream to Manomong Falls which is a hidden gem of Brgy. Tigpalas."
+        "name": "Manomong Falls",
+        "description": "Waterfall in Tigpalas. The recorded location is Brgy. Tigpalas. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-166",
+        "location": "Brgy. Tigpalas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Malinao is known for producing Winnowing Baskets locally termed “Nigo.” These baskets have been used for centuries for drying grains (usually rice) in the sun and wind sifting and seperating the grain from the dried chaff."
+      },
+      {
+        "name": "Abaca bags, sandals and wallets",
+        "description": "Abaca bags, sandals and wallets is abaca-based products reported at a provincial tourism fair. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-167",
+        "location": "Malinao",
+        "sourceUrl": "https://energyfmkalibo.blogspot.com/2016/09/tinda-turismo-ng-aklan-provincial.html"
+      },
+      {
+        "name": "Nigo baskets",
+        "description": "Nigo baskets is basketry product listed in local tourism materials. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban.",
+        "recordId": "AKL-168",
+        "location": "Malinao",
+        "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
+      },
+      {
+        "name": "Sarok hats",
+        "description": "In Barangay Biga-a, Malinao, makers weave strips of bamban into cone-shaped hats called sarok. UP Visayas documents the craft as a local livelihood and a form of knowledge passed on through practice. The shape and material distinguish these hats from other Aklan woven products.",
+        "recordId": "AKL-169",
+        "location": "Biga-a",
+        "sourceUrl": "https://cmpg.upv.edu.ph/heritage/sarok-making/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-160",
+      "itemName": "Malinao municipal overview",
+      "text": "An inland municipality with upland scenery and craft traditions, including sarok hat-making and nigo basketry. Lilo-an commemorates the uprising associated with the 82 from Liloan and is home to a monument to Candido Iban. The municipality also includes Fatima Hill and Manomong Falls. In Biga-a, craft makers weave cone-shaped sarok hats.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/malinao/"
+    }
   },
   {
     "slug": "nabas",
     "name": "Nabas",
     "festivals": [
       {
-        "name": "BARIW FESTIVAL",
-        "description": "It is a festival showcasing the unique skills of Nabasnon weavers of bags, mats and hats made of indigenous bariw leaves, and said to be the fast-growing industry in the municipality. The highlight of the celebration is a dance performance by local talents and ingenuity accompanied with the aboriginal rhythm beat of the drums or bamboo instruments. Townsfolk dance on the streets of the town, all dressed in indigenous bariw-made costumes."
+        "name": "Bariw Festival",
+        "description": "The Bariw Festival celebrates the weaving traditions of Nabas. Local artisans use bariw to make bags, hats, mats and purses. The festival draws attention to the material and the skill involved in turning it into everyday objects.",
+        "recordId": "AKL-171",
+        "location": "Nabas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "LASERNA COLD SPRINGS",
-        "description": "Better known as the Basang and Hurom-Hurom Cold Springs, these are popular alternative summer destinations as its waters gushing from above the beautifully and naturally endowed huge rock formations are cool and clear. Locals even claim these waters are potable."
+        "name": "Laserna cold springs",
+        "description": "Laserna cold springs is cold-spring sites listed in Basang and Hurom-Hurom. The recorded location is Laserna (Basang and Hurom-Hurom spring areas). Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses.",
+        "recordId": "AKL-173",
+        "location": "Laserna (Basang and Hurom-Hurom spring areas)",
+        "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
       },
       {
-        "name": "BASANG CAVE",
-        "description": "Regarded as among the longest caves in the country, its length stretches to the municipality of Pandan in the Province of Antique and is 8 kms. from Brgy. Poblacion."
+        "name": "Basang Cave",
+        "description": "Basang Cave is cave attraction listed in the provincial tourism profile. The recorded location is Brgy. Basang. Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses.",
+        "recordId": "AKL-172",
+        "location": "Brgy. Basang",
+        "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
       },
       {
         "name": "TAGOROROC ECOTOURISM DESTINATION",
@@ -602,8 +1341,35 @@
       {
         "name": null,
         "description": "The Nabasnons weave sturdy and colorful bags, hats, mats, and purses from bariw leaves which brought forth the municipality’s main festival."
+      },
+      {
+        "name": "Bariw bags",
+        "description": "Woven bariw bags. Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses.",
+        "recordId": "AKL-175",
+        "location": "Nabas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
+      },
+      {
+        "name": "Bariw hats",
+        "description": "Woven bariw hats. Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses.",
+        "recordId": "AKL-176",
+        "location": "Nabas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
+      },
+      {
+        "name": "Bariw mats and purses",
+        "description": "Bariw mats and purses is bariw woven mats and purses listed as local products. Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses.",
+        "recordId": "AKL-177",
+        "location": "Nabas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-170",
+      "itemName": "Nabas municipal overview",
+      "text": "A northwestern municipality recognized for bariw weaving, cold springs, caves and ecotourism. Bariw weaving is closely associated with the municipality, where the plant is used to make mats, bags, hats and purses. The Bariw Festival celebrates this craft. In Laserna, the cold springs offer a different view of the town’s landscape.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/nabas/"
+    }
   },
   {
     "slug": "new-washington",
@@ -612,16 +1378,29 @@
       {
         "name": null,
         "description": "“PACTO DE SANGRE” OR BLOOD COMPACT – New Washington is best known in the province for the Blood Compact Celebration or the Pacto de Sangre in Spanish. This annual tradition held every March 1 to 3 has been a significant part in the municipality’s history. The celebration is done in commemoration of the Aklanon heroes who have sacrificed their own lives just to liberate fellow Filipinos from the colonization of the Spanish forces. The Pacto De Sangre happened in Sitio Kuntang of Barangay Ochando in New Washington on March 23, 1897. The Aklanon Katipuneros, namely Romualdo Dalida, Isidro Jimenez, Cornelio Delfin, Valeriano Dalida, Benito Motus, Albino Rabaria, Teodorico Motus and Juan Dalida fought the Spanish regime to uphold the freedom and independence the Filipino people were battling for. Each of the Katipuneros voluntarily wound their wrists and used their blood in signing the document detailing their grievances as a symbol of their revolt against the then Spanish authorities. Furthermore, this blood compact has also been a considered as a symbolism of eternal friendship and brotherhood. The pact was then remembered as one of the most important events in Philippine history and inspired the annual ceremony of commemorating the Blood Compact in the small town that is New Washington."
+      },
+      {
+        "name": "Pacto de Sangre commemoration",
+        "description": "New Washington commemorates the Pacto de Sangre, an episode in the local history of the Philippine Revolution. The National Historical Commission of the Philippines places the historic blood compact at Sitio Kuntang in Barangay Ochando on March 2 and 3, 1897.",
+        "recordId": "AKL-179",
+        "location": "Sitio Kuntang, Brgy. Ochando",
+        "sourceUrl": "https://philhistoricsites.nhcp.gov.ph/registry_database/sanduguan-pacto-de-sangre/"
       }
     ],
     "attractions": [
       {
-        "name": "TAMBAK SEA WALL",
-        "description": "Marvel at the breathtaking sunrise and savor the mouthwatering seafoods served fresh in nearby restaurants."
+        "name": "Tambak seawall",
+        "description": "Seawall and coastal promenade area. The recorded location is Tambak. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-184",
+        "location": "Tambak",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
       },
       {
-        "name": "PINK SISTERS CONVENT",
-        "description": "Located at Barangay Polo, 10 kms. away from Kalibo, this convent means a lot for the highly religious folks of New Washington. The name of the convent attributed to the color of the nun’s garments."
+        "name": "Pink Sisters Convent",
+        "description": "Convent and chapel in Polo. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-183",
+        "location": "Polo",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
       },
       {
         "name": "THE JAIME L. SIN MONUMENT",
@@ -632,8 +1411,11 @@
         "description": "Its name “Kapispisan” comes from the Visayan root word pispis, which means birds, and Kapispisan, meaning flock of birds. This bird sanctuary is a project initiated by the College of Fisheries & Marine Sciences in New Washington. It is a mangrove forest that provides habitats to different aquatic species, birds and other associated organisms."
       },
       {
-        "name": "LAGATIK RIVER CRUISE",
-        "description": "Cruise around town through its pristine and scenic Lagatik River and Batan’s hidden sea. Cruises and tours of the Lagatik River are daily and its beautiful environment covering the coastal areas of Pinamuk-an Island in New Washington and Tinagong Dagat of Batan, including organized visits to the mangrove and bird sanctuary, fish fattening or oyster farms."
+        "name": "Lagatik River cruise",
+        "description": "Lagatik River cruise is river cruise activity listed in tourism materials. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-182",
+        "location": "Lagatik River",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
       }
     ],
     "products": [
@@ -648,22 +1430,90 @@
       {
         "name": null,
         "description": "There is an exotic drink popular in the Visayas called “tuba”. This is a form of coconut wine. Fresh “tuba” has wine like smell but milder (compared to red wine from fermented grapes) and taste like one but sweeter. The sweetness and sourness however would depend on some factors particularly the age of the coconut tree. “Tuba” does not keep long as it readily ferments to vinegar. One to two days old “tuba” already tastes sour. It should be enjoyed fresh from the coconut tree."
+      },
+      {
+        "name": "Amboeong",
+        "description": "Local food item named in the municipal tourism profile; preparation details not stated. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-185",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Crabs and prawns",
+        "description": "Seafood products associated with local fishing and aquaculture. The recorded location is New Washington coast. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-186",
+        "location": "New Washington coast",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Hale-hale",
+        "description": "Hale-hale is local layered or mixed dessert listed in tourism materials. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-187",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Ibos",
+        "description": "Sticky-rice cake cooked in a leaf wrapper. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-188",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Sasing",
+        "description": "Sasing is marine worm listed as a local food product. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-189",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Suman",
+        "description": "Suman is sticky-rice delicacy listed in the tourism profile. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-190",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Tamiluk",
+        "description": "Marine wood-boring mollusk delicacy. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-191",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      },
+      {
+        "name": "Tuba",
+        "description": "Tuba is coconut/palm sap beverage listed as a local product. The Lagatik River and the coast are part of the town’s fishing and seafood economy.",
+        "recordId": "AKL-192",
+        "location": "New Washington",
+        "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-178",
+      "itemName": "New Washington municipal overview",
+      "text": "A coastal municipality with fishing livelihoods and a historic Pacto de Sangre site in Ochando. The Lagatik River and the coast are part of the town’s fishing and seafood economy. The Pink Sisters Convent is in Polo, while Ochando is associated with the 1897 Pacto de Sangre. Local foods include crabs, prawns and rice delicacies such as ibos and suman.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+    }
   },
   {
     "slug": "numancia",
     "name": "Numancia",
     "festivals": [
       {
-        "name": "LECHON PARADE",
-        "description": "The Lechon Parade is a friendly competition among the different barangays and “lechonan” operators in Numancia. This is done annually and the contest proper is held every 28th of the month of April. Come & see for yourself all the lechon entries striking in different poses & costumes. This special event has slowly developed into another tourism spectacle for hundreds of lechon lovers all throughout the province."
+        "name": "Lechon Parade",
+        "description": "Numancia’s Lechon Parade celebrates roast pig as part of the town’s food culture. The event brings attention to local lechon makers and their craft. Pork liempo from Bulwang is another food associated with the municipality.",
+        "recordId": "AKL-194",
+        "location": "Numancia",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       }
     ],
     "attractions": [
       {
-        "name": "VERMI-COMPOSTING FARMS",
-        "description": "This is an eco-friendly industry that produces quality organic fertilizers."
+        "name": "Vermicomposting farms",
+        "description": "Vermicomposting farms is agricultural and environmental demonstration sites listed in the provincial profile. The Lechon Parade celebrates a food tradition associated with the municipality.",
+        "recordId": "AKL-199",
+        "location": "Numancia",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
       },
       {
         "name": "NAHAUNANG ATIS (FIRST AETAS)",
@@ -676,22 +1526,66 @@
       {
         "name": null,
         "description": "Beaches of Barangays Camanci and Navitas are also worth the visit."
+      },
+      {
+        "name": "Albasan Elementary School acacia trees",
+        "description": "Historic acacia trees at a school site; profile notes a connection dating to 1892. The recorded location is Albasan. The Lechon Parade celebrates a food tradition associated with the municipality.",
+        "recordId": "AKL-195",
+        "location": "Albasan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
+      },
+      {
+        "name": "Camanci Beach",
+        "description": "Camanci Beach is beach listed in the provincial tourism profile. The Lechon Parade celebrates a food tradition associated with the municipality.",
+        "recordId": "AKL-196",
+        "location": "Camanci",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
+      },
+      {
+        "name": "Navitas Beach",
+        "description": "Navitas Beach is beach listed in the provincial tourism profile. The Lechon Parade celebrates a food tradition associated with the municipality.",
+        "recordId": "AKL-198",
+        "location": "Navitas",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Numancia is dubbed as the home of the most mouthwatering and best tasting lechon in the province. There is also an establishment in Barangay Bulwang that offers the best pork liempo which has become famous to both locals and people from nearby cities and provinces. Visitors usually drop by to buy some for take away."
+      },
+      {
+        "name": "Bulwang pork liempo",
+        "description": "Bulwang pork liempo is pork liempo product identified with Bulwang. The recorded location is Brgy. Bulwang. The Lechon Parade celebrates a food tradition associated with the municipality.",
+        "recordId": "AKL-200",
+        "location": "Brgy. Bulwang",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
+      },
+      {
+        "name": "Lechon",
+        "description": "Roast pig associated with the town’s annual parade and local food tradition. Camanci and Navitas are coastal destinations, while Albasan Elementary School has historic acacia trees.",
+        "recordId": "AKL-201",
+        "location": "Numancia",
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-193",
+      "itemName": "Numancia municipal overview",
+      "text": "A municipality near Kalibo with agricultural sites, heritage trees and coastal barangays. The Lechon Parade celebrates a food tradition associated with the municipality. Camanci and Navitas are coastal destinations, while Albasan Elementary School has historic acacia trees. Bulwang is associated with pork liempo and is home to an Ati community.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
+    }
   },
   {
     "slug": "tangalan",
     "name": "Tangalan",
     "festivals": [
       {
-        "name": "BUGNA FESTIVAL",
-        "description": "This is a festival held annually showcasing the municipality’s different locally made products, as well as its various eco-tourism destinations such as the Marine Sanctuary and Coral Garden, Afga Point, Campo Verde, Jawili Falls, Bughawi Beach and the town’s reforestation project."
+        "name": "Bugna Festival",
+        "description": "Bugna Festival is town festival listed in the provincial tourism calendar. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-203",
+        "location": "Tangalan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/activities/"
       },
       {
         "name": "HEROES OF VIVO TANGALAN",
@@ -700,39 +1594,71 @@
     ],
     "attractions": [
       {
-        "name": "AFGA WAVE ROCK FORMATION",
-        "description": "This is a unique environmental phenomenon resulting from a wave and rock action on the shore."
+        "name": "Afga Wave Rock Formation",
+        "description": "Coastal rock formation shaped by wave action. The recorded location is Afga. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-205",
+        "location": "Afga",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       },
       {
         "name": "ST. JOHN NEPOMUCENE PARISH CHURCH",
         "description": "It is a century old church designed with limestone wall similar to the beautiful Miag-ao Church of Iloilo. After 28 years of forced labor, the construction of the church was completed in 1889. Women, as much as men and children were encouraged to join this so-called great polo and toiled from sunrise to sunset carrying blocks of corals and limestone from the quarries in Barangay Afga to the construction site in the town center. The church building is among the oldest religious edifices in the province."
       },
       {
-        "name": "JAWILI FALLS",
-        "description": "It is famous for its beautifully and naturally endowed seven water basins each of which are tiered and winding upwards by a distance of about 20 feet. Some of its basins are suitable for diving, the highest point may be reached at the height of 100 feet, shaped like an oval, a diameter of 240 feet and 12 feet in depth, its waters resembles like a small lake. The other basins are of similar shapes from 130- 240 sq. feet in diameter and a depth of 8-10 feet, unlike the sixth basin having a swimming area with a diameter of 540 sq. feet."
+        "name": "Jawili Falls",
+        "description": "Jawili Falls in Tangalan is a series of cascades that flow through seven natural basins. The pools and rocky setting make the falls one of the municipality’s most recognizable natural landmarks. Jawili Beach is in the same barangay.",
+        "recordId": "AKL-208",
+        "location": "Jawili",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       },
       {
-        "name": "JAWILI BEACH",
-        "description": "The white sands and crystal clear waters of Jawili Beach is the perfect spot for a weekend getaway or some R&R. Jawili Beach offers a scenery similar to that of the well known Boracay Island but with the slow pace and tranquility of a small fishing village. Fishing boats line up by the beach as the majority of the local community still depend on the sea for their livelihood. This Beach is an excellent choice for a destination if you want some sea related recreation, picnics, conferences, conventions, holiday outings, and vacations."
+        "name": "Jawili Beach",
+        "description": "Coastal beach destination near Jawili Falls. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-207",
+        "location": "Jawili",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       },
       {
         "name": "JAWILI MANGROVE FOOTWALK",
         "description": "The mangrove footwalk is an added attraction for visitors in Barangay Jawili. It is a mere few minutes walk from Jawili Falls and it takes you through a lush and diverse mangrove environment. There are over twenty species of mangroves in the area, two of which are internationally rare."
       },
       {
-        "name": "CAMPO VERDE",
-        "description": "This camp is located at Barangay Panayakan and offers activities such as mountain trekking, mountain biking, and horse back riding on a trail that extends from Campo Verde to Jawili Falls. Camping is also welcome at a well maintained campground deep in the forest."
+        "name": "Campo Verde",
+        "description": "Nature attraction in Panayakan. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-206",
+        "location": "Panayakan",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       },
       {
         "name": "MARINE SANCTUARY AND CORAL GARDEN",
         "description": "The 375 hectare Marine Sanctuary was officially established in 2003 at Pungtod Reef. Numerous species of hard and soft rock corals, sponges, shells, sea stars, sea cucumber, oysters and lobsters can be found within the sanctuary. There are varieties of colorful fish as well including Butterflyfish, Anglefish, Damselfish, Parrotfish, Surgeonfish, Scorpionfish and Sweetlips among others. Endangered sea snakes and sea turtles are also found within the sanctuary, as well as dolphins and stingrays."
+      },
+      {
+        "name": "Pungtod Reef marine sanctuary",
+        "description": "Pungtod Reef marine sanctuary is marine conservation area listed in the tourism profile. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-210",
+        "location": "Pungtod",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       }
     ],
     "products": [
       {
         "name": null,
         "description": "Tangalan abound in fresh yet affordable seafood."
+      },
+      {
+        "name": "Fresh seafood",
+        "description": "Seafood and local fish catch associated with the municipality’s coastal communities. The recorded location is Tangalan coast. Jawili Falls flows through seven natural basins near the coast.",
+        "recordId": "AKL-212",
+        "location": "Tangalan coast",
+        "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
       }
-    ]
+    ],
+    "overview": {
+      "recordId": "AKL-202",
+      "itemName": "Tangalan municipal overview",
+      "text": "A coastal municipality with a rocky shoreline, waterfall pools, mangroves and marine conservation areas. Jawili Falls flows through seven natural basins near the coast. The rock formations at Afga, mangrove walkways and Pungtod Reef highlight the town’s shoreline and marine habitats. The St. John Nepomucene Church is a landmark in the town center.",
+      "sourceUrl": "https://aklan.gov.ph/tourism/tangalan/"
+    }
   }
 ]

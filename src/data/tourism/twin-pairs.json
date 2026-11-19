@@ -1,0 +1,312 @@
+{
+  "pairs": [
+    {
+      "recordId": "AKL-181",
+      "workbookName": "Jaime L. Sin monument",
+      "siteId": "place-new-washington-2",
+      "siteName": "THE JAIME L. SIN MONUMENT",
+      "municipality": "New Washington",
+      "category": "Spots & Attractions",
+      "score": 1,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-071",
+      "workbookName": "Municipal Ati-Ati / devotional fiesta",
+      "siteId": "event-ibajay-0",
+      "siteName": "IBAJAY ATI-ATI MUNICIPAL AND DEVOTIONAL FIESTA",
+      "municipality": "Ibajay",
+      "category": "Festivals & Events",
+      "score": 0.8,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-211",
+      "workbookName": "St. John Nepomucene Church",
+      "siteId": "place-tangalan-1",
+      "siteName": "ST. JOHN NEPOMUCENE PARISH CHURCH",
+      "municipality": "Tangalan",
+      "category": "Spots & Attractions",
+      "score": 0.8,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-033",
+      "workbookName": "Ati-Ati Malakara Festival",
+      "siteId": "event-batan-0",
+      "siteName": "BATAN ATI-ATI MALAKARA FESTIVAL",
+      "municipality": "Batan",
+      "category": "Festivals & Events",
+      "score": 0.75,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-034",
+      "workbookName": "Juez de Cuchillo commemoration",
+      "siteId": "event-batan-1",
+      "siteName": "JUEZ DE CUCHILLO",
+      "municipality": "Batan",
+      "category": "Festivals & Events",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-056",
+      "workbookName": "Hinugtan Beach",
+      "siteId": "place-buruanga-8",
+      "siteName": "HINUGTAN WHITE BEACH",
+      "municipality": "Buruanga",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-083",
+      "workbookName": "Aklan Day",
+      "siteId": "event-kalibo-2",
+      "siteName": "AKLAN DAY CELEBRATION",
+      "municipality": "Kalibo",
+      "category": "Festivals & Events",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-094",
+      "workbookName": "Freedom Shrine",
+      "siteId": "place-kalibo-0",
+      "siteName": "AKLAN FREEDOM SHRINE",
+      "municipality": "Kalibo",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-116",
+      "workbookName": "Kali-Ugyon",
+      "siteId": "event-libacao-1",
+      "siteName": "KALI-UGYON FESTIVAL",
+      "municipality": "Libacao",
+      "category": "Festivals & Events",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-129",
+      "workbookName": "Panipiason Hanging Bridge",
+      "siteId": "place-madalag-1",
+      "siteName": "HANGING BRIDGE",
+      "municipality": "Madalag",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-148",
+      "workbookName": "Dead Forest",
+      "siteId": "place-malay-4",
+      "siteName": "PRESERVED DEAD FOREST",
+      "municipality": "Malay",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-152",
+      "workbookName": "Nabaoy reforestation area",
+      "siteId": "place-malay-5",
+      "siteName": "NABAOY REFORESTATION",
+      "municipality": "Malay",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-163",
+      "workbookName": "Pascua sa Malinao",
+      "siteId": "event-malinao-2",
+      "siteName": "PASCUA SA MALINAO FESTIVAL",
+      "municipality": "Malinao",
+      "category": "Festivals & Events",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-180",
+      "workbookName": "Isla Kapispisan sanctuary",
+      "siteId": "place-new-washington-3",
+      "siteName": "ISLA KAPISPISAN",
+      "municipality": "New Washington",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-209",
+      "workbookName": "Mangrove footwalk",
+      "siteId": "place-tangalan-4",
+      "siteName": "JAWILI MANGROVE FOOTWALK",
+      "municipality": "Tangalan",
+      "category": "Spots & Attractions",
+      "score": 0.667,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-029",
+      "workbookName": "Aklan State University Main Campus",
+      "siteId": "place-banga-0",
+      "siteName": "AKLAN STATE UNIVERSITY(ASU)",
+      "municipality": "Banga",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-035",
+      "workbookName": "Angas White Stone (Puting Bato)",
+      "siteId": "place-batan-4",
+      "siteName": "ANGAS WHITE STONE MOUNTAIN",
+      "municipality": "Batan",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-048",
+      "workbookName": "Spanish-era relics",
+      "siteId": "place-batan-10",
+      "siteName": "OLD SPANISH RELICS",
+      "municipality": "Batan",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-084",
+      "workbookName": "Ati-Atihan Festival",
+      "siteId": "event-kalibo-0",
+      "siteName": "KALIBO STO. NIÑO ATI-ATIHAN FESTIVAL",
+      "municipality": "Kalibo",
+      "category": "Festivals & Events",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-091",
+      "workbookName": "XIX Martyrs commemoration",
+      "siteId": "event-kalibo-1",
+      "siteName": "XIX MARTYRS OF AKLAN",
+      "municipality": "Kalibo",
+      "category": "Festivals & Events",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-118",
+      "workbookName": "Aklan River wild-river area",
+      "siteId": "place-libacao-1",
+      "siteName": "THE WILD RIVER",
+      "municipality": "Libacao",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-128",
+      "workbookName": "Liktinon White Rocks",
+      "siteId": "place-madalag-0",
+      "siteName": "LIKITINON WHITE ROCKS",
+      "municipality": "Madalag",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-174",
+      "workbookName": "Tagororoc ecotourism area",
+      "siteId": "place-nabas-2",
+      "siteName": "TAGOROROC ECOTOURISM DESTINATION",
+      "municipality": "Nabas",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-197",
+      "workbookName": "Nahaunang Atis",
+      "siteId": "place-numancia-1",
+      "siteName": "NAHAUNANG ATIS (FIRST AETAS)",
+      "municipality": "Numancia",
+      "category": "Spots & Attractions",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-204",
+      "workbookName": "Heroes of Vivo commemoration",
+      "siteId": "event-tangalan-1",
+      "siteName": "HEROES OF VIVO TANGALAN",
+      "municipality": "Tangalan",
+      "category": "Festivals & Events",
+      "score": 0.5,
+      "source": "heuristic",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-004",
+      "workbookName": "Diokno marker",
+      "siteId": "place-altavas-0",
+      "siteName": "HISTORICAL MARKER OF GENERAL ANANIAS DIOKNO",
+      "municipality": "Altavas",
+      "category": "Spots & Attractions",
+      "score": 0.4,
+      "source": "heuristic",
+      "decision": "pending"
+    }
+  ],
+  "heldRecords": [
+    {
+      "recordId": "AKL-003",
+      "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-005",
+      "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-007",
+      "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
+      "decision": "pending"
+    },
+    {
+      "recordId": "AKL-008",
+      "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
+      "decision": "pending"
+    }
+  ]
+}
