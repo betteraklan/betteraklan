@@ -5,6 +5,8 @@ import accommodations from '@/data/tourism/accommodations.json';
 import {
   boundsOfPoints,
   deriveStation,
+  directionsUrl,
+  pinLabel,
   deriveType,
   facetCounts,
   groupStays,
@@ -240,5 +242,40 @@ describe('boundsOfPoints', () => {
       [1.5, 0.5],
       [4.5, 3.5],
     ]);
+  });
+});
+
+describe('pinLabel', () => {
+  it('names each precision in plain words', () => {
+    expect(pinLabel('exact')).toEqual({
+      text: 'Exact pin',
+      approximate: false,
+    });
+    expect(pinLabel('barangay')).toEqual({
+      text: 'Approximate pin · barangay centre',
+      approximate: true,
+    });
+    expect(pinLabel('municipality')?.text).toBe(
+      'Approximate pin · municipality centre'
+    );
+    expect(pinLabel('failed')).toBeNull();
+  });
+
+  it('covers every precision in the data', () => {
+    const seen = new Set(
+      (accommodations as { geocodePrecision: string }[]).map(
+        a => a.geocodePrecision
+      )
+    );
+    for (const p of seen)
+      expect(['exact', 'barangay', 'municipality', 'failed']).toContain(p);
+  });
+});
+
+describe('directionsUrl', () => {
+  it('routes to the coordinate', () => {
+    expect(directionsUrl(11.95, 121.93)).toBe(
+      'https://www.google.com/maps/dir/?api=1&destination=11.95,121.93'
+    );
   });
 });

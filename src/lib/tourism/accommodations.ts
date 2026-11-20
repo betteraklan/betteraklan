@@ -181,3 +181,34 @@ export function boundsOfPoints(
 export function googleMapsUrl(lat: number, lon: number) {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 }
+
+/**
+ * What a pin's precision means to a visitor. "failed" has no pin at all.
+ * Barangay and municipality pins sit at that area's centre, not at the
+ * establishment.
+ */
+export function pinLabel(
+  precision: 'exact' | 'barangay' | 'municipality' | 'failed'
+): { text: string; approximate: boolean } | null {
+  switch (precision) {
+    case 'exact':
+      return { text: 'Exact pin', approximate: false };
+    case 'barangay':
+      return { text: 'Approximate pin · barangay centre', approximate: true };
+    case 'municipality':
+      return {
+        text: 'Approximate pin · municipality centre',
+        approximate: true,
+      };
+    default:
+      return null;
+  }
+}
+
+/** Google Maps directions to a coordinate (the visitor picks the start). */
+export function directionsUrl(lat: number, lon: number) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+}
+
+/** Rows shown at first, and added by each "Load more". */
+export const LOAD_STEP = 20;

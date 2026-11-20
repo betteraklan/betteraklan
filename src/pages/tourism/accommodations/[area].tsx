@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 
-import { BookmarkIcon, MapPinIcon, SearchIcon, XIcon } from 'lucide-react';
+import {
+  BookmarkIcon,
+  MapPinIcon,
+  NavigationIcon,
+  SearchIcon,
+  XIcon,
+} from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbHome,
@@ -12,17 +18,19 @@ import {
   BreadcrumbSeparator,
 } from '@/components/navigation/Breadcrumb';
 import { Card } from '@/components/ui/Card';
-import { PaginationControls } from '@/components/ui/Pagination';
 
 import {
   boundsOfPoints,
   deriveStation,
   deriveType,
+  directionsUrl,
   facetCounts,
   groupStays,
   hasFilters,
+  LOAD_STEP,
   matchesStay,
   NO_FILTERS,
+  pinLabel,
   type Station,
   type StayFilters,
   type StayType,
@@ -34,6 +42,7 @@ import { useSavedTrip } from '@/lib/tourism/tripStore';
 import accommodationsData from '@/data/tourism/accommodations.json';
 import { Accommodation } from '@/types/tourism';
 
+import LayerGlyph from '../components/LayerGlyph';
 import SaveToTripButton from '../components/SaveToTripButton';
 import StayMap from '../components/StayMap';
 import { KNOWN_IDS } from '../components/tourismData';
@@ -91,6 +100,7 @@ function ChipGroup<V extends string>({
             >
               {o.label}
               <span className={on ? '' : 'text-kapwa-text-support'}>
+                {'\u00a0·\u00a0'}
                 {o.count}
               </span>
             </button>
@@ -120,8 +130,8 @@ export default function AccommodationsPage() {
   const mapBox = useRef<HTMLDivElement>(null);
   const trip = useSavedTrip(KNOWN_IDS);
   const [tripNote, setTripNote] = useState('');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(20);
+  const [visible, setVisible] = useState(LOAD_STEP);
+  const [focusRow, setFocusRow] = useState<number | null>(null);
 
   const isValidArea = areaParam === 'mainland' || areaParam === 'boracay';
   const area = (isValidArea ? areaParam : 'mainland') as Area;
@@ -172,17 +182,24 @@ export default function AccommodationsPage() {
     setStationFilter('');
   }, [area]);
 
-  // Reset to page 1 whenever the visible result set changes shape, so a
-  // filter/search doesn't strand the user on a now-empty page.
+  // Start again at the first 20 whenever the result set changes shape.
   useEffect(() => {
-    setPage(1);
+    setVisible(LOAD_STEP);
   }, [search, municipalityFilter, typeFilter, stationFilter, area]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-  const pagedFiltered = useMemo(
-    () => filtered.slice((page - 1) * perPage, page * perPage),
-    [filtered, page, perPage]
-  );
+  const shown = useMemo(() => filtered.slice(0, visible), [filtered, visible]);
+  const remaining = filtered.length - shown.length;
+  const loadMore = () => {
+    setFocusRow(shown.length);
+    setVisible(v => v + LOAD_STEP);
+  };
+  // After "Load more", focus moves to the first new row, so keyboard and
+  // screen reader users land on what was added (the button may be gone).
+  useEffect(() => {
+    if (focusRow == null || focusRow >= shown.length) return;
+    document.getElementById(`stay-row-${focusRow}`)?.focus();
+    setFocusRow(null);
+  }, [focusRow, shown.length]);
 
   const groups = useMemo(() => groupStays(located(filtered)), [filtered]);
   // Boracay opens on the island; the mainland on the whole province.
@@ -383,7 +400,7 @@ export default function AccommodationsPage() {
 
       <Card className='overflow-hidden p-0' hover={false}>
         <h2 className='sr-only'>Establishments</h2>
-        {pagedFiltered.length === 0 ? (
+        {shown.length === 0 ? (
           <div className='space-y-3 p-6 text-center'>
             <p className='text-kapwa-text-strong type-body font-semibold'>
               No establishments match these filters.
@@ -401,20 +418,23 @@ export default function AccommodationsPage() {
         ) : (
           <ol
             role='list'
-            start={(page - 1) * perPage + 1}
+            start={1}
             className='divide-kapwa-border-weak divide-y'
           >
-            {pagedFiltered.map((a, i) => {
+            {shown.map((a, i) => {
               const type = deriveType(a.name);
               const station =
                 area === 'boracay' ? deriveStation(a.address) : null;
+              const pin = a.lat != null ? pinLabel(a.geocodePrecision) : null;
               return (
                 <li
                   key={`${a.name}-${a.address}`}
-                  className='flex gap-3 p-4 sm:gap-4'
+                  id={`stay-row-${i}`}
+                  tabIndex={-1}
+                  className='flex gap-3 p-4 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-kapwa-border-brand sm:gap-4'
                 >
                   <span className='text-kapwa-text-support type-meta w-8 shrink-0 pt-0.5 text-right font-semibold tabular-nums'>
-                    {(page - 1) * perPage + i + 1}.
+                    {i + 1}.
                   </span>
                   <div className='min-w-0 flex-1 space-y-1.5'>
                     <h3 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
@@ -445,14 +465,37 @@ export default function AccommodationsPage() {
                           Location unavailable
                         </span>
                       )}
+                      {a.lat != null && a.lon != null && (
+                        <a
+                          href={directionsUrl(a.lat, a.lon)}
+                          target='_blank'
+                          rel='noreferrer'
+                          className='text-kapwa-text-brand flex min-h-11 items-center gap-1 text-xs font-medium hover:underline'
+                        >
+                          <NavigationIcon
+                            aria-hidden='true'
+                            className='h-3 w-3'
+                          />{' '}
+                          Directions
+                          <span className='sr-only'>
+                            {' '}
+                            to {a.name} (opens Google Maps in a new tab)
+                          </span>
+                        </a>
+                      )}
                       <SaveToTripButton
                         name={a.name}
                         saved={trip.ids.includes(a.id)}
                         onToggle={() => toggleSave(a.id)}
                       />
-                      {a.geocodePrecision !== 'exact' && a.lat != null && (
-                        <span className='text-kapwa-text-support text-xs font-bold'>
-                          Approximate pin · {a.geocodePrecision} level
+                      {pin && (
+                        <span className='text-kapwa-text-support inline-flex items-center gap-1.5 text-xs font-bold'>
+                          <LayerGlyph
+                            layer='stay'
+                            hollow={pin.approximate}
+                            size={14}
+                          />
+                          {pin.text}
                         </span>
                       )}
                     </div>
@@ -462,17 +505,25 @@ export default function AccommodationsPage() {
             })}
           </ol>
         )}
-        <PaginationControls
-          currentPage={page}
-          totalPages={totalPages}
-          resultsPerPage={perPage}
-          totalItems={filtered.length}
-          onPageChange={setPage}
-          onResultsPerPageChange={n => {
-            setPerPage(n);
-            setPage(1);
-          }}
-        />
+        {filtered.length > 0 && (
+          <div className='border-kapwa-border-weak bg-kapwa-bg-surface-raised flex flex-col items-center gap-3 border-t p-4 sm:flex-row sm:justify-between'>
+            <p
+              aria-live='polite'
+              className='text-kapwa-text-support type-meta font-medium'
+            >
+              Showing 1 to {shown.length} of {filtered.length}
+            </p>
+            {remaining > 0 && (
+              <button
+                type='button'
+                onClick={loadMore}
+                className={`${CHIP} ${CHIP_OFF}`}
+              >
+                Load {Math.min(LOAD_STEP, remaining)} more
+              </button>
+            )}
+          </div>
+        )}
       </Card>
 
       <p className='text-kapwa-text-support text-center text-xs italic'>

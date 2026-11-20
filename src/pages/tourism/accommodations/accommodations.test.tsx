@@ -62,7 +62,8 @@ describe('accommodations page', () => {
     expect(screen.queryByRole('button', { name: 'Clear filters' })).toBeNull();
     const station = screen.getByRole('group', { name: 'Station' });
     const chip = within(station).getByRole('button', { name: /^Station 1/ });
-    const n = Number(chip.textContent!.replace('Station 1', ''));
+    // Chips read "Station 1 · 60": the number after the dot.
+    const n = Number(chip.textContent!.split('·')[1]);
     fireEvent.click(chip);
     expect(chip.getAttribute('aria-pressed')).toBe('true');
     expect(status()).toBe(`Showing ${n} of ${boracay.length} establishments`);
@@ -121,5 +122,101 @@ describe('accommodations page', () => {
     const approx = mainland.filter(a => a.geocodePrecision !== 'exact').length;
     if (approx > 0)
       expect(screen.getAllByText(/Approximate pin/).length).toBeGreaterThan(0);
+  });
+});
+
+describe('station chips, rows and Load more', () => {
+  const list = () =>
+    screen
+      .getAllByRole('list')
+      .find(l => l.tagName === 'OL' && l.hasAttribute('start'))!;
+  const rowCount = () => within(list()).getAllByRole('listitem').length;
+  // Counted from the published addresses (a "Station N" in the text).
+  const stationCount = (n: string) =>
+    (accommodations as { area: string; address: string }[]).filter(
+      a =>
+        a.area === 'boracay' &&
+        new RegExp('station\\s*' + n + '\\b', 'i').test(a.address)
+    ).length;
+
+  it('station chips read "Station 2 · 70" with counts from the derived field', () => {
+    page('boracay');
+    const group = screen.getByRole('group', { name: 'Station' });
+    for (const n of ['1', '2', '3'])
+      expect(
+        within(group).getByRole('button', {
+          // The dot has non-breaking spaces around it, so match any space.
+          name: new RegExp(
+            '^Station ' + n + '\\s+·\\s+' + stationCount(n) + '$'
+          ),
+        })
+      ).toBeTruthy();
+  });
+
+  it('every row has a Directions link to its coordinates', () => {
+    page('boracay');
+    for (const row of within(list()).getAllByRole('listitem')) {
+      const link = within(row).getByRole('link', { name: /^Directions/ });
+      expect(link.getAttribute('href')).toMatch(
+        /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&destination=-?\d+\.\d+,-?\d+\.\d+$/
+      );
+      expect(link.getAttribute('target')).toBe('_blank');
+    }
+  });
+
+  it('every row says Exact pin or Approximate pin with the area it sits at', () => {
+    page('mainland');
+    for (const row of within(list()).getAllByRole('listitem'))
+      expect(row.textContent).toMatch(
+        /Exact pin|Approximate pin · (barangay|municipality) centre/
+      );
+    expect(screen.queryByText(/ level$/)).toBeNull();
+  });
+
+  it('"Load 20 more" adds rows, keeps the count, and ends when all are shown', () => {
+    page('boracay');
+    expect(
+      screen.getByText(`Showing 1 to 20 of ${boracay.length}`)
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole('navigation', { name: /pagination/i })
+    ).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Load 20 more' }));
+    expect(rowCount()).toBe(40);
+    expect(
+      screen.getByText(`Showing 1 to 40 of ${boracay.length}`)
+    ).toBeTruthy();
+    // Focus lands on the first new row, numbered 21.
+    expect(document.activeElement?.textContent).toMatch(/^21./);
+    // Narrow to few results: the button goes away and the count is exact.
+    fireEvent.change(screen.getByRole('textbox', { name: 'Search by name' }), {
+      target: { value: 'hostel' },
+    });
+    const n = rowCount();
+    expect(n).toBeLessThanOrEqual(20);
+    expect(screen.getByText(`Showing 1 to ${n} of ${n}`)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /^Load/ })).toBeNull();
+  });
+
+  it('changing a filter starts again at the first 20', () => {
+    page('boracay');
+    fireEvent.click(screen.getByRole('button', { name: 'Load 20 more' }));
+    expect(rowCount()).toBe(40);
+    const type = screen.getByRole('group', { name: 'Type' });
+    fireEvent.click(within(type).getByRole('button', { name: /^Resort/ }));
+    expect(rowCount()).toBeLessThanOrEqual(20);
+  });
+
+  it('the map legend gives each entry a shape and words', () => {
+    page('boracay');
+    const legend = screen.getByRole('list', { name: 'Map legend' });
+    const items = within(legend).getAllByRole('listitem');
+    expect(items.length).toBeGreaterThanOrEqual(3);
+    for (const item of items.slice(0, 3)) {
+      expect(item.querySelector('svg')).not.toBeNull();
+      expect(item.textContent).toMatch(/pin|bubble/i);
+    }
+    expect(legend.textContent).toMatch(/Exact pin/);
+    expect(legend.textContent).toMatch(/Approximate pin/);
   });
 });

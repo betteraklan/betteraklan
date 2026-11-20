@@ -4,12 +4,17 @@ import { XIcon } from 'lucide-react';
 
 import { Card } from '@/components/ui/Card';
 
-import { googleMapsUrl, type StayGroup } from '@/lib/tourism/accommodations';
+import {
+  googleMapsUrl,
+  pinLabel,
+  type StayGroup,
+} from '@/lib/tourism/accommodations';
 import type { GeocodePrecision } from '@/types/tourism';
 
 import AklanMap3D, { type MapPin } from './AklanMap3D';
 import { LAYER_COLOR } from './layerMeta';
 import SaveToTripButton from './SaveToTripButton';
+import StayLegend from './StayLegend';
 import { SOURCES, TIER_COLOR } from './tourismData';
 
 export interface StayPoint {
@@ -96,6 +101,8 @@ export default function StayMap({
         </div>
       </Card>
 
+      <StayLegend />
+
       {group && (
         <section
           aria-labelledby='stay-pin-heading'
@@ -142,9 +149,9 @@ export default function StayMap({
                   <p className='text-kapwa-text-support type-meta'>
                     {p.address}
                   </p>
-                  {p.geocodePrecision !== 'exact' && (
+                  {pinLabel(p.geocodePrecision) && (
                     <p className='text-kapwa-text-support text-xs font-bold'>
-                      Approximate pin · {p.geocodePrecision} level
+                      {pinLabel(p.geocodePrecision)!.text}
                     </p>
                   )}
                 </div>
