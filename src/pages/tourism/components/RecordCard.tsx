@@ -5,7 +5,7 @@ import { BookmarkIcon } from 'lucide-react';
 import { LAYER_LABEL, type Rec, teaser } from '@/lib/tourism/explore';
 
 import LayerGlyph from './LayerGlyph';
-import { LAYER_ICON, townTint } from './layerMeta';
+import TourismImage from './TourismImage';
 import { DatePill, LocationPill } from './StatusPills';
 import { displayName } from '@/lib/tourism/displayName';
 
@@ -20,9 +20,8 @@ interface Props {
 }
 
 /**
- * Image-first result card. The 16:10 frame is sized before the photo loads,
- * so nothing shifts; without a photo it shows a municipality-tinted gradient
- * with the layer icon instead. The bookmark is a sibling of the card button
+ * Image-first result card. The photo frame is TourismImage (fixed 16:10,
+ * lazy, credited); without a photo it shows the layer's fallback tile. The bookmark is a sibling of the card button
  * (buttons can't nest) laid over the image corner.
  */
 export default function RecordCard({
@@ -33,11 +32,8 @@ export default function RecordCard({
   onToggleSave,
   onHover,
 }: Props) {
-  const [loaded, setLoaded] = useState(false);
   // Spring only in response to a tap, never on first render.
   const [spring, setSpring] = useState(0);
-  const tint = rec.image?.color ?? townTint(rec.town);
-  const Icon = LAYER_ICON[rec.layer];
 
   return (
     <div
@@ -54,43 +50,7 @@ export default function RecordCard({
         onClick={() => onSelect(rec.id)}
         className={`group bg-kapwa-bg-surface border-kapwa-border-weak flex h-full w-full flex-col overflow-hidden rounded-panel border text-left shadow-elev-1 transition-[box-shadow,translate] duration-(--dur-fast) ease-out-expo hover:shadow-elev-2 motion-safe:hover:-translate-y-0.5 ${selected ? 'ring-2 ring-[#1D4FB0]' : ''}`}
       >
-        <span
-          className={`relative block aspect-[16/10] w-full overflow-hidden ${rec.image && !loaded ? 'skeleton-shimmer' : ''}`}
-          style={{
-            // Blurred colour placeholder: a soft wash of the photo's (or town's) colour.
-            backgroundColor: tint,
-            ...(rec.image && !loaded
-              ? {}
-              : {
-                  backgroundImage: `radial-gradient(120% 90% at 30% 20%, color-mix(in oklab, ${tint} 35%, white), ${tint})`,
-                }),
-          }}
-        >
-          {rec.image ? (
-            <>
-              <img
-                src={rec.image.src}
-                alt={rec.image.alt}
-                width={1600}
-                height={1000}
-                loading='lazy'
-                decoding='async'
-                onLoad={() => setLoaded(true)}
-                className={`h-full w-full object-cover transition-opacity duration-(--dur-base) ease-out-expo motion-reduce:transition-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
-              />
-              <span className='type-meta absolute right-0 bottom-0 max-w-full truncate bg-black/55 px-2 py-0.5 text-white'>
-                Photo: {rec.image.credit}
-              </span>
-            </>
-          ) : (
-            <span
-              aria-hidden='true'
-              className='absolute inset-0 flex items-center justify-center'
-            >
-              <Icon className='h-10 w-10 text-white/85' strokeWidth={1.5} />
-            </span>
-          )}
-        </span>
+        <TourismImage image={rec.image} layer={rec.layer} />
 
         <span className='flex flex-1 flex-col gap-1.5 p-3'>
           <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>
