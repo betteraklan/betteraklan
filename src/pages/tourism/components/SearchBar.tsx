@@ -16,6 +16,7 @@ import {
 } from '@/lib/tourism/explore';
 
 import LayerGlyph from './LayerGlyph';
+import { displayName } from '@/lib/tourism/displayName';
 
 const RECENT_KEY = 'betteraklan:recent-searches';
 const MAX_RECENT = 5;
@@ -281,7 +282,7 @@ export default function SearchBar({
                         row(
                           { kind: 'record', rec },
                           <>
-                            {rec.name}
+                            {displayName(rec.name)}
                             {rec.townName && (
                               <span className='text-kapwa-text-support type-meta'>
                                 {' '}

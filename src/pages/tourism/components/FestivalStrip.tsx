@@ -12,6 +12,7 @@ import {
 } from '@/lib/tourism/festivalDates';
 
 import { LAYER_COLOR } from './layerMeta';
+import { displayName } from '@/lib/tourism/displayName';
 
 interface Props {
   /** All festival records (dated or not). */
@@ -67,7 +68,7 @@ export default function FestivalStrip({
                 className='type-meta hover:bg-kapwa-bg-hover flex min-h-11 w-full items-center justify-between gap-3 rounded-control px-2 text-left'
               >
                 <span className='min-w-0 truncate font-semibold'>
-                  {e.name}
+                  {displayName(e.name)}
                   {e.townName && (
                     <span className='text-kapwa-text-support font-normal'>
                       {' '}

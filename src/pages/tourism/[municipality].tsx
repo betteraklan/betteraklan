@@ -25,8 +25,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
+import { displayName } from '@/lib/tourism/displayName';
 import { DATE_STATUS_LABEL, getDateStatus } from '@/lib/tourism/festivalDates';
-import { toTitleCase } from '@/lib/stringUtils';
 
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
 import { MunicipalityTourism, TourismEntry } from '@/types/tourism';
@@ -47,7 +47,7 @@ function EntryCard({
         {entry.name && (
           <h4 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
             {/* Workbook names are verbatim; only legacy names are re-cased. */}
-            {entry.recordId ? entry.name : toTitleCase(entry.name)}
+            {entry.recordId ? entry.name : displayName(entry.name)}
           </h4>
         )}
         <p className='text-kapwa-text-support text-sm leading-relaxed'>

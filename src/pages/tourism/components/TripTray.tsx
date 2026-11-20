@@ -13,6 +13,7 @@ import { LAYER_LABEL, type Rec } from '@/lib/tourism/explore';
 import { routeKm } from '@/lib/tourism/trip';
 
 import LayerGlyph from './LayerGlyph';
+import { displayName } from '@/lib/tourism/displayName';
 
 interface Props {
   open: boolean;
@@ -120,7 +121,7 @@ export default function TripTray({
                   </span>
                   <span className='min-w-0 flex-1'>
                     <span className='type-meta block truncate font-semibold'>
-                      {s.name}
+                      {displayName(s.name)}
                     </span>
                     <span className='text-kapwa-text-support type-meta flex items-center gap-1'>
                       <LayerGlyph layer={s.layer} size={12} />
@@ -130,7 +131,7 @@ export default function TripTray({
                   </span>
                   <button
                     type='button'
-                    aria-label={`Move ${s.name} up`}
+                    aria-label={`Move ${displayName(s.name)} up`}
                     disabled={i === 0}
                     onClick={() => onMove(i, -1)}
                     className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
@@ -139,7 +140,7 @@ export default function TripTray({
                   </button>
                   <button
                     type='button'
-                    aria-label={`Move ${s.name} down`}
+                    aria-label={`Move ${displayName(s.name)} down`}
                     disabled={i === stops.length - 1}
                     onClick={() => onMove(i, 1)}
                     className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
@@ -148,7 +149,7 @@ export default function TripTray({
                   </button>
                   <button
                     type='button'
-                    aria-label={`Remove ${s.name} from my trip`}
+                    aria-label={`Remove ${displayName(s.name)} from my trip`}
                     onClick={() => onRemove(s.id)}
                     className='text-kapwa-text-support flex h-11 w-9 items-center justify-center rounded-control'
                   >

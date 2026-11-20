@@ -7,6 +7,7 @@ import { LAYER_LABEL, type Rec, teaser } from '@/lib/tourism/explore';
 import LayerGlyph from './LayerGlyph';
 import { LAYER_ICON, townTint } from './layerMeta';
 import { DatePill, LocationPill } from './StatusPills';
+import { displayName } from '@/lib/tourism/displayName';
 
 interface Props {
   rec: Rec;
@@ -93,7 +94,7 @@ export default function RecordCard({
 
         <span className='flex flex-1 flex-col gap-1.5 p-3'>
           <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>
-            {rec.name}
+            {displayName(rec.name)}
           </span>
           {rec.townName && (
             <span className='text-kapwa-text-support type-meta'>
@@ -124,8 +125,8 @@ export default function RecordCard({
           aria-pressed={saved}
           aria-label={
             saved
-              ? `Remove ${rec.name} from my trip`
-              : `Add ${rec.name} to my trip`
+              ? `Remove ${displayName(rec.name)} from my trip`
+              : `Add ${displayName(rec.name)} to my trip`
           }
           onClick={() => {
             onToggleSave(rec.id);

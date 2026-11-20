@@ -19,6 +19,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { YouTubeFacade } from '@/components/ui/YouTubeFacade';
 
 import { lguLabels } from '@/lib/lguLabels';
+import { displayName } from '@/lib/tourism/displayName';
 import { type BoundaryFeature, findMunicipalityAt } from '@/lib/tourism/geo';
 import { projectTowns } from '@/lib/tourism/shapes';
 
@@ -113,7 +114,7 @@ export default function TourismIndex() {
                           </div>
                           <div className='min-w-0 flex-1'>
                             <h3 className='text-kapwa-text-strong text-base leading-tight font-bold'>
-                              {spot.name}
+                              {displayName(spot.name)}
                             </h3>
                             <p className='text-kapwa-text-disabled mt-0.5 text-[11px] font-medium'>
                               {spot.address}

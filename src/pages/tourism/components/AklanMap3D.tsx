@@ -19,6 +19,7 @@ import type { BoundaryFeature } from '@/lib/tourism/geo';
 // mask has one clean hole (overlapping per-town holes triangulate badly).
 import outlineTowns from '@/data/geo/municipalities-boundaries.json';
 import outline from '@/data/geo/aklan-outline.json';
+import { displayName } from '@/lib/tourism/displayName';
 
 export type TourMove = 'fly' | 'orbit' | 'tilt';
 
@@ -907,7 +908,7 @@ export default function AklanMap3D({
         type: 'Feature',
         properties: {
           id: p.id,
-          name: `${p.name} · ${p.label}${p.approximate ? ' (approximate location)' : ''}`,
+          name: `${displayName(p.name)} · ${p.label}${p.approximate ? ' (approximate location)' : ''}`,
           color: p.color,
           layer: p.layer,
           town: p.town ?? '',
@@ -1197,7 +1198,7 @@ export default function AklanMap3D({
     if (!selected) return;
     const label = document.createElement('div');
     const title = document.createElement('strong');
-    title.textContent = selected.name;
+    title.textContent = displayName(selected.name);
     const sub = document.createElement('div');
     sub.textContent = selected.label;
     label.append(title, sub);

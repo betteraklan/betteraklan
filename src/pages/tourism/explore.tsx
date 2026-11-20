@@ -70,6 +70,7 @@ import centroidData from '@/data/geo/municipality-centroids.json';
 import municipalitiesData from '@/data/tourism/municipalities.json';
 import resortsData from '@/data/tourism/resorts.json';
 import type { Accommodation, MunicipalityTourism } from '@/types/tourism';
+import { displayName } from '@/lib/tourism/displayName';
 
 const SOURCES: Sources = {
   municipalities: municipalitiesData as MunicipalityTourism[],
@@ -191,7 +192,7 @@ export default function TourismExplore() {
       selected && selected.lat != null && selected.lon != null
         ? {
             id: selected.id,
-            name: selected.name,
+            name: displayName(selected.name),
             lat: selected.lat,
             lon: selected.lon,
             color: LAYER_COLOR[selected.layer],
@@ -1322,7 +1323,7 @@ export default function TourismExplore() {
                     {LAYER_LABEL[selected.layer]}
                   </p>
                   <h2 className='text-kapwa-text-strong type-title'>
-                    {selected.name}
+                    {displayName(selected.name)}
                   </h2>
                   <p className='text-kapwa-text-support type-body'>
                     {selected.description}
