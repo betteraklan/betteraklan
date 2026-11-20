@@ -1,6 +1,6 @@
 # Tourism: Figma "All pages redesign" vs the current site
 
-Figma file: BetterAklan (page 1, section "All pages redesign (Tourism first)"). Reviewed: Overview, Town page (Malay), Where to stay (Boracay) and the phone frames. Compared against branch `feat/tourism-explore-map` (HEAD `60ce014`) and the JSON files in `src/data/tourism/`.
+Figma file: BetterAklan (page 1, section "All pages redesign (Tourism first)"). Reviewed: Overview, Town page (Malay), Where to stay (Boracay) and the phone frames. Compared against branch `feat/tourism-explore-map` (HEAD `69863ac`) and the JSON files in `src/data/tourism/`.
 
 ## 1. Already built (matches the Figma)
 
@@ -11,11 +11,11 @@ Figma file: BetterAklan (page 1, section "All pages redesign (Tourism first)"). 
 | Top places with category tabs | `PlacesTabs` |
 | Festivals band and Towns grid | `FestivalBand`, `TownsGrid` |
 | Map teaser | `index.tsx` teaser using `MiniMap` shapes |
-| Town page rebuild | `[municipality].tsx` (commit `a288a99`) |
-| Stay chips, numbered rows, result count, type and station | commits `0e51727`, `bd44e97` |
-| Stay map on MapLibre with Save to trip | `StayMap`, `SaveToTripButton` (commits `50fcecb`, `72834e5`) |
+| Town page rebuild | `[municipality].tsx` (commit `f172edd`) |
+| Stay chips, numbered rows, result count, type and station | commits `bb2d91d`, `ed970ae` |
+| Stay map on MapLibre with Save to trip | `StayMap`, `SaveToTripButton` (commits `a722986`, `3a83d45`) |
 | Image frame with fallback tiles | `TourismImage` |
-| 12 px minimum text | commit `60ce014` |
+| 12 px minimum text | commit `69863ac` |
 | Interactive 3D map, trip tray, festival strip, advisories | unchanged in `explore.tsx` |
 
 Twelve files are modified but not committed in the working tree (`[municipality].tsx`, `index.tsx`, `layout.tsx`, `TourismTabs.tsx`, `TownsGrid.tsx`, `StatusPills.tsx`, `Pagination.tsx`, the accommodations page, plus `docs/` and `e2e/tourism/`). I did not make those changes and did not touch them.

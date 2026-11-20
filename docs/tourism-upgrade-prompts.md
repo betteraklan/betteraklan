@@ -136,4 +136,4 @@ A, B, C, D, E, F, G, H, I (items 1 to 5 in order), then J when photos are ready,
 
 ## Not checked
 
-I took your word that phases 0 to 6 were run, and the git log agrees (commits through `60ce014`). I have not run these prompts, the site or its tests. Transport times and spot facts in the Figma have no source in the repo, so prompts D and G leave them out until sourced. Opus 5.5 is the highest model used anywhere.
+I took your word that phases 0 to 6 were run, and the git log agrees (commits through `69863ac`). I have not run these prompts, the site or its tests. Transport times and spot facts in the Figma have no source in the repo, so prompts D and G leave them out until sourced. Opus 5.5 is the highest model used anywhere.

@@ -1,7 +1,7 @@
 # Tourism workbook review (owner decisions needed)
 
 Workbook SHA-256: `450348e7df619a1bf9421028ff053ea999cdfb73669f721d4f7b6c999b8ee9b8`
-Baseline revision: `6d1f30ead5c59002e1af9852ffcaa51ce24c97e1`
+Baseline revision: `1322fd5a4e0d5ed45afe1911066e217bfec3eef2`
 
 Edit `src/data/tourism/twin-pairs.json`, then tell the agent to run the live import.
 

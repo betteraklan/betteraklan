@@ -6,7 +6,7 @@ Generated from `src/data/tourism/workbook-reconciliation.json`. Every workbook r
 
 - Workbook used: `C:\Users\Lance\Downloads\Aklan_Image_Sources_Google_Images_Update_22.xlsx`. The path named in `AGENTS - Aklan Tourism.md` (`outputs/aklan-image-update-22/...`) does not exist on this machine, so the owner's same-named copy was used.
 - Workbook SHA-256: `450348e7df619a1bf9421028ff053ea999cdfb73669f721d4f7b6c999b8ee9b8`. **Owner: please confirm this is the approved file.**
-- Baseline (pre-import `municipalities.json`): git revision `6d1f30ead5c59002e1af9852ffcaa51ce24c97e1`.
+- Baseline (pre-import `municipalities.json`): git revision `1322fd5a4e0d5ed45afe1911066e217bfec3eef2`.
 - Owner decisions: all 26 candidate pairs left `pending`, so the more detailed site entry stays. The 4 held records were published at the owner's direction to keep the data complete: their shared text is generic but true for each (all four are in Talon).
 - Pins: approximate municipality-centre pins (A7) on; `--no-pins` not used.
 
