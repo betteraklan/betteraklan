@@ -4,6 +4,9 @@ import { BookmarkIcon } from 'lucide-react';
 
 import { LAYER_LABEL, type Rec, teaser } from '@/lib/tourism/explore';
 
+import type { Category } from '@/lib/tourism/category';
+
+import CategoryBadge from './CategoryBadge';
 import LayerGlyph from './LayerGlyph';
 import TourismImage from './TourismImage';
 import { DatePill, LocationPill } from './StatusPills';
@@ -12,6 +15,8 @@ import { displayName } from '@/lib/tourism/displayName';
 interface Props {
   rec: Rec;
   selected?: boolean;
+  /** Shown as a badge in the article form (town pages). */
+  category?: Category;
   /**
    * Makes the whole card a button (Explore). Without it the card is an
    * article that shows the full description and `children`, for pages that
@@ -35,6 +40,7 @@ export default function RecordCard({
   rec,
   selected = false,
   onSelect,
+  category,
   children,
   saved = false,
   onToggleSave,
@@ -50,6 +56,7 @@ export default function RecordCard({
         <LayerGlyph layer={rec.layer} />
         {LAYER_LABEL[rec.layer]}
       </span>
+      {category && <CategoryBadge category={category} />}
       {rec.layer === 'event' && <DatePill rec={rec} />}
       {rec.placement !== 'exact' && <LocationPill placement={rec.placement} />}
     </span>

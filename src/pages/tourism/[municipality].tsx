@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 
 import {
   BookmarkIcon,
@@ -26,6 +26,11 @@ import {
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
+import {
+  type Category,
+  categoryOf,
+  FILTER_CATEGORIES,
+} from '@/lib/tourism/category';
 import { displayName } from '@/lib/tourism/displayName';
 import { projectTowns } from '@/lib/tourism/shapes';
 import { MAX_STOPS, serializeTrip } from '@/lib/tourism/trip';
@@ -64,6 +69,14 @@ const SECTIONS = [
     icon: ShoppingBagIcon,
   },
 ] as const;
+
+// Chip wording for each filterable category.
+const CHIP_LABEL: Record<(typeof FILTER_CATEGORIES)[number], string> = {
+  Beach: 'Beaches',
+  Falls: 'Falls',
+  Cave: 'Caves',
+  Culture: 'Culture',
+};
 
 const FALLBACK_NOTE =
   'Live notices couldn’t be loaded. Showing the last published list.';
@@ -132,6 +145,7 @@ function NoticeBanner({
 
 export default function TourismMunicipalityDetail() {
   const { municipality: slug } = useParams();
+  const [params, setParams] = useSearchParams();
   const { advisories, status: advisoriesStatus } = useAdvisories();
   const trip = useSavedTrip(KNOWN_IDS);
   const [tripNote, setTripNote] = useState('');
@@ -146,7 +160,35 @@ export default function TourismMunicipalityDetail() {
   const prev =
     municipalities[(index - 1 + municipalities.length) % municipalities.length];
   const next = municipalities[(index + 1) % municipalities.length];
-  const sections = SECTIONS.filter(s => municipality[s.key].length > 0);
+  // Category comes from the record's own text (see categoryOf); the data has
+  // none. Festivals are Culture, places are read from their name and
+  // description, and products carry no category.
+  const allItems = (s: (typeof SECTIONS)[number]) =>
+    municipality[s.key].map((entry, i) => {
+      const rec = entry.name
+        ? BY_ID.get(`${s.prefix}-${municipality.slug}-${i}`)
+        : undefined;
+      const category: Category | null =
+        rec && rec.layer !== 'product' ? categoryOf(rec) : null;
+      return { entry, i, rec, category };
+    });
+  const counts: Partial<Record<Category, number>> = {};
+  for (const s of SECTIONS)
+    for (const it of allItems(s))
+      if (it.category) counts[it.category] = (counts[it.category] ?? 0) + 1;
+  // Only categories this town has, so no chip leads to an empty page.
+  const chips = FILTER_CATEGORIES.filter(c => (counts[c] ?? 0) > 0);
+  const asked = params.get('category');
+  const active = chips.find(c => c.toLowerCase() === asked) ?? null;
+  const choose = (c: Category | null) => {
+    const next = new URLSearchParams(params);
+    if (c) next.set('category', c.toLowerCase());
+    else next.delete('category');
+    setParams(next, { replace: true });
+  };
+  const itemsOf = (s: (typeof SECTIONS)[number]) =>
+    allItems(s).filter(it => !active || it.category === active);
+  const sections = SECTIONS.filter(s => itemsOf(s).length > 0);
 
   const toggleSave = (id: string) => {
     const name = displayName(BY_ID.get(id)?.name ?? '');
@@ -229,13 +271,44 @@ export default function TourismMunicipalityDetail() {
                 >
                   {s.title}
                   <span className='text-kapwa-text-support'>
-                    {municipality[s.key].length}
+                    {itemsOf(s).length}
                   </span>
                 </a>
               </li>
             ))}
           </ul>
         </nav>
+      )}
+
+      {/* --- CATEGORY FILTER --- */}
+      {chips.length > 0 && (
+        <div className='space-y-1'>
+          <div
+            role='group'
+            aria-label='Filter by category'
+            className='flex flex-wrap gap-2'
+          >
+            {[null, ...chips].map(c => {
+              const on = (c ?? null) === active;
+              return (
+                <button
+                  key={c ?? 'all'}
+                  type='button'
+                  aria-pressed={on}
+                  onClick={() => choose(c)}
+                  className={`type-meta inline-flex min-h-11 items-center rounded-full border px-4 font-semibold transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand ${on ? 'bg-kapwa-bg-brand-default border-kapwa-border-brand text-kapwa-text-inverse' : 'bg-kapwa-bg-surface border-kapwa-border-weak text-kapwa-text-strong hover:border-kapwa-border-brand'}`}
+                >
+                  {c ? `${CHIP_LABEL[c]} · ${counts[c]}` : 'All'}
+                </button>
+              );
+            })}
+          </div>
+          <p aria-live='polite' className='sr-only'>
+            {active
+              ? `Showing ${counts[active]} ${CHIP_LABEL[active].toLowerCase()} records`
+              : ''}
+          </p>
+        </div>
       )}
 
       {/* --- MY TRIP --- */}
@@ -280,10 +353,7 @@ export default function TourismMunicipalityDetail() {
             </div>
             <div className='p-6'>
               <ul className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                {municipality[s.key].map((entry, i) => {
-                  const rec = entry.name
-                    ? BY_ID.get(`${s.prefix}-${municipality.slug}-${i}`)
-                    : undefined;
+                {itemsOf(s).map(({ entry, i, rec, category }) => {
                   // Nameless entries are free-text paragraphs, kept as they were.
                   if (!rec)
                     return (
@@ -304,6 +374,7 @@ export default function TourismMunicipalityDetail() {
                     <li key={rec.id}>
                       <RecordCard
                         rec={rec}
+                        category={category ?? undefined}
                         saved={trip.ids.includes(rec.id)}
                         onToggleSave={toggleSave}
                       >
