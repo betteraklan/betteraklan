@@ -15,7 +15,12 @@ const TOWNS = [...SOURCES.municipalities]
  * pressing Enter opens Explore's list with the query. "Near me" asks for
  * location only when tapped, and the position never leaves the device.
  */
-export default function OverviewSearch() {
+export default function OverviewSearch({
+  onDark = false,
+}: {
+  /** The form sits on the dark hero, so its message is white. */
+  onDark?: boolean;
+}) {
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   const [locating, setLocating] = useState(false);
@@ -84,7 +89,7 @@ export default function OverviewSearch() {
       <p
         role='status'
         aria-live='polite'
-        className='text-kapwa-text-support type-meta mt-2 min-h-5 px-2'
+        className={`type-meta mt-2 min-h-5 px-2 ${onDark ? 'text-white' : 'text-kapwa-text-support'}`}
       >
         {message}
       </p>

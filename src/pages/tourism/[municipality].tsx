@@ -196,7 +196,6 @@ export default function TourismMunicipalityDetail() {
         eyebrow='Municipality'
         title={municipality.name}
         description={`Festivals, spots, and local products of the Municipality of ${municipality.name}, Aklan.`}
-        shapes={SHAPES}
         aside={<MiniMap shapes={SHAPES} active={municipality.slug} />}
         actions={
           <Link

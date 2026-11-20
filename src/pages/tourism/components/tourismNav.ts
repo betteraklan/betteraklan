@@ -62,3 +62,20 @@ export function activeTab(pathname: string, search: string): TabId | null {
 /** The phone bottom bar is hidden on Explore, which has its own bottom sheet. */
 export const showBottomBar = (pathname: string) =>
   !pathname.replace(/\/+$/, '').endsWith('/tourism/explore');
+
+/**
+ * Overview hero category chips. The data has no category field and Explore's
+ * search takes one term, so each chip is the strongest single term (or a layer):
+ * beach 31 records, falls 35, cave 23, heritage 5, festivals 36, products 53.
+ */
+export const HERO_CHIPS = [
+  { label: 'Beaches', to: '/tourism/explore?q=beach&view=list' },
+  { label: 'Waterfalls and springs', to: '/tourism/explore?q=falls&view=list' },
+  { label: 'Caves and hills', to: '/tourism/explore?q=cave&view=list' },
+  { label: 'Festivals', to: '/tourism/explore?layer=event&view=list' },
+  { label: 'Heritage', to: '/tourism/explore?q=heritage&view=list' },
+  {
+    label: 'Food and products',
+    to: '/tourism/explore?layer=product&view=list',
+  },
+] as const;

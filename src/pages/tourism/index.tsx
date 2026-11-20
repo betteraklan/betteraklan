@@ -16,6 +16,14 @@ import {
   WavesIcon,
 } from 'lucide-react';
 
+import {
+  Breadcrumb,
+  BreadcrumbHome,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/navigation/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { YouTubeFacade } from '@/components/ui/YouTubeFacade';
@@ -36,6 +44,7 @@ import { LAYER_ICON } from './components/layerMeta';
 import MiniMap from './components/MiniMap';
 import OverviewSearch from './components/OverviewSearch';
 import PlacesTabs from './components/PlacesTabs';
+import { HERO_CHIPS } from './components/tourismNav';
 import { COUNTS } from './components/tourismData';
 import TourismHero from './components/TourismHero';
 import { useActiveTown, useReveal } from './components/useScrollStory';
@@ -118,15 +127,41 @@ export default function TourismIndex() {
   return (
     <div ref={root} className='space-y-10'>
       <TourismHero
-        title='Tourism'
+        title='Discover Aklan'
+        breadcrumb={
+          <Breadcrumb>
+            <BreadcrumbList className='text-white/70'>
+              <BreadcrumbItem>
+                <BreadcrumbHome
+                  href='/'
+                  aria-label='Home'
+                  className='text-white/90 hover:text-white'
+                />
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className='text-white/70' />
+              <BreadcrumbItem>
+                <BreadcrumbPage className='text-white'>Tourism</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        }
+        search={<OverviewSearch onDark />}
+        chips={[...HERO_CHIPS]}
+        stats={[
+          { value: COUNTS.towns, label: 'Municipalities' },
+          { value: COUNTS.spots, label: 'Spots and attractions' },
+          { value: COUNTS.festivals, label: 'Festivals' },
+          { value: COUNTS.stays, label: 'Places to stay' },
+        ]}
+        video={
+          <YouTubeFacade
+            videoId='0iy3YKv1FZk'
+            title='Welcome to Aklan!'
+            subtitle='Watch · Aklan Tourism'
+          />
+        }
         description={`From the world-famous shores of Boracay to the hidden waterfalls and centuries-old festivals of its ${COUNTS.towns} municipalities, ${lguLabels.fullName} invites you to discover a province where nature, culture, and hospitality meet.`}
-        shapes={SHAPES}
       />
-
-      {/* --- SEARCH --- */}
-      <section data-reveal data-town='' aria-label='Search'>
-        <OverviewSearch />
-      </section>
 
       {/* --- QUICK TILES (no "Getting here" tile until it is sourced) --- */}
       <section aria-label='Plan your visit' data-town=''>
@@ -194,15 +229,6 @@ export default function TourismIndex() {
       {/* Reading column plus a sticky mini-map (wide screens) that follows it. */}
       <div className='xl:grid xl:grid-cols-[minmax(0,1fr)_200px] xl:gap-8'>
         <div className='min-w-0 space-y-12'>
-          {/* --- PROMO VIDEO --- */}
-          <section data-reveal data-town=''>
-            <YouTubeFacade
-              videoId='0iy3YKv1FZk'
-              title='Welcome to Aklan!'
-              subtitle='Watch · Aklan Tourism'
-            />
-          </section>
-
           {/* --- PLACES TO VISIT --- */}
           <section data-town='' className='space-y-4'>
             <SectionHead icon={SparklesIcon}>Places to visit</SectionHead>
