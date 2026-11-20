@@ -35,6 +35,7 @@ import municipalitiesTourism from '@/data/tourism/municipalities.json';
 import type { Advisory, MunicipalityTourism } from '@/types/tourism';
 
 import MiniMap from './components/MiniMap';
+import PlanYourVisit from './components/PlanYourVisit';
 import RecordCard from './components/RecordCard';
 import { AdvisoryKindPill } from './components/StatusPills';
 import TourismHero from './components/TourismHero';
@@ -213,6 +214,8 @@ export default function TourismMunicipalityDetail() {
           {municipality.overview.text}
         </p>
       )}
+
+      <PlanYourVisit slug={municipality.slug} name={municipality.name} />
 
       {/* --- IN-PAGE TABS --- */}
       {sections.length > 0 && (

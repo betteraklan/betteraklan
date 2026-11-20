@@ -93,3 +93,8 @@ export const COUNTS = {
     .length,
   records: ALL_RECORDS.length,
 } as const;
+
+/** Places to stay in a town, from the accommodations data. */
+export function staysIn(slug: string): number {
+  return ALL_RECORDS.filter(r => r.layer === 'stay' && r.town === slug).length;
+}

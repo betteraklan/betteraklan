@@ -40,6 +40,7 @@ import municipalitiesTourism from '@/data/tourism/municipalities.json';
 import { FeaturedAttraction } from '@/types/tourism';
 
 import FestivalBand from './components/FestivalBand';
+import GettingHere from './components/GettingHere';
 import { LAYER_ICON } from './components/layerMeta';
 import MiniMap from './components/MiniMap';
 import OverviewSearch from './components/OverviewSearch';
@@ -163,7 +164,7 @@ export default function TourismIndex() {
         description={`From the world-famous shores of Boracay to the hidden waterfalls and centuries-old festivals of its ${COUNTS.towns} municipalities, ${lguLabels.fullName} invites you to discover a province where nature, culture, and hospitality meet.`}
       />
 
-      {/* --- QUICK TILES (no "Getting here" tile until it is sourced) --- */}
+      {/* --- QUICK TILES --- */}
       <section aria-label='Plan your visit' data-town=''>
         <ul className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
           <li data-reveal style={{ '--i': 0 } as React.CSSProperties}>
@@ -225,6 +226,9 @@ export default function TourismIndex() {
           </li>
         </ul>
       </section>
+
+      {/* --- GETTING HERE (airports from the data; live flights line) --- */}
+      <GettingHere />
 
       {/* Reading column plus a sticky mini-map (wide screens) that follows it. */}
       <div className='xl:grid xl:grid-cols-[minmax(0,1fr)_200px] xl:gap-8'>

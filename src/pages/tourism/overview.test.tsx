@@ -68,7 +68,6 @@ describe('Tourism Overview', () => {
       /^https:\/\/hotlines\.bettergov\.ph\/\?city=/
     );
     expect(help.getAttribute('target')).toBe('_blank');
-    expect(screen.queryByText(/Getting here/i)).toBeNull();
   });
 
   it('category tabs switch and deep-link into Explore', () => {
