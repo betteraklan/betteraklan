@@ -8,6 +8,7 @@ import { mobileCheck } from '../utils/device';
 const PAGES = [
   ['Overview', '/tourism'],
   ['Town page', '/tourism/kalibo'],
+  ['Town page with a long spot list', '/tourism/malay'],
   ['Explore list', '/tourism/explore?view=list'],
   ['Boracay stays', '/tourism/accommodations/boracay'],
   ['Mainland stays', '/tourism/accommodations/mainland'],

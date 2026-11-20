@@ -1,3 +1,7 @@
+import { websiteUrl } from '@/lib/tourism/gettingHere';
+
+import municipal from '@/data/directory/municipal.json';
+
 // Tourism records shared by Explore and the Towns grid, so both count the
 // same records and shade them with the same ramp.
 import {
@@ -97,4 +101,23 @@ export const COUNTS = {
 /** Places to stay in a town, from the accommodations data. */
 export function staysIn(slug: string): number {
   return ALL_RECORDS.filter(r => r.layer === 'stay' && r.town === slug).length;
+}
+
+/** The municipal hall's website from the directory, or null (none is recorded yet). */
+export function municipalWebsite(slug: string): string | null {
+  const m = (municipal as { slug: string; website: string | null }[]).find(
+    x => x.slug === `municipality-of-${slug}`
+  );
+  return websiteUrl(m?.website);
+}
+
+/**
+ * The town's own spots (its workbook records) that have a pin on the Explore
+ * map. Featured highlights that Explore places in the town by coordinates are
+ * left out, so this agrees with the spot list on the town page.
+ */
+export function spotsOnMap(slug: string): number {
+  return ALL_RECORDS.filter(
+    r => r.id.startsWith(`place-${slug}-`) && r.lat != null && r.lon != null
+  ).length;
 }

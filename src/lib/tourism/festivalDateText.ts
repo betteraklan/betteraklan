@@ -224,6 +224,46 @@ export function pickFeatured<T extends FestivalLike>(
 }
 
 /** Only a plain day or day range can be added to a calendar. */
+export interface DateTile {
+  /** Upper line: month ("JUN"), or "DATE". */
+  top: string;
+  /** Lower line: day or days ("15", "12–23"), weekday ("3RD SUN"), or "TBC". */
+  bottom: string;
+  /** What a screen reader hears: the phrase as the data gives it. */
+  label: string;
+}
+
+const ORDINAL: Record<string, string> = {
+  first: '1st',
+  second: '2nd',
+  third: '3rd',
+  fourth: '4th',
+};
+
+/**
+ * The calendar tile on a festival card. Only a phrase in one month becomes a
+ * date; a hedged or multi-month phrase, or none, is "DATE TBC".
+ */
+export function dateTile(info: FestivalDateInfo | null): DateTile {
+  const tbc = { top: 'DATE', bottom: 'TBC', label: 'Date to be confirmed' };
+  if (!info || info.kind === 'unconfirmed' || info.months.length !== 1)
+    return tbc;
+  const top = MONTH_NAMES[info.months[0] - 1].slice(0, 3).toUpperCase();
+  const label = `Date: ${info.text}`;
+  if (info.kind === 'weekday') {
+    const m =
+      /\b(1st|2nd|3rd|4th|first|second|third|fourth|last)\s+(sun|mon|tue|wed|thu|fri|sat)/i.exec(
+        info.text
+      );
+    if (!m) return tbc;
+    const nth = ORDINAL[m[1].toLowerCase()] ?? m[1];
+    return { top, bottom: `${nth} ${m[2]}`.toUpperCase(), label };
+  }
+  if (!info.day) return tbc;
+  const bottom = info.endDay ? `${info.day}–${info.endDay}` : `${info.day}`;
+  return { top, bottom, label };
+}
+
 export const canAddToCalendar = (i: FestivalDateInfo) => i.kind === 'fixed';
 
 // ---------------------------------------------------------------- .ics ----

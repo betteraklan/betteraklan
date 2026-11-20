@@ -23,6 +23,8 @@ interface Props {
    * list records in full (town pages).
    */
   onSelect?: (id: string) => void;
+  /** Laid over the image's top-left corner, article form only (date tile). */
+  corner?: React.ReactNode;
   /** Extra details and links, shown only in the article form. */
   children?: React.ReactNode;
   saved?: boolean;
@@ -41,6 +43,7 @@ export default function RecordCard({
   selected = false,
   onSelect,
   category,
+  corner,
   children,
   saved = false,
   onToggleSave,
@@ -110,6 +113,7 @@ export default function RecordCard({
             >
               {displayName(rec.name)}
             </h3>
+            {corner && <div className='absolute top-2 left-2'>{corner}</div>}
             {pills}
             {rec.description && (
               <p className='text-kapwa-text-support type-body'>

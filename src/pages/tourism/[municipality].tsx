@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLinkIcon,
+  FlagIcon,
   MapIcon,
   PartyPopperIcon,
   ShoppingBagIcon,
@@ -32,6 +33,8 @@ import {
   FILTER_CATEGORIES,
 } from '@/lib/tourism/category';
 import { displayName } from '@/lib/tourism/displayName';
+import { dateTile, parseFestivalDate } from '@/lib/tourism/festivalDateText';
+import { config } from '@/lib/lguConfig';
 import { projectTowns } from '@/lib/tourism/shapes';
 import { MAX_STOPS, serializeTrip } from '@/lib/tourism/trip';
 import { useSavedTrip } from '@/lib/tourism/tripStore';
@@ -44,7 +47,13 @@ import PlanYourVisit from './components/PlanYourVisit';
 import RecordCard from './components/RecordCard';
 import { AdvisoryKindPill } from './components/StatusPills';
 import TourismHero from './components/TourismHero';
-import { BY_ID, KNOWN_IDS, SOURCES } from './components/tourismData';
+import {
+  BY_ID,
+  KNOWN_IDS,
+  municipalWebsite,
+  SOURCES,
+  spotsOnMap,
+} from './components/tourismData';
 
 const SHAPES = projectTowns(SOURCES.boundaries, 600, 2);
 
@@ -77,6 +86,80 @@ const CHIP_LABEL: Record<(typeof FILTER_CATEGORIES)[number], string> = {
   Cave: 'Caves',
   Culture: 'Culture',
 };
+
+// Spots shown before "Show all": four rows of two on wide screens.
+const SPOTS_SHOWN = 8;
+
+/** Calendar tile for a festival card, read from its own description. */
+function DateTileBadge({ description }: { description: string }) {
+  const t = dateTile(parseFestivalDate(description));
+  return (
+    <span className='bg-kapwa-bg-surface text-kapwa-text-strong flex w-16 flex-col items-center rounded-panel py-1.5 leading-tight shadow-elev-2'>
+      <span
+        aria-hidden='true'
+        className='type-meta text-kapwa-text-brand font-bold'
+      >
+        {t.top}
+      </span>
+      <span aria-hidden='true' className='type-meta text-center font-bold'>
+        {t.bottom}
+      </span>
+      <span className='sr-only'>{t.label}</span>
+    </span>
+  );
+}
+
+/** "N spots on the map", with the town highlighted, linking into Explore. */
+function TownMapCard({ slug, name }: { slug: string; name: string }) {
+  const n = spotsOnMap(slug);
+  return (
+    <section
+      aria-labelledby='town-map-heading'
+      className='bg-kapwa-bg-surface border-kapwa-border-weak flex items-center gap-4 rounded-card border p-4 shadow-elev-1 lg:flex-col lg:items-stretch lg:gap-3'
+    >
+      <div className='w-28 shrink-0 lg:w-full'>
+        <MiniMap shapes={SHAPES} active={slug} />
+      </div>
+      <div className='min-w-0'>
+        <h2
+          id='town-map-heading'
+          className='text-kapwa-text-strong type-body font-semibold'
+        >
+          {n} spot{n === 1 ? '' : 's'} on the map
+        </h2>
+        <Link
+          to={`/tourism/explore?town=${slug}`}
+          className='text-kapwa-text-brand type-body inline-flex min-h-11 items-center gap-2 font-semibold hover:underline'
+        >
+          <MapIcon aria-hidden='true' className='h-4 w-4' />
+          Open map
+          <span className='sr-only'> of {name}</span>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/** Links out to the town's own site, or the provincial page when none is recorded. */
+function MoreEvents({ slug, name }: { slug: string; name: string }) {
+  const site = municipalWebsite(slug);
+  const href = site ?? `https://aklan.gov.ph/tourism/${slug}/`;
+  const text = site
+    ? `More events on ${name}’s official website`
+    : `More events on the Aklan Provincial Tourism page for ${name}`;
+  return (
+    <a
+      href={href}
+      target='_blank'
+      rel='noreferrer'
+      className='text-kapwa-text-brand type-body inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
+    >
+      {text}
+      <ExternalLinkIcon aria-hidden='true' className='h-4 w-4' />
+      <span className='sr-only'> (opens in a new tab)</span>
+    </a>
+  );
+}
 
 const FALLBACK_NOTE =
   'Live notices couldn’t be loaded. Showing the last published list.';
@@ -149,6 +232,8 @@ export default function TourismMunicipalityDetail() {
   const { advisories, status: advisoriesStatus } = useAdvisories();
   const trip = useSavedTrip(KNOWN_IDS);
   const [tripNote, setTripNote] = useState('');
+  // Which town's spot list is open; a new town starts collapsed.
+  const [openSpots, setOpenSpots] = useState<string | null>(null);
   const municipalities = municipalitiesTourism as MunicipalityTourism[];
   const index = municipalities.findIndex(m => m.slug === slug);
   const municipality = index >= 0 ? municipalities[index] : undefined;
@@ -189,6 +274,15 @@ export default function TourismMunicipalityDetail() {
   const itemsOf = (s: (typeof SECTIONS)[number]) =>
     allItems(s).filter(it => !active || it.category === active);
   const sections = SECTIONS.filter(s => itemsOf(s).length > 0);
+  // Long spot lists start collapsed; a category chip already narrows the list.
+  const spotsOpen = openSpots === municipality.slug;
+  const collapsible = (s: (typeof SECTIONS)[number]) =>
+    s.key === 'attractions' && !active && itemsOf(s).length > SPOTS_SHOWN;
+  const shownOf = (s: (typeof SECTIONS)[number]) =>
+    collapsible(s) && !spotsOpen
+      ? itemsOf(s).slice(0, SPOTS_SHOWN)
+      : itemsOf(s);
+  const namedSpots = itemsOf(SECTIONS[1]).filter(it => it.rec).length;
 
   const toggleSave = (id: string) => {
     const name = displayName(BY_ID.get(id)?.name ?? '');
@@ -239,7 +333,6 @@ export default function TourismMunicipalityDetail() {
         eyebrow='Municipality'
         title={municipality.name}
         description={`Festivals, spots, and local products of the Municipality of ${municipality.name}, Aklan.`}
-        aside={<MiniMap shapes={SHAPES} active={municipality.slug} />}
         actions={
           <Link
             to={`/tourism/explore?town=${municipality.slug}`}
@@ -257,7 +350,10 @@ export default function TourismMunicipalityDetail() {
         </p>
       )}
 
-      <PlanYourVisit slug={municipality.slug} name={municipality.name} />
+      <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]'>
+        <PlanYourVisit slug={municipality.slug} name={municipality.name} />
+        <TownMapCard slug={municipality.slug} name={municipality.name} />
+      </div>
 
       {/* --- IN-PAGE TABS --- */}
       {sections.length > 0 && (
@@ -351,9 +447,12 @@ export default function TourismMunicipalityDetail() {
                 {s.title}
               </h2>
             </div>
-            <div className='p-6'>
-              <ul className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                {itemsOf(s).map(({ entry, i, rec, category }) => {
+            <div className='space-y-4 p-6'>
+              <ul
+                id={`${s.key}-list`}
+                className='grid grid-cols-1 gap-4 md:grid-cols-2'
+              >
+                {shownOf(s).map(({ entry, i, rec, category }) => {
                   // Nameless entries are free-text paragraphs, kept as they were.
                   if (!rec)
                     return (
@@ -375,6 +474,11 @@ export default function TourismMunicipalityDetail() {
                       <RecordCard
                         rec={rec}
                         category={category ?? undefined}
+                        corner={
+                          rec.layer === 'event' ? (
+                            <DateTileBadge description={rec.description} />
+                          ) : undefined
+                        }
                         saved={trip.ids.includes(rec.id)}
                         onToggleSave={toggleSave}
                       >
@@ -404,6 +508,24 @@ export default function TourismMunicipalityDetail() {
                   );
                 })}
               </ul>
+              {collapsible(s) && (
+                <button
+                  type='button'
+                  aria-expanded={spotsOpen}
+                  aria-controls={`${s.key}-list`}
+                  onClick={() =>
+                    setOpenSpots(spotsOpen ? null : municipality.slug)
+                  }
+                  className='bg-kapwa-bg-surface border-kapwa-border-weak text-kapwa-text-strong type-body inline-flex min-h-11 w-full items-center justify-center rounded-full border px-4 font-semibold transition-colors duration-(--dur-fast) hover:border-kapwa-border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
+                >
+                  {spotsOpen
+                    ? 'Show fewer spots'
+                    : `Show all ${namedSpots} spots`}
+                </button>
+              )}
+              {s.key === 'festivals' && (
+                <MoreEvents slug={municipality.slug} name={municipality.name} />
+              )}
             </div>
           </section>
         </div>
@@ -422,6 +544,20 @@ export default function TourismMunicipalityDetail() {
           <ExternalLinkIcon className='ml-1 inline h-3 w-3' />
         </a>
         .
+      </p>
+
+      <p className='type-meta text-kapwa-text-support'>
+        Spotted a mistake?{' '}
+        <a
+          href={`${config.portal.githubUrl}/issues/new?title=${encodeURIComponent(`Tourism fix: ${municipality.name}`)}&body=${encodeURIComponent(`Page: /tourism/${municipality.slug}\n\nWhat is wrong, and where can the correct information be checked?\n`)}`}
+          target='_blank'
+          rel='noreferrer'
+          className='text-kapwa-text-brand inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
+        >
+          <FlagIcon aria-hidden='true' className='h-4 w-4' />
+          Suggest a fix
+          <span className='sr-only'> (opens GitHub in a new tab)</span>
+        </a>
       </p>
 
       {/* --- PREV / NEXT --- */}

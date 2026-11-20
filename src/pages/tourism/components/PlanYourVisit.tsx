@@ -9,24 +9,15 @@ import {
   PhoneCallIcon,
 } from 'lucide-react';
 
-import { hotlinesUrl, websiteUrl } from '@/lib/tourism/gettingHere';
+import { hotlinesUrl } from '@/lib/tourism/gettingHere';
 import { fetchWeatherForCity } from '@/lib/weather';
 
-import municipal from '@/data/directory/municipal.json';
 import type { WeatherData } from '@/types';
 
-import { staysIn } from './tourismData';
+import { municipalWebsite, staysIn } from './tourismData';
 
 const ROW =
   'flex min-h-11 items-center gap-3 rounded-panel border border-kapwa-border-weak p-3';
-
-/** The municipal hall's website from the directory, or null (none is recorded yet). */
-function municipalWebsite(slug: string): string | null {
-  const m = (municipal as { slug: string; website: string | null }[]).find(
-    x => x.slug === `municipality-of-${slug}`
-  );
-  return websiteUrl(m?.website);
-}
 
 /**
  * "Plan your visit" on a town page. Every row comes from data or a live
