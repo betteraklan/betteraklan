@@ -259,7 +259,7 @@ export default function TourismIndex() {
                             <h3 className='text-kapwa-text-strong text-base leading-tight font-bold'>
                               {displayName(spot.name)}
                             </h3>
-                            <p className='text-kapwa-text-disabled mt-0.5 text-[11px] font-medium'>
+                            <p className='text-kapwa-text-disabled mt-0.5 text-xs font-medium'>
                               {spot.address}
                             </p>
                           </div>
@@ -273,7 +273,7 @@ export default function TourismIndex() {
                           href={spot.google_maps_link}
                           target='_blank'
                           rel='noreferrer'
-                          className='text-kapwa-text-brand mt-auto flex items-center gap-1.5 border-kapwa-border-weak border-t pt-3 text-[11px] font-bold tracking-widest uppercase hover:underline'
+                          className='text-kapwa-text-brand mt-auto flex items-center gap-1.5 border-kapwa-border-weak border-t pt-3 text-xs font-bold tracking-widest uppercase hover:underline'
                         >
                           <MapPinIcon className='h-3.5 w-3.5' />
                           View on Map
@@ -360,7 +360,7 @@ export default function TourismIndex() {
                           <h3 className='group-hover:text-kapwa-text-brand text-kapwa-text-strong text-base leading-tight font-bold transition-colors'>
                             {m.name}
                           </h3>
-                          <p className='text-kapwa-text-disabled mt-0.5 text-[10px] font-bold tracking-widest uppercase'>
+                          <p className='text-kapwa-text-disabled mt-0.5 text-xs font-bold tracking-widest uppercase'>
                             Municipality
                           </p>
                         </div>

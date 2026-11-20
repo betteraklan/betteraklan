@@ -1149,7 +1149,7 @@ export default function TourismExplore() {
                 <span className='flex items-center gap-1.5'>
                   <span
                     aria-hidden='true'
-                    className='flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1D4FB0] px-1 text-[10px] font-bold text-white shadow-elev-1'
+                    className='flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1D4FB0] px-1 text-xs font-bold text-white shadow-elev-1'
                   >
                     12
                   </span>

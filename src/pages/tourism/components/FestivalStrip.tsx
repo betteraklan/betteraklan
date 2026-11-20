@@ -132,7 +132,7 @@ export default function FestivalStrip({
                 {m.label}
               </span>
               {m.month === 1 && (
-                <span className='text-[10px] leading-none opacity-70'>
+                <span className='text-xs leading-none opacity-70'>
                   {m.year}
                 </span>
               )}

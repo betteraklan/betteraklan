@@ -143,7 +143,7 @@ export default function StayMap({
                     {p.address}
                   </p>
                   {p.geocodePrecision !== 'exact' && (
-                    <p className='text-kapwa-text-support text-[11px] font-bold'>
+                    <p className='text-kapwa-text-support text-xs font-bold'>
                       Approximate pin · {p.geocodePrecision} level
                     </p>
                   )}

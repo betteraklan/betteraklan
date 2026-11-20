@@ -445,7 +445,7 @@ export default function AccommodationsPage() {
                         onToggle={() => toggleSave(a.id)}
                       />
                       {a.geocodePrecision !== 'exact' && a.lat != null && (
-                        <span className='text-kapwa-text-support text-[11px] font-bold'>
+                        <span className='text-kapwa-text-support text-xs font-bold'>
                           Approximate pin · {a.geocodePrecision} level
                         </span>
                       )}
