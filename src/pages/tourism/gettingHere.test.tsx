@@ -69,7 +69,7 @@ describe('Getting here card', () => {
     });
     inRouter(<GettingHere />);
     for (const a of airports) {
-      expect(screen.getByText(new RegExp(`\(${a.iata}\)`))).toBeTruthy();
+      expect(screen.getByText(`(${a.iata})`, { exact: false })).toBeTruthy();
       expect(
         screen
           .getByRole('link', {
