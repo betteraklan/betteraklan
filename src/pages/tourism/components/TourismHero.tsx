@@ -8,6 +8,12 @@ interface Props {
   title: string;
   description: string;
   shapes: { viewBox: string; towns: TownShape[] };
+  /** Small label above the title. */
+  eyebrow?: string;
+  /** Replaces the default "Explore the map" and "Browse municipalities" links. */
+  actions?: React.ReactNode;
+  /** Shown beside the text (below it on phones), e.g. a MiniMap. */
+  aside?: React.ReactNode;
 }
 
 /**
@@ -16,7 +22,14 @@ interface Props {
  * tourism photos yet, so the backdrop is drawn: sea, waves and the province
  * outline from the municipality boundaries.
  */
-export default function TourismHero({ title, description, shapes }: Props) {
+export default function TourismHero({
+  title,
+  description,
+  shapes,
+  eyebrow = 'Visit Aklan',
+  actions,
+  aside,
+}: Props) {
   return (
     <section
       aria-labelledby='tourism-title'
@@ -49,30 +62,37 @@ export default function TourismHero({ title, description, shapes }: Props) {
         className='absolute inset-0 -z-10 bg-gradient-to-r from-[#0a2a6b]/90 via-[#0a2a6b]/55 to-transparent'
       />
 
-      <div className='max-w-xl p-6 sm:p-10'>
-        <p className='type-meta font-bold tracking-[0.2em] text-white/75 uppercase'>
-          Visit Aklan
-        </p>
-        <h1 id='tourism-title' className='type-display mt-1 text-white'>
-          {title}
-        </h1>
-        <p className='type-body mt-2 text-white/90'>{description}</p>
-        <div className='mt-5 flex flex-wrap gap-2'>
-          <Link
-            to='/tourism/explore'
-            className='inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-[#0B3FAE] shadow-elev-2'
-          >
-            <MapIcon aria-hidden='true' className='h-4 w-4' />
-            Explore the map
-          </Link>
-          <a
-            href='#municipalities'
-            className='inline-flex min-h-11 items-center gap-2 rounded-full border border-white/60 px-5 text-sm font-bold text-white'
-          >
-            Browse municipalities
-            <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
-          </a>
+      <div className='flex w-full flex-col gap-4 p-6 sm:flex-row sm:items-end sm:justify-between sm:p-10'>
+        <div className='max-w-xl'>
+          <p className='type-meta font-bold tracking-[0.2em] text-white/75 uppercase'>
+            {eyebrow}
+          </p>
+          <h1 id='tourism-title' className='type-display mt-1 text-white'>
+            {title}
+          </h1>
+          <p className='type-body mt-2 text-white/90'>{description}</p>
+          <div className='mt-5 flex flex-wrap gap-2'>
+            {actions ?? (
+              <>
+                <Link
+                  to='/tourism/explore'
+                  className='inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-[#0B3FAE] shadow-elev-2'
+                >
+                  <MapIcon aria-hidden='true' className='h-4 w-4' />
+                  Explore the map
+                </Link>
+                <a
+                  href='#municipalities'
+                  className='inline-flex min-h-11 items-center gap-2 rounded-full border border-white/60 px-5 text-sm font-bold text-white'
+                >
+                  Browse municipalities
+                  <ArrowRightIcon aria-hidden='true' className='h-4 w-4' />
+                </a>
+              </>
+            )}
+          </div>
         </div>
+        {aside && <div className='w-32 shrink-0 self-end sm:w-44'>{aside}</div>}
       </div>
     </section>
   );

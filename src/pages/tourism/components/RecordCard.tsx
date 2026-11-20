@@ -11,8 +11,15 @@ import { displayName } from '@/lib/tourism/displayName';
 
 interface Props {
   rec: Rec;
-  selected: boolean;
-  onSelect: (id: string) => void;
+  selected?: boolean;
+  /**
+   * Makes the whole card a button (Explore). Without it the card is an
+   * article that shows the full description and `children`, for pages that
+   * list records in full (town pages).
+   */
+  onSelect?: (id: string) => void;
+  /** Extra details and links, shown only in the article form. */
+  children?: React.ReactNode;
   saved?: boolean;
   onToggleSave?: (id: string) => void;
   /** Pointer or focus on the card (null when it leaves), to highlight its pin. */
@@ -26,14 +33,27 @@ interface Props {
  */
 export default function RecordCard({
   rec,
-  selected,
+  selected = false,
   onSelect,
+  children,
   saved = false,
   onToggleSave,
   onHover,
 }: Props) {
   // Spring only in response to a tap, never on first render.
   const [spring, setSpring] = useState(0);
+  const nameId = `rec-${rec.id}-name`;
+
+  const pills = (
+    <span className='flex flex-wrap items-center gap-1.5'>
+      <span className='type-meta border-kapwa-border-weak text-kapwa-text-strong inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold'>
+        <LayerGlyph layer={rec.layer} />
+        {LAYER_LABEL[rec.layer]}
+      </span>
+      {rec.layer === 'event' && <DatePill rec={rec} />}
+      {rec.placement !== 'exact' && <LocationPill placement={rec.placement} />}
+    </span>
+  );
 
   return (
     <div
@@ -44,40 +64,55 @@ export default function RecordCard({
       onFocus={() => onHover?.(rec.id)}
       onBlur={() => onHover?.(null)}
     >
-      <button
-        type='button'
-        aria-pressed={selected}
-        onClick={() => onSelect(rec.id)}
-        className={`group bg-kapwa-bg-surface border-kapwa-border-weak flex h-full w-full flex-col overflow-hidden rounded-panel border text-left shadow-elev-1 transition-[box-shadow,translate] duration-(--dur-fast) ease-out-expo hover:shadow-elev-2 motion-safe:hover:-translate-y-0.5 ${selected ? 'ring-2 ring-[#1D4FB0]' : ''}`}
-      >
-        <TourismImage image={rec.image} layer={rec.layer} />
+      {onSelect ? (
+        <button
+          type='button'
+          aria-pressed={selected}
+          onClick={() => onSelect(rec.id)}
+          className={`group bg-kapwa-bg-surface border-kapwa-border-weak flex h-full w-full flex-col overflow-hidden rounded-panel border text-left shadow-elev-1 transition-[box-shadow,translate] duration-(--dur-fast) ease-out-expo hover:shadow-elev-2 motion-safe:hover:-translate-y-0.5 ${selected ? 'ring-2 ring-[#1D4FB0]' : ''}`}
+        >
+          <TourismImage image={rec.image} layer={rec.layer} />
 
-        <span className='flex flex-1 flex-col gap-1.5 p-3'>
-          <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>
-            {displayName(rec.name)}
-          </span>
-          {rec.townName && (
-            <span className='text-kapwa-text-support type-meta'>
-              {rec.townName}
+          <span className='flex flex-1 flex-col gap-1.5 p-3'>
+            <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>
+              {displayName(rec.name)}
             </span>
-          )}
-          <span className='flex flex-wrap items-center gap-1.5'>
-            <span className='type-meta border-kapwa-border-weak text-kapwa-text-strong inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold'>
-              <LayerGlyph layer={rec.layer} />
-              {LAYER_LABEL[rec.layer]}
-            </span>
-            {rec.layer === 'event' && <DatePill rec={rec} />}
-            {rec.placement !== 'exact' && (
-              <LocationPill placement={rec.placement} />
+            {rec.townName && (
+              <span className='text-kapwa-text-support type-meta'>
+                {rec.townName}
+              </span>
+            )}
+            {pills}
+            {rec.description && (
+              <span className='text-kapwa-text-support type-meta line-clamp-1'>
+                {teaser(rec.description)}
+              </span>
             )}
           </span>
-          {rec.description && (
-            <span className='text-kapwa-text-support type-meta line-clamp-1'>
-              {teaser(rec.description)}
-            </span>
-          )}
-        </span>
-      </button>
+        </button>
+      ) : (
+        <article
+          aria-labelledby={nameId}
+          className='bg-kapwa-bg-surface border-kapwa-border-weak flex h-full w-full flex-col overflow-hidden rounded-panel border shadow-elev-1'
+        >
+          <TourismImage image={rec.image} layer={rec.layer} />
+          <div className='flex flex-1 flex-col gap-2 p-4'>
+            <h3
+              id={nameId}
+              className='text-kapwa-text-strong type-body pr-1 font-semibold'
+            >
+              {displayName(rec.name)}
+            </h3>
+            {pills}
+            {rec.description && (
+              <p className='text-kapwa-text-support type-body'>
+                {rec.description}
+              </p>
+            )}
+            {children}
+          </div>
+        </article>
+      )}
 
       {onToggleSave && (
         <button

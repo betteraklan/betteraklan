@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import {
+  BookmarkIcon,
   CalendarHeart,
   ChevronLeft,
   ChevronRight,
   ExternalLinkIcon,
-  MapPinIcon,
+  MapIcon,
   PartyPopperIcon,
   ShoppingBagIcon,
   SparklesIcon,
+  TriangleAlertIcon,
 } from 'lucide-react';
 
 import { DetailSection } from '@/components/layout/PageLayouts';
@@ -21,69 +24,117 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/navigation/Breadcrumb';
-import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
 import { displayName } from '@/lib/tourism/displayName';
-import { DATE_STATUS_LABEL, getDateStatus } from '@/lib/tourism/festivalDates';
+import { projectTowns } from '@/lib/tourism/shapes';
+import { MAX_STOPS, serializeTrip } from '@/lib/tourism/trip';
+import { useSavedTrip } from '@/lib/tourism/tripStore';
 
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
-import { MunicipalityTourism, TourismEntry } from '@/types/tourism';
+import type { Advisory, MunicipalityTourism } from '@/types/tourism';
 
+import MiniMap from './components/MiniMap';
+import RecordCard from './components/RecordCard';
 import { AdvisoryKindPill } from './components/StatusPills';
+import TourismHero from './components/TourismHero';
+import { BY_ID, KNOWN_IDS, SOURCES } from './components/tourismData';
 
-function EntryCard({
-  entry,
-  dated = false,
+const SHAPES = projectTowns(SOURCES.boundaries, 600, 2);
+
+// Page sections, in the order they have always appeared.
+const SECTIONS = [
+  {
+    key: 'festivals',
+    prefix: 'event',
+    title: 'Festivals & Events',
+    icon: PartyPopperIcon,
+  },
+  {
+    key: 'attractions',
+    prefix: 'place',
+    title: 'Spots & Attractions',
+    icon: SparklesIcon,
+  },
+  {
+    key: 'products',
+    prefix: 'product',
+    title: 'Products & Local Delicacies',
+    icon: ShoppingBagIcon,
+  },
+] as const;
+
+const FALLBACK_NOTE =
+  'Live notices couldn’t be loaded. Showing the last published list.';
+
+/** Verified notices for the town; rendered only when there is at least one. */
+function NoticeBanner({
+  notices,
+  fallback,
+  townName,
 }: {
-  entry: TourismEntry;
-  dated?: boolean;
+  notices: Advisory[];
+  fallback: boolean;
+  townName: string;
 }) {
-  const status = getDateStatus(entry);
+  if (notices.length === 0)
+    return fallback ? (
+      <p className='text-kapwa-text-muted type-meta'>{FALLBACK_NOTE}</p>
+    ) : null;
   return (
-    <Card hover={false} className='border-kapwa-border-weak shadow-elev-1'>
-      <CardContent className='space-y-1.5 p-4'>
-        {entry.name && (
-          <h4 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
-            {/* Workbook names are verbatim; only legacy names are re-cased. */}
-            {entry.recordId ? entry.name : displayName(entry.name)}
-          </h4>
-        )}
-        <p className='text-kapwa-text-support text-sm leading-relaxed'>
-          {entry.description}
-        </p>
-        {entry.location && (
-          <p className='text-kapwa-text-muted text-xs'>
-            Location/barangay: {entry.location}
-          </p>
-        )}
-        {dated && (
-          <div className='flex flex-wrap items-center gap-2 pt-1 text-xs'>
-            <Badge
-              variant={
-                status === 'confirmed'
-                  ? 'success'
-                  : status === 'tentative'
-                    ? 'warning'
-                    : 'slate'
-              }
-            >
-              {DATE_STATUS_LABEL[status]}
-            </Badge>
-            <span className='text-kapwa-text-muted'>
-              Last checked: {entry.dates?.lastCheckedAt ?? 'Not recorded'}
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <section
+      aria-labelledby='town-notices'
+      className='bg-kapwa-bg-warning-weak border-kapwa-border-warning space-y-3 rounded-card border p-4'
+    >
+      <h2
+        id='town-notices'
+        className='text-kapwa-text-strong type-body flex items-center gap-2 font-bold'
+      >
+        <TriangleAlertIcon
+          aria-hidden='true'
+          className='text-kapwa-text-warning h-5 w-5'
+        />
+        Notices for {townName}
+      </h2>
+      <ul className='space-y-3'>
+        {notices.map(a => (
+          <li key={a.id} className='type-body space-y-1'>
+            <p className='flex flex-wrap items-center gap-2'>
+              <AdvisoryKindPill kind={a.kind} />
+              <strong className='text-kapwa-text-strong'>{a.title}</strong>
+            </p>
+            {a.summary && (
+              <p className='text-kapwa-text-support'>{a.summary}</p>
+            )}
+            <p className='text-kapwa-text-support type-meta'>
+              {a.issuer} · published {a.publishedAt}
+              {a.endsAt ? ` · until ${a.endsAt}` : ''} ·{' '}
+              <a
+                href={a.sourceUrl}
+                target='_blank'
+                rel='noreferrer'
+                className='text-kapwa-text-brand font-semibold hover:underline'
+              >
+                Source
+                <span className='sr-only'> (opens in a new tab)</span>
+              </a>
+            </p>
+          </li>
+        ))}
+      </ul>
+      {fallback && (
+        <p className='text-kapwa-text-support type-meta'>{FALLBACK_NOTE}</p>
+      )}
+    </section>
   );
 }
 
 export default function TourismMunicipalityDetail() {
   const { municipality: slug } = useParams();
   const { advisories, status: advisoriesStatus } = useAdvisories();
+  const trip = useSavedTrip(KNOWN_IDS);
+  const [tripNote, setTripNote] = useState('');
   const municipalities = municipalitiesTourism as MunicipalityTourism[];
   const index = municipalities.findIndex(m => m.slug === slug);
   const municipality = index >= 0 ? municipalities[index] : undefined;
@@ -95,6 +146,19 @@ export default function TourismMunicipalityDetail() {
   const prev =
     municipalities[(index - 1 + municipalities.length) % municipalities.length];
   const next = municipalities[(index + 1) % municipalities.length];
+  const sections = SECTIONS.filter(s => municipality[s.key].length > 0);
+
+  const toggleSave = (id: string) => {
+    const name = displayName(BY_ID.get(id)?.name ?? '');
+    const result = trip.toggle(id);
+    setTripNote(
+      result === 'full'
+        ? `Your trip is full (${MAX_STOPS} stops). Remove one to add more.`
+        : result === 'added'
+          ? `Added ${name} to My trip.`
+          : `Removed ${name} from My trip.`
+    );
+  };
 
   return (
     <div className='animate-in fade-in space-y-6 pb-8 duration-(--dur-slow) ease-out-expo'>
@@ -115,99 +179,140 @@ export default function TourismMunicipalityDetail() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* --- HEADER --- */}
-      <header className='bg-kapwa-bg-surface border-kapwa-border-weak rounded-card border p-6 shadow-elev-1'>
-        <div className='flex items-center gap-3'>
-          <MapPinIcon
-            aria-hidden='true'
-            className='text-kapwa-text-brand h-5 w-5'
-          />
-          <h1 className='kapwa-heading-lg text-kapwa-text-strong'>
-            {municipality.name}
-          </h1>
-        </div>
-        <p className='text-kapwa-text-support mt-2 text-sm'>
-          Festivals, spots, and local products of the Municipality of{' '}
-          {municipality.name}, Aklan.
+      {/* --- NOTICES (only when there is one) --- */}
+      <NoticeBanner
+        notices={notices}
+        fallback={advisoriesStatus === 'fallback'}
+        townName={municipality.name}
+      />
+
+      {/* --- HERO --- */}
+      <TourismHero
+        eyebrow='Municipality'
+        title={municipality.name}
+        description={`Festivals, spots, and local products of the Municipality of ${municipality.name}, Aklan.`}
+        shapes={SHAPES}
+        aside={<MiniMap shapes={SHAPES} active={municipality.slug} />}
+        actions={
+          <Link
+            to={`/tourism/explore?town=${municipality.slug}`}
+            className='text-kapwa-text-brand inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-bold shadow-elev-2'
+          >
+            <MapIcon aria-hidden='true' className='h-4 w-4' />
+            See {municipality.name} on the map
+          </Link>
+        }
+      />
+
+      {municipality.overview && (
+        <p className='text-kapwa-text-support type-body max-w-3xl'>
+          {municipality.overview.text}
         </p>
-        {municipality.overview && (
-          <p className='text-kapwa-text-support mt-2 text-sm leading-relaxed'>
-            {municipality.overview.text}
-          </p>
-        )}
-      </header>
-
-      {/* --- FESTIVALS & EVENTS --- */}
-      {municipality.festivals.length > 0 && (
-        <DetailSection title='Festivals & Events' icon={PartyPopperIcon}>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {municipality.festivals.map((f, i) => (
-              <EntryCard key={f.name ?? `festival-${i}`} entry={f} dated />
-            ))}
-          </div>
-        </DetailSection>
       )}
 
-      {/* --- SPOTS & ATTRACTIONS --- */}
-      {municipality.attractions.length > 0 && (
-        <DetailSection title='Spots & Attractions' icon={SparklesIcon}>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {municipality.attractions.map((a, i) => (
-              <EntryCard key={a.name ?? `attraction-${i}`} entry={a} />
-            ))}
-          </div>
-        </DetailSection>
-      )}
-
-      {/* --- PRODUCTS & LOCAL DELICACIES --- */}
-      {municipality.products.length > 0 && (
-        <DetailSection
-          title='Products & Local Delicacies'
-          icon={ShoppingBagIcon}
-        >
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {municipality.products.map((p, i) => (
-              <EntryCard key={p.name ?? `product-${i}`} entry={p} />
-            ))}
-          </div>
-        </DetailSection>
-      )}
-
-      {/* --- NOTICES --- */}
-      <DetailSection title='Notices' icon={CalendarHeart}>
-        {notices.length > 0 ? (
-          <ul className='space-y-3'>
-            {notices.map(a => (
-              <li key={a.id} className='text-sm'>
-                <AdvisoryKindPill kind={a.kind} /> <strong>{a.title}</strong> ·{' '}
-                {a.issuer} · published {a.publishedAt}
-                {a.endsAt ? ` · until ${a.endsAt}` : ''}
+      {/* --- IN-PAGE TABS --- */}
+      {sections.length > 0 && (
+        <nav aria-label='On this page'>
+          <ul className='flex flex-wrap gap-2'>
+            {sections.map(s => (
+              <li key={s.key}>
                 <a
-                  href={a.sourceUrl}
-                  target='_blank'
-                  rel='noreferrer'
-                  className='text-kapwa-text-brand block text-xs hover:underline'
+                  href={`#${s.key}`}
+                  className='bg-kapwa-bg-surface border-kapwa-border-weak text-kapwa-text-strong type-meta inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 font-semibold transition-colors duration-(--dur-fast) hover:border-kapwa-border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
                 >
-                  Source
+                  {s.title}
+                  <span className='text-kapwa-text-support'>
+                    {municipality[s.key].length}
+                  </span>
                 </a>
               </li>
             ))}
           </ul>
-        ) : advisoriesStatus === 'loading' ? (
-          <p className='text-kapwa-text-support text-sm'>
-            Checking for notices…
-          </p>
-        ) : (
-          <p className='text-kapwa-text-support text-sm'>
-            No verified notices are published for this municipality yet.
-          </p>
+        </nav>
+      )}
+
+      {/* --- MY TRIP --- */}
+      <div className='space-y-1'>
+        {trip.ids.length > 0 && (
+          <Link
+            to={`/tourism/explore?trip=${serializeTrip(trip.ids)}`}
+            className='text-kapwa-text-brand type-meta inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
+          >
+            <BookmarkIcon aria-hidden='true' className='h-4 w-4' />
+            My trip: {trip.ids.length} stop{trip.ids.length === 1 ? '' : 's'} ·
+            Open in Explore
+          </Link>
         )}
-        {advisoriesStatus === 'fallback' && (
-          <p className='text-kapwa-text-muted mt-2 text-xs'>
-            Live notices couldn’t be loaded. Showing the last published list.
-          </p>
-        )}
-      </DetailSection>
+        <p
+          role='status'
+          aria-live='polite'
+          className='text-kapwa-text-support type-meta'
+        >
+          {tripNote}
+        </p>
+      </div>
+
+      {/* --- SECTIONS --- */}
+      {sections.map(s => (
+        <div key={s.key} id={s.key}>
+          <DetailSection title={s.title} icon={s.icon}>
+            <ul className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+              {municipality[s.key].map((entry, i) => {
+                const rec = entry.name
+                  ? BY_ID.get(`${s.prefix}-${municipality.slug}-${i}`)
+                  : undefined;
+                // Nameless entries are free-text paragraphs, kept as they were.
+                if (!rec)
+                  return (
+                    <li key={`${s.key}-${i}`}>
+                      <Card
+                        hover={false}
+                        className='border-kapwa-border-weak h-full shadow-elev-1'
+                      >
+                        <CardContent className='p-4'>
+                          <p className='text-kapwa-text-support type-body'>
+                            {entry.description}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </li>
+                  );
+                return (
+                  <li key={rec.id}>
+                    <RecordCard
+                      rec={rec}
+                      saved={trip.ids.includes(rec.id)}
+                      onToggleSave={toggleSave}
+                    >
+                      {rec.location && (
+                        <p className='text-kapwa-text-muted type-meta'>
+                          Location/barangay: {rec.location}
+                        </p>
+                      )}
+                      {rec.layer === 'event' && (
+                        <p className='text-kapwa-text-muted type-meta'>
+                          Last checked:{' '}
+                          {rec.dates?.lastCheckedAt ?? 'Not recorded'}
+                        </p>
+                      )}
+                      <Link
+                        to={`/tourism/explore?town=${municipality.slug}&sel=${rec.id}`}
+                        className='text-kapwa-text-brand type-meta mt-auto inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
+                      >
+                        <MapIcon aria-hidden='true' className='h-4 w-4' />
+                        See on map
+                        <span className='sr-only'>
+                          : {displayName(rec.name)}
+                        </span>
+                      </Link>
+                    </RecordCard>
+                  </li>
+                );
+              })}
+            </ul>
+          </DetailSection>
+        </div>
+      ))}
 
       {/* --- SOURCE NOTE --- */}
       <p className='text-kapwa-text-disabled text-xs italic'>
