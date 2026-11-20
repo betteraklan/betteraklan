@@ -6,28 +6,9 @@ import accommodations from '@/data/tourism/accommodations.json';
 
 import AccommodationsPage from './[area]';
 
-// The map is not under test; keep it from loading Leaflet.
-vi.mock('leaflet', () => ({
-  default: {
-    icon: () => ({}),
-    Marker: { prototype: { options: {} } },
-    marker: () => ({ bindPopup: () => undefined }),
-    markerClusterGroup: () => ({ addLayer: () => undefined }),
-  },
-}));
-vi.mock('leaflet.markercluster', () => ({}));
-vi.mock('leaflet/dist/leaflet.css', () => ({}));
-vi.mock('leaflet.markercluster/dist/MarkerCluster.css', () => ({}));
-vi.mock('leaflet.markercluster/dist/MarkerCluster.Default.css', () => ({}));
-vi.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid='map'>{children}</div>
-  ),
-  TileLayer: () => null,
-  Marker: () => null,
-  Popup: () => null,
-  Tooltip: () => null,
-  useMap: () => ({ addLayer: () => undefined, removeLayer: () => undefined }),
+// The map is not under test here (and WebGL is unavailable): stub it.
+vi.mock('../components/AklanMap3D', () => ({
+  default: () => <div data-testid='map' />,
 }));
 
 const page = (area: 'boracay' | 'mainland') =>
