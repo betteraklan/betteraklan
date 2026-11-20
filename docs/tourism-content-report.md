@@ -111,6 +111,45 @@ Name and description now equal the workbook. "Explore" shows the stored name; th
 
 Changed display names: 71 in Explore, 17 on municipality pages.
 
+## Site descriptions kept on updated entries (32)
+
+Owner decision (2026-11-20): where the workbook copy drops figures or dates that the site text had, the entry keeps the site description. Its name, Location/barangay and Record ID still come from the workbook. This is an exception to the AGENTS rule that the workbook is the only source for copy, made so that no facts are lost.
+
+| Record ID | Site ID | Name | Facts the workbook copy lacks |
+| --- | --- | --- | --- |
+| AKL-009 | place-altavas-1 | Tinagong Dagat | 8, 4 |
+| AKL-027 | event-banga-1 | Pag-Aeaw-Aeaw | 223, 1942 |
+| AKL-030 | place-banga-1 | Manduyog Hill | 500, 99, 92 |
+| AKL-036 | place-batan-7 | Batan Sea Port | 130, 15 |
+| AKL-044 | place-batan-1 | Ob-Ob Hill | 200 |
+| AKL-055 | place-buruanga-11 | Hacienda Maria | 14 |
+| AKL-073 | place-ibajay-1 | Campo Verde | 28, 3, 700 |
+| AKL-074 | place-ibajay-3 | Ibajay Beach | 10 |
+| AKL-085 | event-kalibo-6 | Feast of St. John the Baptist | 24 |
+| AKL-087 | event-kalibo-8 | Iwag it Kalibonhon | 15 |
+| AKL-088 | event-kalibo-7 | Kalibo Day | 3 |
+| AKL-089 | event-kalibo-4 | Kalibo Food Festival | 12, 23 |
+| AKL-092 | place-kalibo-4 | Ati-Atihan Village | 3rd |
+| AKL-093 | place-kalibo-6 | Bakhawan Eco-Park | 200, 1 |
+| AKL-095 | place-kalibo-5 | Kalibo Cathedral | 1581, 1993, 1990 |
+| AKL-107 | event-lezo-0 | Bayangan Festival | 6th |
+| AKL-115 | event-libacao-0 | Baesa Parada | 24 |
+| AKL-121 | place-libacao-0 | Taroytoy | 5, 6 |
+| AKL-126 | event-madalag-0 | Tinuom Festival | 17 |
+| AKL-135 | place-makato-0 | Aklan Sports Complex | 6, 5 |
+| AKL-142 | event-malay-1 | Fiesta de Obreros | 2003 |
+| AKL-143 | event-malay-0 | Malay Day | 15 |
+| AKL-146 | place-malay-0 | Boracay Island | 1, 083 |
+| AKL-151 | place-malay-8 | Naasug Point | 120 |
+| AKL-154 | place-malay-7 | Nagata Falls | 5 |
+| AKL-161 | event-malinao-1 | El Levantamiento de los Ochenta y Dos de Liloan | 30 |
+| AKL-164 | place-malinao-0 | Candido Iban Monument | 19 |
+| AKL-165 | place-malinao-1 | Fatima Hill | 9 |
+| AKL-172 | place-nabas-1 | Basang Cave | 8 |
+| AKL-183 | place-new-washington-1 | Pink Sisters Convent | 10 |
+| AKL-194 | event-numancia-0 | Lechon Parade | 28th |
+| AKL-208 | place-tangalan-2 | Jawili Falls | 20, 100, 240, 12, 130, 8, 10, 540 |
+
 ## NEW records appended (91)
 
 | Record ID | Municipality | Category | Item name | New id |

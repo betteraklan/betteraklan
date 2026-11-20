@@ -344,6 +344,47 @@ describe('runImport', () => {
     ).toThrow(/renumber/);
   });
 
+  it('keeps the site description when the owner chose it, and refuses stale ones', () => {
+    const keep = run({
+      saved: {
+        pairs: [],
+        heldRecords: [],
+        descriptionOverrides: [
+          {
+            recordId: 'AKL-002',
+            siteId: 'place-altavas-0',
+            decision: 'site-description',
+          },
+        ],
+      },
+    });
+    expect(keep.municipalities[0].attractions[0]).toMatchObject({
+      name: 'Tigayon Hill and caves',
+      description: 'Old text.',
+      recordId: 'AKL-002',
+      location: 'Barangay Tigayon',
+    });
+    expect(
+      keep.reconciliation.records.find(x => x.recordId === 'AKL-002')
+        .descriptionSource
+    ).toBe('site');
+    expect(() =>
+      run({
+        saved: {
+          pairs: [],
+          heldRecords: [],
+          descriptionOverrides: [
+            {
+              recordId: 'AKL-005',
+              siteId: 'place-altavas-0',
+              decision: 'site-description',
+            },
+          ],
+        },
+      })
+    ).toThrow(/Stale description override/);
+  });
+
   it('is deterministic across runs with the same inputs', () => {
     const a = run();
     const b = run({ slots: a.slots, current: a.municipalities });

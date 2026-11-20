@@ -308,5 +308,199 @@
       "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
       "decision": "publish"
     }
+  ],
+  "descriptionOverrides": [
+    {
+      "recordId": "AKL-009",
+      "siteId": "place-altavas-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 8, 4"
+    },
+    {
+      "recordId": "AKL-027",
+      "siteId": "event-banga-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 223, 1942"
+    },
+    {
+      "recordId": "AKL-030",
+      "siteId": "place-banga-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 500, 99, 92"
+    },
+    {
+      "recordId": "AKL-036",
+      "siteId": "place-batan-7",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 130, 15"
+    },
+    {
+      "recordId": "AKL-044",
+      "siteId": "place-batan-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 200"
+    },
+    {
+      "recordId": "AKL-055",
+      "siteId": "place-buruanga-11",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 14"
+    },
+    {
+      "recordId": "AKL-073",
+      "siteId": "place-ibajay-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 28, 3, 700"
+    },
+    {
+      "recordId": "AKL-074",
+      "siteId": "place-ibajay-3",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 10"
+    },
+    {
+      "recordId": "AKL-085",
+      "siteId": "event-kalibo-6",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 24"
+    },
+    {
+      "recordId": "AKL-087",
+      "siteId": "event-kalibo-8",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 15"
+    },
+    {
+      "recordId": "AKL-088",
+      "siteId": "event-kalibo-7",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 3"
+    },
+    {
+      "recordId": "AKL-089",
+      "siteId": "event-kalibo-4",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 12, 23"
+    },
+    {
+      "recordId": "AKL-092",
+      "siteId": "place-kalibo-4",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 3rd"
+    },
+    {
+      "recordId": "AKL-093",
+      "siteId": "place-kalibo-6",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 200, 1"
+    },
+    {
+      "recordId": "AKL-095",
+      "siteId": "place-kalibo-5",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 1581, 1993, 1990"
+    },
+    {
+      "recordId": "AKL-107",
+      "siteId": "event-lezo-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 6th"
+    },
+    {
+      "recordId": "AKL-115",
+      "siteId": "event-libacao-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 24"
+    },
+    {
+      "recordId": "AKL-121",
+      "siteId": "place-libacao-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 5, 6"
+    },
+    {
+      "recordId": "AKL-126",
+      "siteId": "event-madalag-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 17"
+    },
+    {
+      "recordId": "AKL-135",
+      "siteId": "place-makato-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 6, 5"
+    },
+    {
+      "recordId": "AKL-142",
+      "siteId": "event-malay-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 2003"
+    },
+    {
+      "recordId": "AKL-143",
+      "siteId": "event-malay-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 15"
+    },
+    {
+      "recordId": "AKL-146",
+      "siteId": "place-malay-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 1, 083"
+    },
+    {
+      "recordId": "AKL-151",
+      "siteId": "place-malay-8",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 120"
+    },
+    {
+      "recordId": "AKL-154",
+      "siteId": "place-malay-7",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 5"
+    },
+    {
+      "recordId": "AKL-161",
+      "siteId": "event-malinao-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 30"
+    },
+    {
+      "recordId": "AKL-164",
+      "siteId": "place-malinao-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 19"
+    },
+    {
+      "recordId": "AKL-165",
+      "siteId": "place-malinao-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 9"
+    },
+    {
+      "recordId": "AKL-172",
+      "siteId": "place-nabas-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 8"
+    },
+    {
+      "recordId": "AKL-183",
+      "siteId": "place-new-washington-1",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 10"
+    },
+    {
+      "recordId": "AKL-194",
+      "siteId": "event-numancia-0",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 28th"
+    },
+    {
+      "recordId": "AKL-208",
+      "siteId": "place-tangalan-2",
+      "decision": "site-description",
+      "reason": "Site text has figures or dates the workbook copy drops: 20, 100, 240, 12, 130, 8, 10, 540"
+    }
   ]
 }

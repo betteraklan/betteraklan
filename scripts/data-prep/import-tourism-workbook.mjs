@@ -648,6 +648,27 @@ export function runImport({
     if (!status.has(r['Record ID']))
       status.set(r['Record ID'], { status: 'new' });
 
+  // Owner decisions to keep a site description on an in-place update.
+  const descriptionOverrides = [...(saved.descriptionOverrides ?? [])].sort(
+    (a, b) => a.recordId.localeCompare(b.recordId)
+  );
+  for (const o of descriptionOverrides) {
+    const st = status.get(o.recordId);
+    if (o.decision !== 'site-description')
+      throw new Error(
+        `${o.recordId}: description override must be site-description`
+      );
+    if (
+      !st ||
+      !['exact', 'twin-replace'].includes(st.status) ||
+      st.siteId !== o.siteId
+    )
+      throw new Error(
+        `Stale description override ${o.recordId}/${o.siteId}: not an in-place update of that entry`
+      );
+  }
+  const keepSiteText = new Set(descriptionOverrides.map(o => o.recordId));
+
   // Images: rules on recorded data, then the fetched-file manifest.
   const manifestById = new Map(manifest.map(f => [f.recordId, f]));
   const imageEval = new Map(
@@ -702,7 +723,12 @@ export function runImport({
     }
     const st = status.get(id);
     if (st.status === 'exact' || st.status === 'twin-replace') {
+      const prior = baseline.find(b => b.slug === m.slug)[st.array][st.index];
       m[st.array][st.index] = workbookEntry(r, m[st.array][st.index]);
+      // Owner decision: keep the site's own description where the workbook
+      // copy drops facts it had. Name, location and Record ID stay workbook.
+      if (keepSiteText.has(id))
+        m[st.array][st.index].description = prior.description;
       live.add(id);
     } else if (st.status === 'new' || st.status === 'twin-keep-both') {
       appended.push(r);
@@ -887,6 +913,7 @@ export function runImport({
         location: r['Location/barangay'],
         sourceUrl: r['Source URL'],
         status: isHeld(id) ? 'held' : st.status,
+        descriptionSource: keepSiteText.has(id) ? 'site' : 'workbook',
         live: live.has(id) || (r.Category === 'Description' && !isHeld(id)),
         siteId: st.siteId ?? null,
         siteName: st.siteName ?? null,
@@ -907,7 +934,7 @@ export function runImport({
   return {
     municipalities: out,
     reconciliation: recon,
-    twinPairs: { pairs: twinPairs, heldRecords },
+    twinPairs: { pairs: twinPairs, heldRecords, descriptionOverrides },
     slots: Object.fromEntries(
       Object.entries(nextSlots).sort(([a], [b]) => a.localeCompare(b))
     ),
