@@ -22,8 +22,16 @@ import {
 // Status pills: icon + sentence-case text, so status reads at a glance and never by colour alone.
 const PILL_TONE = {
   ok: 'bg-kapwa-bg-success-weak text-kapwa-text-success border-kapwa-border-success',
-  warn: 'bg-kapwa-bg-warning-weak text-kapwa-text-warning border-kapwa-border-warning',
+  // Orange-600 text is only 2.8:1 on this tint, so the text is the strong colour.
+  warn: 'bg-kapwa-bg-warning-weak text-kapwa-text-strong border-kapwa-border-warning',
   none: 'bg-kapwa-bg-surface-raised text-kapwa-text-support border-kapwa-border-weak',
+} as const;
+
+// The icon carries the orange (3:1 is enough for graphics; orange-700 gives 4.2:1).
+const ICON_TONE = {
+  ok: '',
+  warn: 'text-kapwa-text-accent-orange',
+  none: '',
 } as const;
 
 export function Pill({
@@ -39,7 +47,10 @@ export function Pill({
     <span
       className={`type-meta inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold whitespace-nowrap ${PILL_TONE[tone]}`}
     >
-      <Icon aria-hidden='true' className='h-4 w-4 shrink-0' />
+      <Icon
+        aria-hidden='true'
+        className={`h-4 w-4 shrink-0 ${ICON_TONE[tone]}`}
+      />
       {children}
     </span>
   );

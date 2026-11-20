@@ -14,7 +14,6 @@ import {
   TriangleAlertIcon,
 } from 'lucide-react';
 
-import { DetailSection } from '@/components/layout/PageLayouts';
 import {
   Breadcrumb,
   BreadcrumbHome,
@@ -93,7 +92,7 @@ function NoticeBanner({
       >
         <TriangleAlertIcon
           aria-hidden='true'
-          className='text-kapwa-text-warning h-5 w-5'
+          className='text-kapwa-text-accent-orange h-5 w-5'
         />
         Notices for {townName}
       </h2>
@@ -166,11 +165,17 @@ export default function TourismMunicipalityDetail() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbHome href='/' />
+            <BreadcrumbHome
+              href='/'
+              aria-label='Home'
+              className='text-kapwa-text-support'
+            />
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href='/tourism'>Tourism</BreadcrumbLink>
+            <BreadcrumbLink href='/tourism' className='text-kapwa-text-support'>
+              Tourism
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -255,67 +260,84 @@ export default function TourismMunicipalityDetail() {
       {/* --- SECTIONS --- */}
       {sections.map(s => (
         <div key={s.key} id={s.key}>
-          <DetailSection title={s.title} icon={s.icon}>
-            <ul className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-              {municipality[s.key].map((entry, i) => {
-                const rec = entry.name
-                  ? BY_ID.get(`${s.prefix}-${municipality.slug}-${i}`)
-                  : undefined;
-                // Nameless entries are free-text paragraphs, kept as they were.
-                if (!rec)
+          <section
+            aria-labelledby={`${s.key}-heading`}
+            className='bg-kapwa-bg-surface border-kapwa-border-weak overflow-hidden rounded-2xl border shadow-sm'
+          >
+            <div className='bg-kapwa-bg-surface-raised/50 border-kapwa-border-weak flex items-center gap-2 border-b px-6 py-4'>
+              <s.icon
+                aria-hidden='true'
+                className='text-kapwa-text-brand h-4 w-4'
+              />
+              <h2
+                id={`${s.key}-heading`}
+                className='text-kapwa-text-support type-meta font-bold tracking-widest uppercase'
+              >
+                {s.title}
+              </h2>
+            </div>
+            <div className='p-6'>
+              <ul className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                {municipality[s.key].map((entry, i) => {
+                  const rec = entry.name
+                    ? BY_ID.get(`${s.prefix}-${municipality.slug}-${i}`)
+                    : undefined;
+                  // Nameless entries are free-text paragraphs, kept as they were.
+                  if (!rec)
+                    return (
+                      <li key={`${s.key}-${i}`}>
+                        <Card
+                          hover={false}
+                          className='border-kapwa-border-weak h-full shadow-elev-1'
+                        >
+                          <CardContent className='p-4'>
+                            <p className='text-kapwa-text-support type-body'>
+                              {entry.description}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </li>
+                    );
                   return (
-                    <li key={`${s.key}-${i}`}>
-                      <Card
-                        hover={false}
-                        className='border-kapwa-border-weak h-full shadow-elev-1'
+                    <li key={rec.id}>
+                      <RecordCard
+                        rec={rec}
+                        saved={trip.ids.includes(rec.id)}
+                        onToggleSave={toggleSave}
                       >
-                        <CardContent className='p-4'>
-                          <p className='text-kapwa-text-support type-body'>
-                            {entry.description}
+                        {rec.location && (
+                          <p className='text-kapwa-text-muted type-meta'>
+                            Location/barangay: {rec.location}
                           </p>
-                        </CardContent>
-                      </Card>
+                        )}
+                        {rec.layer === 'event' && (
+                          <p className='text-kapwa-text-muted type-meta'>
+                            Last checked:{' '}
+                            {rec.dates?.lastCheckedAt ?? 'Not recorded'}
+                          </p>
+                        )}
+                        <Link
+                          to={`/tourism/explore?town=${municipality.slug}&sel=${rec.id}`}
+                          className='text-kapwa-text-brand type-meta mt-auto inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
+                        >
+                          <MapIcon aria-hidden='true' className='h-4 w-4' />
+                          See on map
+                          <span className='sr-only'>
+                            : {displayName(rec.name)}
+                          </span>
+                        </Link>
+                      </RecordCard>
                     </li>
                   );
-                return (
-                  <li key={rec.id}>
-                    <RecordCard
-                      rec={rec}
-                      saved={trip.ids.includes(rec.id)}
-                      onToggleSave={toggleSave}
-                    >
-                      {rec.location && (
-                        <p className='text-kapwa-text-muted type-meta'>
-                          Location/barangay: {rec.location}
-                        </p>
-                      )}
-                      {rec.layer === 'event' && (
-                        <p className='text-kapwa-text-muted type-meta'>
-                          Last checked:{' '}
-                          {rec.dates?.lastCheckedAt ?? 'Not recorded'}
-                        </p>
-                      )}
-                      <Link
-                        to={`/tourism/explore?town=${municipality.slug}&sel=${rec.id}`}
-                        className='text-kapwa-text-brand type-meta mt-auto inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
-                      >
-                        <MapIcon aria-hidden='true' className='h-4 w-4' />
-                        See on map
-                        <span className='sr-only'>
-                          : {displayName(rec.name)}
-                        </span>
-                      </Link>
-                    </RecordCard>
-                  </li>
-                );
-              })}
-            </ul>
-          </DetailSection>
+                })}
+              </ul>
+            </div>
+          </section>
         </div>
       ))}
 
       {/* --- SOURCE NOTE --- */}
-      <p className='text-kapwa-text-disabled text-xs italic'>
+      <p className='text-kapwa-text-support text-xs italic'>
         Adapted from the official{' '}
         <a
           href={`https://aklan.gov.ph/tourism/${municipality.slug}/`}

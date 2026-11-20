@@ -259,7 +259,7 @@ export default function TourismIndex() {
                             <h3 className='text-kapwa-text-strong text-base leading-tight font-bold'>
                               {displayName(spot.name)}
                             </h3>
-                            <p className='text-kapwa-text-disabled mt-0.5 text-xs font-medium'>
+                            <p className='text-kapwa-text-support mt-0.5 text-xs font-medium'>
                               {spot.address}
                             </p>
                           </div>
@@ -360,7 +360,7 @@ export default function TourismIndex() {
                           <h3 className='group-hover:text-kapwa-text-brand text-kapwa-text-strong text-base leading-tight font-bold transition-colors'>
                             {m.name}
                           </h3>
-                          <p className='text-kapwa-text-disabled mt-0.5 text-xs font-bold tracking-widest uppercase'>
+                          <p className='text-kapwa-text-support mt-0.5 text-xs font-bold tracking-widest uppercase'>
                             Municipality
                           </p>
                         </div>
@@ -395,7 +395,7 @@ export default function TourismIndex() {
           {/* --- SOURCE NOTE --- */}
           <p
             data-reveal
-            className='text-kapwa-text-disabled text-center text-xs italic'
+            className='text-kapwa-text-support text-center text-xs italic'
           >
             Attraction, festival, and product details are adapted from the
             official{' '}

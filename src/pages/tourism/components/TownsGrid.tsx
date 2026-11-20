@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import { tierBounds } from '@/lib/tourism/explore';
@@ -24,8 +25,14 @@ interface Props {
  * Explore map. Counts are written out, so the shading is never the only cue.
  */
 export default function TownsGrid({ activeSlug, onNavigate }: Props) {
+  const root = useRef<HTMLDivElement>(null);
+  // Opened from the Towns tab: focus goes to the first town, so a keyboard
+  // user doesn't have to Tab past the rest of the tab row to reach the panel.
+  useEffect(() => {
+    root.current?.querySelector('a')?.focus();
+  }, []);
   return (
-    <div className='space-y-3'>
+    <div ref={root} className='space-y-3'>
       <div
         role='group'
         aria-label='Shading legend'

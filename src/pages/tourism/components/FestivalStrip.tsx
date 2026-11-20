@@ -50,6 +50,11 @@ export default function FestivalStrip({
     [events, today]
   );
   const undated = events.filter(e => e.dateStatus === 'unavailable').length;
+  // With no enabled month there is nothing to focus, so a keyboard user could
+  // not scroll the strip: make the strip itself focusable in that case.
+  const noneEnabled = months.every(
+    m => (perMonth.get(m.key) ?? []).length === 0
+  );
   const anyDated = undated < events.length;
   const color = LAYER_COLOR.event;
 
@@ -110,7 +115,8 @@ export default function FestivalStrip({
       <div
         role='group'
         aria-label='Months'
-        className='-mx-1 flex snap-x gap-1.5 overflow-x-auto px-1 pb-1'
+        tabIndex={noneEnabled ? 0 : undefined}
+        className='-mx-1 flex snap-x gap-1.5 overflow-x-auto px-1 pb-1 focus-visible:outline-2 focus-visible:outline-kapwa-border-brand'
       >
         {months.map(m => {
           const list = perMonth.get(m.key) ?? [];

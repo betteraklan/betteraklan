@@ -222,11 +222,17 @@ export default function AccommodationsPage() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbHome href='/' />
+            <BreadcrumbHome
+              href='/'
+              aria-label='Home'
+              className='text-kapwa-text-support'
+            />
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href='/tourism'>Tourism</BreadcrumbLink>
+            <BreadcrumbLink href='/tourism' className='text-kapwa-text-support'>
+              Tourism
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -435,7 +441,7 @@ export default function AccommodationsPage() {
                           <span className='sr-only'>: {a.name}</span>
                         </button>
                       ) : (
-                        <span className='text-kapwa-text-disabled text-xs italic'>
+                        <span className='text-kapwa-text-support text-xs italic'>
                           Location unavailable
                         </span>
                       )}
@@ -469,7 +475,7 @@ export default function AccommodationsPage() {
         />
       </Card>
 
-      <p className='text-kapwa-text-disabled text-center text-xs italic'>
+      <p className='text-kapwa-text-support text-center text-xs italic'>
         Source:{' '}
         <a
           href='https://aklan.gov.ph/tourism/accommodation/'

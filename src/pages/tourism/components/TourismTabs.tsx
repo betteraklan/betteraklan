@@ -38,6 +38,7 @@ export default function TourismTabs() {
   const [top, setTop] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLUListElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const buttons = useRef<Partial<Record<Panel, HTMLButtonElement | null>>>({});
 
   // Stick just under the site nav, whose height differs by screen size.
@@ -63,6 +64,12 @@ export default function TourismTabs() {
       root.style.removeProperty('--tourism-sticky-top');
     };
   }, []);
+
+  // Where to stay is not lazy: move focus to its first link as it opens
+  // (the Towns grid does the same when it mounts).
+  useEffect(() => {
+    if (panel === 'stay') panelRef.current?.querySelector('a')?.focus();
+  }, [panel]);
 
   // Navigating closes any open panel.
   useEffect(() => setPanel(null), [pathname, search]);
@@ -139,6 +146,7 @@ export default function TourismTabs() {
 
       {panel && (
         <div
+          ref={panelRef}
           id={`tourism-${panel}-panel`}
           role='region'
           aria-label={panel === 'towns' ? 'Towns' : 'Where to stay'}

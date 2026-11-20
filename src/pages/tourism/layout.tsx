@@ -35,10 +35,21 @@ export default function TourismPageLayout() {
 
   return (
     <>
+      {/* First stop in the tourism shell: jumps past the tab row to the page. */}
+      <a
+        href='#tourism-main'
+        className='bg-kapwa-bg-brand-default text-kapwa-text-inverse type-body sr-only font-semibold focus:not-sr-only focus:rounded-full focus:px-5 focus:py-3 focus:shadow-elev-3 focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
+      >
+        Skip to content
+      </a>
       <TourismTabs />
       <div className='bg-kapwa-bg-surface min-h-screen'>
         <div className='container mx-auto py-6 sm:px-4 md:py-8'>
-          <main className='min-w-0'>
+          <main
+            id='tourism-main'
+            tabIndex={-1}
+            className='min-w-0 outline-none'
+          >
             <div
               id='layout-content'
               className='border-kapwa-border-weak bg-kapwa-bg-surface min-h-[50vh] rounded-2xl border p-4 shadow-sm md:p-8'

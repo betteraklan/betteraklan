@@ -58,7 +58,7 @@ export function PaginationControls({
   return (
     <div className='border-kapwa-border-weak bg-kapwa-bg-surface-raised flex flex-col items-center gap-4 border-t p-4 md:flex-row md:justify-between'>
       {/* Left: Info & Selector */}
-      <div className='text-kapwa-text-disabled flex flex-wrap items-center justify-center gap-4 text-xs font-medium'>
+      <div className='text-kapwa-text-support flex flex-wrap items-center justify-center gap-4 text-xs font-medium'>
         <span>
           Showing{' '}
           <span className='text-kapwa-text-strong font-bold'>
@@ -73,6 +73,7 @@ export function PaginationControls({
         <div className='flex items-center gap-2'>
           <span>Rows:</span>
           <select
+            aria-label='Rows per page'
             value={resultsPerPage}
             onChange={e => onResultsPerPageChange(Number(e.target.value))}
             className='focus:border-kapwa-border-brand focus:ring-kapwa-border-brand border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-support h-8 rounded-lg text-xs font-medium'
@@ -91,11 +92,12 @@ export function PaginationControls({
         <Button
           variant='outline'
           size='sm'
+          aria-label='Previous page'
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className='h-8 w-8 p-0'
         >
-          <ChevronLeft className='h-4 w-4' />
+          <ChevronLeft aria-hidden='true' className='h-4 w-4' />
         </Button>
 
         <div className='hidden gap-1 sm:flex'>
@@ -103,7 +105,7 @@ export function PaginationControls({
             page === '...' ? (
               <span
                 key={`ellipsis-${idx}`}
-                className='text-kapwa-text-disabled px-2 py-1 text-xs'
+                className='text-kapwa-text-support px-2 py-1 text-xs'
               >
                 ...
               </span>
@@ -126,11 +128,12 @@ export function PaginationControls({
         <Button
           variant='outline'
           size='sm'
+          aria-label='Next page'
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className='h-8 w-8 p-0'
         >
-          <ChevronRight className='h-4 w-4' />
+          <ChevronRight aria-hidden='true' className='h-4 w-4' />
         </Button>
       </nav>
     </div>
