@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 
-import { MapPinIcon, SearchIcon } from 'lucide-react';
+import { MapPinIcon, SearchIcon, XIcon } from 'lucide-react';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -28,8 +28,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/navigation/Breadcrumb';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { PaginationControls } from '@/components/ui/Pagination';
+
+import {
+  deriveStation,
+  deriveType,
+  facetCounts,
+  hasFilters,
+  matchesStay,
+  NO_FILTERS,
+  type Station,
+  type StayFilters,
+  type StayType,
+  TYPE_LABEL,
+} from '@/lib/tourism/accommodations';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
 import { Accommodation } from '@/types/tourism';
@@ -142,6 +155,63 @@ function ClusterLayer({ groups }: { groups: CoordinateGroup[] }) {
   return null;
 }
 
+const CHIP =
+  'type-meta inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 font-semibold transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand';
+const CHIP_ON =
+  'bg-kapwa-bg-brand-default border-kapwa-border-brand text-kapwa-text-inverse';
+const CHIP_OFF =
+  'bg-kapwa-bg-surface border-kapwa-border-weak text-kapwa-text-strong hover:border-kapwa-border-brand';
+
+/** A row of toggle chips for one facet. Click the active chip to clear it. */
+function ChipGroup<V extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: V | '';
+  options: { value: V; label: string; count: number }[];
+  onChange: (v: V | '') => void;
+}) {
+  const labelId = `chips-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  return (
+    <div className='space-y-2'>
+      <p
+        id={labelId}
+        className='text-kapwa-text-support type-meta font-semibold'
+      >
+        {label}
+      </p>
+      <div
+        role='group'
+        aria-labelledby={labelId}
+        className='flex flex-wrap gap-2'
+      >
+        {options.map(o => {
+          const on = value === o.value;
+          // A chip with nothing behind it is hidden, unless it is the chosen one.
+          if (!on && o.count === 0) return null;
+          return (
+            <button
+              key={o.value}
+              type='button'
+              aria-pressed={on}
+              onClick={() => onChange(on ? '' : o.value)}
+              className={`${CHIP} ${on ? CHIP_ON : CHIP_OFF}`}
+            >
+              {o.label}
+              <span className={on ? '' : 'text-kapwa-text-support'}>
+                {o.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function FlyTo({ target }: { target: [number, number] | null }) {
   const map = useMap();
   useEffect(() => {
@@ -154,6 +224,9 @@ export default function AccommodationsPage() {
   const { area: areaParam } = useParams<{ area: string }>();
   const [search, setSearch] = useState('');
   const [municipalityFilter, setMunicipalityFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState<StayFilters['type']>('');
+  const [stationFilter, setStationFilter] =
+    useState<StayFilters['station']>('');
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -173,23 +246,40 @@ export default function AccommodationsPage() {
     return [...set].sort();
   }, [all, area]);
 
-  const filtered = useMemo(
-    () =>
-      all.filter(a => {
-        if (search && !a.name.toLowerCase().includes(search.toLowerCase()))
-          return false;
-        if (municipalityFilter && a.municipality !== municipalityFilter)
-          return false;
-        return true;
-      }),
-    [all, search, municipalityFilter]
+  const filters: StayFilters = useMemo(
+    () => ({
+      search,
+      municipality: municipalityFilter,
+      type: typeFilter,
+      station: area === 'boracay' ? stationFilter : '',
+    }),
+    [search, municipalityFilter, typeFilter, stationFilter, area]
   );
+  const filtered = useMemo(
+    () => all.filter(a => matchesStay(a, filters)),
+    [all, filters]
+  );
+  const facets = useMemo(() => facetCounts(all, filters), [all, filters]);
+  const clearFilters = () => {
+    setSearch(NO_FILTERS.search);
+    setMunicipalityFilter(NO_FILTERS.municipality);
+    setTypeFilter(NO_FILTERS.type);
+    setStationFilter(NO_FILTERS.station);
+  };
+
+  // Changing area starts fresh: a Kalibo filter means nothing in Boracay.
+  useEffect(() => {
+    setSearch('');
+    setMunicipalityFilter('');
+    setTypeFilter('');
+    setStationFilter('');
+  }, [area]);
 
   // Reset to page 1 whenever the visible result set changes shape, so a
   // filter/search doesn't strand the user on a now-empty page.
   useEffect(() => {
     setPage(1);
-  }, [search, municipalityFilter, area]);
+  }, [search, municipalityFilter, typeFilter, stationFilter, area]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const pagedFiltered = useMemo(
@@ -250,34 +340,101 @@ export default function AccommodationsPage() {
         </p>
       </header>
 
-      <div className='flex flex-wrap items-center gap-3'>
-        <div className='relative min-w-[220px] flex-1'>
-          <SearchIcon className='text-kapwa-text-disabled absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
-          <input
-            type='text'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder='Search by name…'
-            className='border-kapwa-border-weak bg-kapwa-bg-surface w-full rounded-md border py-2 pr-3 pl-9 text-sm'
-          />
+      <div className='space-y-4'>
+        <div className='flex flex-wrap items-center gap-3'>
+          <div className='relative min-w-[220px] flex-1'>
+            <SearchIcon
+              aria-hidden='true'
+              className='text-kapwa-text-disabled absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2'
+            />
+            <input
+              type='text'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder='Search by name…'
+              aria-label='Search by name'
+              className='border-kapwa-border-weak bg-kapwa-bg-surface min-h-11 w-full rounded-md border py-2 pr-3 pl-9 text-sm'
+            />
+          </div>
+          {area === 'mainland' && (
+            <select
+              value={municipalityFilter}
+              onChange={e => setMunicipalityFilter(e.target.value)}
+              aria-label='Municipality'
+              className='border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong min-h-11 rounded-md border px-3 py-2 text-sm'
+            >
+              <option value=''>All municipalities</option>
+              {municipalities.map(m => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
-        {area === 'mainland' && (
-          <select
-            value={municipalityFilter}
-            onChange={e => setMunicipalityFilter(e.target.value)}
-            className='border-kapwa-border-weak bg-kapwa-bg-surface text-kapwa-text-strong rounded-md border px-3 py-2 text-sm'
-          >
-            <option value=''>All municipalities</option>
-            {municipalities.map(m => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
+
+        <ChipGroup<StayType | 'none'>
+          label='Type'
+          value={typeFilter}
+          onChange={setTypeFilter}
+          options={[
+            ...(Object.keys(TYPE_LABEL) as StayType[]).map(k => ({
+              value: k as StayType | 'none',
+              label: TYPE_LABEL[k],
+              count: facets.type.get(k) ?? 0,
+            })),
+            {
+              value: 'none' as const,
+              label: 'Not stated',
+              count: facets.type.get('none') ?? 0,
+            },
+          ]}
+        />
+        {area === 'boracay' && (
+          <ChipGroup<Station | 'none'>
+            label='Station'
+            value={stationFilter}
+            onChange={setStationFilter}
+            options={[
+              ...(['Station 1', 'Station 2', 'Station 3'] as Station[]).map(
+                s => ({
+                  value: s as Station | 'none',
+                  label: s,
+                  count: facets.station.get(s) ?? 0,
+                })
+              ),
+              {
+                value: 'none' as const,
+                label: 'Not stated',
+                count: facets.station.get('none') ?? 0,
+              },
+            ]}
+          />
         )}
-        <span className='text-kapwa-text-muted text-xs'>
-          {filtered.length} shown
-        </span>
+        <p className='text-kapwa-text-muted text-xs'>
+          Type comes from the establishment&apos;s name and station from its
+          published address. &quot;Not stated&quot; means they don&apos;t say.
+        </p>
+
+        <div className='flex flex-wrap items-center gap-3'>
+          <p
+            role='status'
+            aria-live='polite'
+            className='text-kapwa-text-strong type-body font-semibold'
+          >
+            Showing {filtered.length} of {all.length} establishments
+          </p>
+          {hasFilters(filters) && (
+            <button
+              type='button'
+              onClick={clearFilters}
+              className='text-kapwa-text-brand type-meta inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
+            >
+              <XIcon aria-hidden='true' className='h-4 w-4' />
+              Clear filters
+            </button>
+          )}
+        </div>
       </div>
 
       <Card className='overflow-hidden p-0' hover={false}>
@@ -369,46 +526,83 @@ export default function AccommodationsPage() {
       </Card>
 
       <Card className='overflow-hidden p-0' hover={false}>
-        <div className='grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {pagedFiltered.map(a => (
-            <Card
-              key={`${a.name}-${a.address}`}
-              hover={false}
-              className='border-kapwa-border-weak shadow-elev-1'
-            >
-              <CardContent className='space-y-1.5 p-4'>
-                <h4 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
-                  {a.name}
-                </h4>
-                <p className='text-kapwa-text-support text-xs leading-relaxed'>
-                  {a.address}
-                </p>
-                <div className='flex items-center gap-2 pt-1'>
-                  {a.lat != null && a.lon != null ? (
-                    <button
-                      type='button'
-                      onClick={() =>
-                        setFlyTarget([a.lat as number, a.lon as number])
-                      }
-                      className='text-kapwa-text-brand flex items-center gap-1 text-xs font-medium hover:underline'
-                    >
-                      <MapPinIcon className='h-3 w-3' /> Show on map
-                    </button>
-                  ) : (
-                    <span className='text-kapwa-text-disabled text-xs italic'>
-                      Location unavailable
-                    </span>
-                  )}
-                  {a.geocodePrecision !== 'exact' && a.lat != null && (
-                    <span className='text-kapwa-text-support text-[11px] font-bold'>
-                      Approximate pin · {a.geocodePrecision} level
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <h2 className='sr-only'>Establishments</h2>
+        {pagedFiltered.length === 0 ? (
+          <div className='space-y-3 p-6 text-center'>
+            <p className='text-kapwa-text-strong type-body font-semibold'>
+              No establishments match these filters.
+            </p>
+            {hasFilters(filters) && (
+              <button
+                type='button'
+                onClick={clearFilters}
+                className={`${CHIP} ${CHIP_OFF}`}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <ol
+            role='list'
+            start={(page - 1) * perPage + 1}
+            className='divide-kapwa-border-weak divide-y'
+          >
+            {pagedFiltered.map((a, i) => {
+              const type = deriveType(a.name);
+              const station =
+                area === 'boracay' ? deriveStation(a.address) : null;
+              return (
+                <li
+                  key={`${a.name}-${a.address}`}
+                  className='flex gap-3 p-4 sm:gap-4'
+                >
+                  <span className='text-kapwa-text-support type-meta w-8 shrink-0 pt-0.5 text-right font-semibold tabular-nums'>
+                    {(page - 1) * perPage + i + 1}.
+                  </span>
+                  <div className='min-w-0 flex-1 space-y-1.5'>
+                    <h3 className='text-kapwa-text-strong text-sm leading-tight font-bold'>
+                      {a.name}
+                    </h3>
+                    <p className='text-kapwa-text-support text-xs leading-relaxed'>
+                      {a.address}
+                    </p>
+                    {(type || station) && (
+                      <p className='text-kapwa-text-support type-meta flex flex-wrap gap-x-3'>
+                        {type && <span>{TYPE_LABEL[type]}</span>}
+                        {station && <span>{station}</span>}
+                      </p>
+                    )}
+                    <div className='flex flex-wrap items-center gap-x-3 gap-y-1 pt-1'>
+                      {a.lat != null && a.lon != null ? (
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setFlyTarget([a.lat as number, a.lon as number])
+                          }
+                          className='text-kapwa-text-brand flex min-h-11 items-center gap-1 text-xs font-medium hover:underline'
+                        >
+                          <MapPinIcon aria-hidden='true' className='h-3 w-3' />{' '}
+                          Show on map
+                          <span className='sr-only'>: {a.name}</span>
+                        </button>
+                      ) : (
+                        <span className='text-kapwa-text-disabled text-xs italic'>
+                          Location unavailable
+                        </span>
+                      )}
+                      {a.geocodePrecision !== 'exact' && a.lat != null && (
+                        <span className='text-kapwa-text-support text-[11px] font-bold'>
+                          Approximate pin · {a.geocodePrecision} level
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
         <PaginationControls
           currentPage={page}
           totalPages={totalPages}
