@@ -68,3 +68,28 @@ export function pickSpread(
 
 export const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
 export const KNOWN_IDS = new Set(BY_ID.keys());
+
+/**
+ * Every count the tourism pages show, computed from the JSON once here.
+ * "Named" counts are the records a visitor can open; raw counts also include
+ * the unnamed free-text paragraphs (which the pages show as text, not records).
+ */
+const MUNI = SOURCES.municipalities;
+const named = (key: 'attractions' | 'festivals' | 'products') =>
+  MUNI.reduce((n, m) => n + m[key].filter(e => e.name).length, 0);
+const raw = (key: 'attractions' | 'festivals' | 'products') =>
+  MUNI.reduce((n, m) => n + m[key].length, 0);
+
+export const COUNTS = {
+  towns: MUNI.length,
+  spots: named('attractions'),
+  spotsRaw: raw('attractions'),
+  festivals: named('festivals'),
+  festivalsRaw: raw('festivals'),
+  products: named('products'),
+  stays: SOURCES.accommodations.length,
+  boracayStays: SOURCES.accommodations.filter(a => a.area === 'boracay').length,
+  mainlandStays: SOURCES.accommodations.filter(a => a.area === 'mainland')
+    .length,
+  records: ALL_RECORDS.length,
+} as const;

@@ -65,7 +65,12 @@ import ViewToggle from './components/ViewToggle';
 
 import { displayName } from '@/lib/tourism/displayName';
 
-import { ALL_RECORDS, SOURCES, TIER_COLOR } from './components/tourismData';
+import {
+  ALL_RECORDS,
+  COUNTS,
+  SOURCES,
+  TIER_COLOR,
+} from './components/tourismData';
 const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
 const KNOWN_IDS = new Set(BY_ID.keys());
 // Town view centre: mean of the town's exactly located records (the town
@@ -646,7 +651,7 @@ export default function TourismExplore() {
               <h1 className='type-display text-white sm:mt-1'>Explore Aklan</h1>
               <p className='type-body mt-1 hidden max-w-xl text-white/85 sm:block'>
                 Find places, festivals, and public visitor information across
-                all 17 municipalities.
+                all {COUNTS.towns} municipalities.
               </p>
             </div>
           </div>

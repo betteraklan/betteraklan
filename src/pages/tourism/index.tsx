@@ -36,7 +36,7 @@ import { LAYER_ICON } from './components/layerMeta';
 import MiniMap from './components/MiniMap';
 import OverviewSearch from './components/OverviewSearch';
 import PlacesTabs from './components/PlacesTabs';
-import { ALL_RECORDS } from './components/tourismData';
+import { COUNTS } from './components/tourismData';
 import TourismHero from './components/TourismHero';
 import { useActiveTown, useReveal } from './components/useScrollStory';
 
@@ -44,9 +44,6 @@ const BOUNDARIES = (boundaryData as { features: BoundaryFeature[] }).features;
 const SHAPES = projectTowns(BOUNDARIES, 600, 2);
 
 // Every count on this page comes from the tourism JSON files.
-const STAYS = ALL_RECORDS.filter(r => r.layer === 'stay').length;
-const FESTIVALS = ALL_RECORDS.filter(r => r.layer === 'event').length;
-const TOTAL = ALL_RECORDS.length;
 const HOTLINES = `https://hotlines.bettergov.ph/?city=${encodeURIComponent(config.lgu.name)}&province=${encodeURIComponent(config.lgu.province)}`;
 
 // Gentle hover lift for cards; the movement is off under reduced motion.
@@ -122,7 +119,7 @@ export default function TourismIndex() {
     <div ref={root} className='space-y-10'>
       <TourismHero
         title='Tourism'
-        description={`From the world-famous shores of Boracay to the hidden waterfalls and centuries-old festivals of its 17 municipalities, ${lguLabels.fullName} invites you to discover a province where nature, culture, and hospitality meet.`}
+        description={`From the world-famous shores of Boracay to the hidden waterfalls and centuries-old festivals of its ${COUNTS.towns} municipalities, ${lguLabels.fullName} invites you to discover a province where nature, culture, and hospitality meet.`}
         shapes={SHAPES}
       />
 
@@ -143,7 +140,7 @@ export default function TourismIndex() {
                 icon={LAYER_ICON.stay}
                 iconTint='text-kapwa-text-brand'
                 title='Where to stay'
-                text={`${STAYS} places to stay in Boracay and the mainland`}
+                text={`${COUNTS.stays} places to stay in Boracay and the mainland`}
               />
             </Link>
           </li>
@@ -156,7 +153,7 @@ export default function TourismIndex() {
                 icon={LAYER_ICON.event}
                 iconTint='text-kapwa-text-accent-orange'
                 title='Festivals'
-                text={`${FESTIVALS} festivals through the year`}
+                text={`${COUNTS.festivals} festivals through the year`}
               />
             </a>
           </li>
@@ -305,8 +302,9 @@ export default function TourismIndex() {
                 See Aklan on the map
               </h2>
               <p className='text-kapwa-text-support type-body'>
-                {TOTAL} BetterAklan records across 17 municipalities: places,
-                festivals, local products and places to stay.
+                {COUNTS.records} BetterAklan records across {COUNTS.towns}{' '}
+                municipalities: places, festivals, local products and places to
+                stay.
               </p>
               <Link
                 to='/tourism/explore?view=map'
