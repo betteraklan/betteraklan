@@ -37,6 +37,34 @@
         "recordId": "AKL-006",
         "location": "Cabugao",
         "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
+      },
+      {
+        "name": "Agtutoe-an Falls",
+        "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-003",
+        "location": "Talon",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
+      },
+      {
+        "name": "Kipot Cave",
+        "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-005",
+        "location": "Talon",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
+      },
+      {
+        "name": "Quinasay-an Falls",
+        "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-007",
+        "location": "Talon",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
+      },
+      {
+        "name": "Suhot Cave",
+        "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
+        "recordId": "AKL-008",
+        "location": "Talon",
+        "sourceUrl": "https://aklan.gov.ph/tourism/altavas/"
       }
     ],
     "products": [

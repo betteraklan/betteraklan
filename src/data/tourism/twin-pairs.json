@@ -291,22 +291,22 @@
     {
       "recordId": "AKL-003",
       "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
-      "decision": "pending"
+      "decision": "publish"
     },
     {
       "recordId": "AKL-005",
       "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
-      "decision": "pending"
+      "decision": "publish"
     },
     {
       "recordId": "AKL-007",
       "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
-      "decision": "pending"
+      "decision": "publish"
     },
     {
       "recordId": "AKL-008",
       "reason": "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy",
-      "decision": "pending"
+      "decision": "publish"
     }
   ]
 }

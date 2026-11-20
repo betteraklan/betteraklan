@@ -4,10 +4,30 @@
     "array": "festivals",
     "index": 1
   },
+  "AKL-003": {
+    "municipality": "altavas",
+    "array": "attractions",
+    "index": 4
+  },
+  "AKL-005": {
+    "municipality": "altavas",
+    "array": "attractions",
+    "index": 5
+  },
   "AKL-006": {
     "municipality": "altavas",
     "array": "attractions",
     "index": 3
+  },
+  "AKL-007": {
+    "municipality": "altavas",
+    "array": "attractions",
+    "index": 6
+  },
+  "AKL-008": {
+    "municipality": "altavas",
+    "array": "attractions",
+    "index": 7
   },
   "AKL-010": {
     "municipality": "altavas",

@@ -58,13 +58,13 @@
     },
     "after": {
       "raw": {
-        "attractions": 117,
+        "attractions": 121,
         "festivals": 40,
         "products": 72,
         "nameless": 32
       },
       "named": {
-        "altavas": 9,
+        "altavas": 13,
         "balete": 10,
         "banga": 5,
         "batan": 18,
@@ -82,10 +82,10 @@
         "numancia": 9,
         "tangalan": 11
       },
-      "namedTotal": 197
+      "namedTotal": 201
     },
     "recordsPerMunicipalityPin": {
-      "altavas": 9,
+      "altavas": 13,
       "balete": 10,
       "banga": 5,
       "batan": 18,
@@ -678,11 +678,15 @@
       "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
       "location": "Talon",
       "sourceUrl": "https://aklan.gov.ph/tourism/altavas/",
-      "status": "held",
-      "live": false,
+      "status": "new",
+      "live": true,
       "siteId": null,
       "siteName": null,
-      "slot": null,
+      "slot": {
+        "municipality": "altavas",
+        "array": "attractions",
+        "index": 4
+      },
       "flags": [
         "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy"
       ],
@@ -760,11 +764,15 @@
       "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
       "location": "Talon",
       "sourceUrl": "https://aklan.gov.ph/tourism/altavas/",
-      "status": "held",
-      "live": false,
+      "status": "new",
+      "live": true,
       "siteId": null,
       "siteName": null,
-      "slot": null,
+      "slot": {
+        "municipality": "altavas",
+        "array": "attractions",
+        "index": 5
+      },
       "flags": [
         "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy"
       ],
@@ -846,11 +854,15 @@
       "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
       "location": "Talon",
       "sourceUrl": "https://aklan.gov.ph/tourism/altavas/",
-      "status": "held",
-      "live": false,
+      "status": "new",
+      "live": true,
       "siteId": null,
       "siteName": null,
-      "slot": null,
+      "slot": {
+        "municipality": "altavas",
+        "array": "attractions",
+        "index": 6
+      },
       "flags": [
         "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy"
       ],
@@ -889,11 +901,15 @@
       "description": "Natural site named in the provincial tourism profile. The recorded location is Talon. The town’s January Santo Niño celebration is tied to a local armistice observance.",
       "location": "Talon",
       "sourceUrl": "https://aklan.gov.ph/tourism/altavas/",
-      "status": "held",
-      "live": false,
+      "status": "new",
+      "live": true,
       "siteId": null,
       "siteName": null,
-      "slot": null,
+      "slot": {
+        "municipality": "altavas",
+        "array": "attractions",
+        "index": 7
+      },
       "flags": [
         "Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy"
       ],

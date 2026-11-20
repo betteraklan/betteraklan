@@ -7,7 +7,7 @@ Generated from `src/data/tourism/workbook-reconciliation.json`. Every workbook r
 - Workbook used: `C:\Users\Lance\Downloads\Aklan_Image_Sources_Google_Images_Update_22.xlsx`. The path named in `AGENTS - Aklan Tourism.md` (`outputs/aklan-image-update-22/...`) does not exist on this machine, so the owner's same-named copy was used.
 - Workbook SHA-256: `450348e7df619a1bf9421028ff053ea999cdfb73669f721d4f7b6c999b8ee9b8`. **Owner: please confirm this is the approved file.**
 - Baseline (pre-import `municipalities.json`): git revision `6d1f30ead5c59002e1af9852ffcaa51ce24c97e1`.
-- Owner decisions: all 26 candidate pairs and all 4 held records left `pending` (confirmed in chat).
+- Owner decisions: all 26 candidate pairs left `pending`, so the more detailed site entry stays. The 4 held records were published at the owner's direction to keep the data complete: their shared text is generic but true for each (all four are in Talon).
 - Pins: approximate municipality-centre pins (A7) on; `--no-pins` not used.
 
 ## Section 3 facts, recomputed
@@ -26,7 +26,7 @@ Generated from `src/data/tourism/workbook-reconciliation.json`. Every workbook r
 | Candidate pairs | 26 | 26 | none |
 | Unmatched site entries | 13 | 13 | none |
 | Licence classes (explicit / see source / not stated / other) | 10 / 41 / 124 / 30 | 10 / 41 / 124 / 30 | none |
-| NEW records appended | 91 | 87 | 4 fewer: AKL-003, 005, 007, 008 are held (identical description) |
+| NEW records appended | 91 | 91 | none (87 plus the 4 released from hold) |
 | Names `toTitleCase` would re-case | 75 of 188 | 75 of 188 | none |
 
 Correction to the prompt: section 10 said `npx tsc -p tsconfig.app.json --noEmit` reports 48 pre-existing errors in four files. It reports 312 error lines across many files, identical before and after this work (3 are in tourism files and predate it). This work adds none.
@@ -111,12 +111,16 @@ Name and description now equal the workbook. "Explore" shows the stored name; th
 
 Changed display names: 71 in Explore, 17 on municipality pages.
 
-## NEW records appended (87)
+## NEW records appended (91)
 
 | Record ID | Municipality | Category | Item name | New id |
 | --- | --- | --- | --- | --- |
 | AKL-002 | Altavas | Festivals & Events | Santo Niño Festival | event-altavas-1 |
+| AKL-003 | Altavas | Spots & Attractions | Agtutoe-an Falls | place-altavas-4 |
+| AKL-005 | Altavas | Spots & Attractions | Kipot Cave | place-altavas-5 |
 | AKL-006 | Altavas | Spots & Attractions | Macawiwili Falls | place-altavas-3 |
+| AKL-007 | Altavas | Spots & Attractions | Quinasay-an Falls | place-altavas-6 |
+| AKL-008 | Altavas | Spots & Attractions | Suhot Cave | place-altavas-7 |
 | AKL-010 | Altavas | Products & Local Delicacies | Nito bags | product-altavas-1 |
 | AKL-011 | Altavas | Products & Local Delicacies | Puto Seko | product-altavas-2 |
 | AKL-012 | Altavas | Products & Local Delicacies | Puto Tostado | product-altavas-3 |
@@ -300,10 +304,10 @@ NEW workbook records in the same municipality and category, for alias review (th
 
 ## Held records (doubtful copy)
 
-- AKL-003: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Not published.
-- AKL-005: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Not published.
-- AKL-007: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Not published.
-- AKL-008: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Not published.
+- AKL-003: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Decision: publish.
+- AKL-005: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Decision: publish.
+- AKL-007: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Decision: publish.
+- AKL-008: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy Decision: publish.
 
 ## Blank rows, ID gaps, blank locations
 
@@ -569,22 +573,22 @@ NEW workbook records in the same municipality and category, for alias review (th
 
 ## Cards that truncate
 
-158 of 158 live workbook records have a description longer than the card teaser (first sentence). The card also clamps the name to two lines and the teaser to one. The full text is in the Explore details panel and on the municipality page. Records: AKL-002, AKL-006, AKL-009, AKL-010, AKL-011, AKL-012, AKL-013, AKL-015, AKL-016, AKL-017, AKL-018, AKL-019, AKL-020, AKL-021, AKL-023, AKL-024, AKL-025, AKL-027, AKL-028, AKL-030, AKL-031, AKL-036, AKL-038, AKL-040, AKL-041, AKL-042, AKL-043, AKL-044, AKL-045, AKL-046, AKL-047, AKL-049, AKL-050, AKL-052, AKL-053, AKL-054, AKL-055, AKL-057, AKL-058, AKL-059, AKL-060, AKL-061, AKL-062, AKL-063, AKL-064, AKL-065, AKL-066, AKL-067, AKL-068, AKL-069, AKL-072, AKL-073, AKL-074, AKL-075, AKL-076, AKL-077, AKL-078, AKL-079, AKL-080, AKL-081, AKL-085, AKL-086, AKL-087, AKL-088, AKL-089, AKL-090, AKL-092, AKL-093, AKL-095, AKL-096, AKL-097, AKL-098, AKL-101, AKL-102, AKL-103, AKL-104, AKL-105, AKL-107, AKL-108, AKL-109, AKL-110, AKL-111, AKL-112, AKL-113, AKL-115, AKL-117, AKL-119, AKL-120, AKL-121, AKL-122, AKL-123, AKL-124, AKL-126, AKL-127, AKL-130, AKL-132, AKL-134, AKL-135, AKL-136, AKL-137, AKL-138, AKL-140, AKL-142, AKL-143, AKL-144, AKL-145, AKL-146, AKL-147, AKL-149, AKL-150, AKL-151, AKL-153, AKL-154, AKL-155, AKL-156, AKL-157, AKL-158, AKL-159, AKL-161, AKL-162, AKL-164, AKL-165, AKL-166, AKL-167, AKL-168, AKL-169, AKL-171, AKL-172, AKL-173, AKL-175, AKL-176, AKL-177, AKL-179, AKL-182, AKL-183, AKL-184, AKL-185, AKL-186, AKL-187, AKL-188, AKL-189, AKL-190, AKL-191, AKL-192, AKL-194, AKL-195, AKL-196, AKL-198, AKL-199, AKL-200, AKL-201, AKL-203, AKL-205, AKL-206, AKL-207, AKL-208, AKL-210, AKL-212.
+162 of 162 live workbook records have a description longer than the card teaser (first sentence). The card also clamps the name to two lines and the teaser to one. The full text is in the Explore details panel and on the municipality page. Records: AKL-002, AKL-003, AKL-005, AKL-006, AKL-007, AKL-008, AKL-009, AKL-010, AKL-011, AKL-012, AKL-013, AKL-015, AKL-016, AKL-017, AKL-018, AKL-019, AKL-020, AKL-021, AKL-023, AKL-024, AKL-025, AKL-027, AKL-028, AKL-030, AKL-031, AKL-036, AKL-038, AKL-040, AKL-041, AKL-042, AKL-043, AKL-044, AKL-045, AKL-046, AKL-047, AKL-049, AKL-050, AKL-052, AKL-053, AKL-054, AKL-055, AKL-057, AKL-058, AKL-059, AKL-060, AKL-061, AKL-062, AKL-063, AKL-064, AKL-065, AKL-066, AKL-067, AKL-068, AKL-069, AKL-072, AKL-073, AKL-074, AKL-075, AKL-076, AKL-077, AKL-078, AKL-079, AKL-080, AKL-081, AKL-085, AKL-086, AKL-087, AKL-088, AKL-089, AKL-090, AKL-092, AKL-093, AKL-095, AKL-096, AKL-097, AKL-098, AKL-101, AKL-102, AKL-103, AKL-104, AKL-105, AKL-107, AKL-108, AKL-109, AKL-110, AKL-111, AKL-112, AKL-113, AKL-115, AKL-117, AKL-119, AKL-120, AKL-121, AKL-122, AKL-123, AKL-124, AKL-126, AKL-127, AKL-130, AKL-132, AKL-134, AKL-135, AKL-136, AKL-137, AKL-138, AKL-140, AKL-142, AKL-143, AKL-144, AKL-145, AKL-146, AKL-147, AKL-149, AKL-150, AKL-151, AKL-153, AKL-154, AKL-155, AKL-156, AKL-157, AKL-158, AKL-159, AKL-161, AKL-162, AKL-164, AKL-165, AKL-166, AKL-167, AKL-168, AKL-169, AKL-171, AKL-172, AKL-173, AKL-175, AKL-176, AKL-177, AKL-179, AKL-182, AKL-183, AKL-184, AKL-185, AKL-186, AKL-187, AKL-188, AKL-189, AKL-190, AKL-191, AKL-192, AKL-194, AKL-195, AKL-196, AKL-198, AKL-199, AKL-200, AKL-201, AKL-203, AKL-205, AKL-206, AKL-207, AKL-208, AKL-210, AKL-212.
 
 ## Counts
 
 | | Before | After |
 | --- | --- | --- |
-| Raw attractions slots | 89 | 117 |
+| Raw attractions slots | 89 | 121 |
 | Raw festivals slots | 34 | 40 |
 | Raw products slots | 19 | 72 |
 | Of which nameless paragraphs | 32 | 32 |
-| Named municipality records | 110 | 197 |
-| Explore total (adds 10 resorts and 478 stays) | 598 | 685 |
+| Named municipality records | 110 | 201 |
+| Explore total (adds 10 resorts and 478 stays) | 598 | 689 |
 
 | Municipality | Named before | Named after | Records sharing the municipality-centre pin |
 | --- | --- | --- | --- |
-| Altavas | 3 | 9 | 9 |
+| Altavas | 3 | 13 | 13 |
 | Balete | 5 | 10 | 10 |
 | Banga | 4 | 5 | 5 |
 | Batan | 12 | 18 | 18 |

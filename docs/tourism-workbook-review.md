@@ -123,7 +123,7 @@ Each is shown next to the NEW workbook records in the same municipality and cate
 
 ## Held records (4)
 
-- AKL-003: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: pending)
-- AKL-005: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: pending)
-- AKL-007: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: pending)
-- AKL-008: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: pending)
+- AKL-003: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: publish)
+- AKL-005: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: publish)
+- AKL-007: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: publish)
+- AKL-008: Identical Content Description shared by AKL-003, AKL-005, AKL-007, AKL-008: doubtful copy (decision: publish)
