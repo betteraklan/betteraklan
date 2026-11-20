@@ -65,3 +65,6 @@ export function pickSpread(
   }
   return out;
 }
+
+export const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
+export const KNOWN_IDS = new Set(BY_ID.keys());

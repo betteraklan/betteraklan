@@ -40,6 +40,7 @@ import {
   parseTrip,
   serializeTrip,
 } from '@/lib/tourism/trip';
+import { readSavedTrip, saveTrip } from '@/lib/tourism/tripStore';
 
 import AklanMap3D, {
   type MapPin,
@@ -397,7 +398,21 @@ export default function TourismExplore() {
         .map(r => ({ id: r.id, lat: r.lat!, lon: r.lon! })),
     [tripIds]
   );
-  const setTrip = (ids: string[]) => update({ trip: serializeTrip(ids) });
+  // The trip is also remembered in this browser, but only when the visitor
+  // changes it: opening someone's shared link never overwrites a saved trip.
+  const setTrip = (ids: string[]) => {
+    update({ trip: serializeTrip(ids) });
+    saveTrip(ids);
+  };
+  // Opened without a trip link: pick up the trip saved on this device
+  // (for example, stops saved from a town page).
+  useEffect(() => {
+    if (params.get('trip')) return;
+    const saved = readSavedTrip(KNOWN_IDS);
+    if (saved.length) update({ trip: serializeTrip(saved) });
+    // Runs once on arrival; later changes come from setTrip.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const toggleSaved = (id: string) => {
     if (tripSet.has(id)) {
       setTrip(tripIds.filter(x => x !== id));
