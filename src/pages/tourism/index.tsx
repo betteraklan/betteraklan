@@ -234,7 +234,7 @@ export default function TourismIndex() {
           </p>
         </div>
         <aside className='hidden xl:block'>
-          <div className='sticky top-[136px]'>
+          <div className='sticky top-[calc(var(--tourism-sticky-top,128px)+8px)]'>
             <MiniMap shapes={SHAPES} active={activeTown} />
           </div>
         </aside>

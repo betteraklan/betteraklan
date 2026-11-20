@@ -404,3 +404,16 @@
     transform: scale(0.92);
   }
 }
+
+/* Tourism: the sticky tab row publishes --tourism-sticky-top (site nav plus
+   tab row), so anchors and focused elements scroll clear of both. */
+html {
+  scroll-padding-top: var(--tourism-sticky-top, 0px);
+}
+
+/* Tourism: room for the phone bottom bar so it never covers the page. */
+@media (width < 48rem) {
+  body.tourism-bottom-bar {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+}

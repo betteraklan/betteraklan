@@ -25,17 +25,15 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL, overlaps } from '@/lib/tourism/festivalDates';
 import {
-  buildRecords,
   densityTier,
   emptyState,
   filterRecords,
   LAYER_LABEL,
   type Layer,
   type Rec,
-  type Sources,
   tierBounds,
 } from '@/lib/tourism/explore';
-import { findMunicipalityAt, type BoundaryFeature } from '@/lib/tourism/geo';
+import { findMunicipalityAt } from '@/lib/tourism/geo';
 import {
   MAX_STOPS,
   moveStop,
@@ -64,22 +62,9 @@ import {
 import { useBottomSheet } from './components/useBottomSheet';
 import ViewToggle from './components/ViewToggle';
 
-import accommodationsData from '@/data/tourism/accommodations.json';
-import boundaryData from '@/data/geo/municipalities-boundaries.json';
-import centroidData from '@/data/geo/municipality-centroids.json';
-import municipalitiesData from '@/data/tourism/municipalities.json';
-import resortsData from '@/data/tourism/resorts.json';
-import type { Accommodation, MunicipalityTourism } from '@/types/tourism';
 import { displayName } from '@/lib/tourism/displayName';
 
-const SOURCES: Sources = {
-  municipalities: municipalitiesData as MunicipalityTourism[],
-  resorts: resortsData as Sources['resorts'],
-  accommodations: accommodationsData as Accommodation[],
-  centroids: centroidData as Sources['centroids'],
-  boundaries: (boundaryData as { features: BoundaryFeature[] }).features,
-};
-const ALL_RECORDS = buildRecords(SOURCES);
+import { ALL_RECORDS, SOURCES, TIER_COLOR } from './components/tourismData';
 const BY_ID = new Map(ALL_RECORDS.map(r => [r.id, r]));
 const KNOWN_IDS = new Set(BY_ID.keys());
 // Town view centre: mean of the town's exactly located records (the town
@@ -116,15 +101,6 @@ const PLACEMENT_LABEL: Record<Rec['placement'], string> = {
 const TOUR_STEP_MS = 5000;
 const LAYERS_KEY = 'betteraklan:layers-minimized';
 const RING_LEN = 2 * Math.PI * 21;
-// Shading ramp for record counts: brighter means more BetterAklan records.
-const TIER_COLOR = [
-  '#EEF3FB',
-  '#D6E4FA',
-  '#A9C7F5',
-  '#6FA0EC',
-  '#3B78DB',
-  '#1D4FB0',
-];
 // Sea backdrop: soft wave lines, drawn once as an inline SVG.
 const WAVES = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cpath d='M0 12 Q15 2 30 12 T60 12 T90 12 T120 12' fill='none' stroke='%231D4FB0' stroke-width='1' stroke-opacity='.35'/%3E%3C/svg%3E")`;
 
