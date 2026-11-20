@@ -432,9 +432,31 @@ describe('runImport', () => {
     ).toBe(false);
   });
 
+  it('refuses a manifest whose alt or credit differs from the workbook', () => {
+    const wrongAlt = () =>
+      run({
+        manifest: [
+          {
+            recordId: 'AKL-002',
+            src: '/tourism/AKL-002.jpg',
+            alt: 'Tigayon Hill, Altavas',
+            credit: PD,
+          },
+        ],
+      });
+    expect(wrongAlt).toThrow(/manifest alt or credit differs/);
+  });
+
   it('attaches only passing, fetched images with verbatim alt and credit', () => {
     const withFile = run({
-      manifest: [{ recordId: 'AKL-002', file: 'AKL-002.jpg' }],
+      manifest: [
+        {
+          recordId: 'AKL-002',
+          src: '/tourism/AKL-002.jpg',
+          alt: 'Tigayon Hill and caves, Altavas',
+          credit: PD,
+        },
+      ],
     });
     expect(withFile.municipalities[0].attractions[0].image).toEqual({
       src: '/tourism/AKL-002.jpg',
@@ -570,7 +592,7 @@ describe('image files', () => {
     mkdirSync(dir);
     for (const f of ['AKL-001.jpg', 'AKL-002.png', 'other.jpg'])
       writeFileSync(join(dir, f), 'x');
-    pruneOwnedFiles(dir, [{ file: 'AKL-001.jpg' }]);
+    pruneOwnedFiles(dir, [{ src: '/tourism/AKL-001.jpg' }]);
     expect(readdirSync(dir).sort()).toEqual(['AKL-001.jpg', 'other.jpg']);
   });
 });

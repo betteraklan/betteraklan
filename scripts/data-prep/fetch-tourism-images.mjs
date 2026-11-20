@@ -84,7 +84,7 @@ const OWNED_FILE = /^AKL-\d{3}\.(jpg|png|webp)$/;
 /** Deletes importer-owned files in `dir` that the manifest does not list. */
 export function pruneOwnedFiles(dir, manifest) {
   if (!existsSync(dir)) return [];
-  const keep = new Set(manifest.map(f => f.file));
+  const keep = new Set(manifest.map(f => f.src.split('/').pop()));
   const removed = [];
   for (const f of readdirSync(dir))
     if (OWNED_FILE.test(f) && !keep.has(f)) {
@@ -141,7 +141,14 @@ async function main() {
       );
       mkdirSync(dir, { recursive: true });
       writeFileSync(join(dir, entry.file), body);
-      manifest.push(entry);
+      // Manifest entry: alt and credit are copied from the workbook, verbatim.
+      manifest.push({
+        recordId: r.recordId,
+        src: `/tourism/${entry.file}`,
+        alt: `${r.itemName}, ${r.municipality}`,
+        credit: r.image.row['Credit and reuse terms'],
+      });
+      r.image.file = entry;
       console.log(
         `${r.recordId}: saved ${entry.file} ${entry.width}x${entry.height}${entry.overBudget ? ' (over 500 KB)' : ''}`
       );
@@ -155,6 +162,11 @@ async function main() {
   writeFileSync(
     join(root, 'src/data/tourism/tourism-images.json'),
     `${JSON.stringify(manifest, null, 2)}\n`
+  );
+  // Digest, size and dimensions go to the reconciliation file, not the manifest.
+  writeFileSync(
+    join(root, 'src/data/tourism/workbook-reconciliation.json'),
+    `${JSON.stringify(recon, null, 2)}\n`
   );
   console.log(
     `${manifest.length} image(s) in the manifest. Re-run the importer to attach them.`

@@ -681,11 +681,18 @@ export function runImport({
     const ev = imageEval.get(r['Record ID']);
     const f = manifestById.get(r['Record ID']);
     if (ev.verdict !== 'pass' || !f) return undefined;
-    return {
-      src: `/tourism/${f.file}`,
-      alt: `${r['Item name']}, ${r.Municipality}`,
-      credit: imageRows.get(r['Record ID'])['Credit and reuse terms'],
-    };
+    // The manifest copy must match the workbook exactly; alt and credit are never edited.
+    const alt = `${r['Item name']}, ${r.Municipality}`;
+    const credit = imageRows.get(r['Record ID'])['Credit and reuse terms'];
+    if (f.alt !== alt || f.credit !== credit)
+      throw new Error(
+        `${r['Record ID']}: manifest alt or credit differs from the workbook; re-run fetch-tourism-images`
+      );
+    if (!/^\/tourism\/AKL-\d{3}\.(jpg|png|webp)$/.test(f.src))
+      throw new Error(
+        `${r['Record ID']}: manifest src must be /tourism/<Record ID>.<ext>`
+      );
+    return { src: f.src, alt, credit };
   };
   const workbookEntry = (r, base = {}) => {
     const e = {
@@ -925,7 +932,7 @@ export function runImport({
           verdict: ev.verdict,
           reasons: ev.reasons,
           hasPhotoSlot: r.Category !== 'Description',
-          file: manifestById.get(id) ?? null,
+          file: manifestById.get(id)?.src ?? null,
         },
       };
     }),
