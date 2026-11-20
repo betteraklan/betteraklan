@@ -1,6 +1,11 @@
 // Tourism records shared by Explore and the Towns grid, so both count the
 // same records and shade them with the same ramp.
-import { buildRecords, densityTier, type Sources } from '@/lib/tourism/explore';
+import {
+  buildRecords,
+  densityTier,
+  type Rec,
+  type Sources,
+} from '@/lib/tourism/explore';
 import type { BoundaryFeature } from '@/lib/tourism/geo';
 
 import boundaryData from '@/data/geo/municipalities-boundaries.json';
@@ -39,3 +44,24 @@ export function townCounts(): { counts: Map<string, number>; max: number } {
 }
 
 export const tierFor = (n: number, max: number) => densityTier(n, max);
+
+/**
+ * Up to `n` records of one layer, at most one per municipality, in record
+ * order. BetterAklan has no popularity data, so this is a spread across
+ * towns, not a ranking.
+ */
+export function pickSpread(
+  recs: Rec[],
+  layer: 'place' | 'event' | 'product',
+  n = 6
+): Rec[] {
+  const towns = new Set<string>();
+  const out: Rec[] = [];
+  for (const r of recs) {
+    if (r.layer !== layer || !r.town || towns.has(r.town)) continue;
+    towns.add(r.town);
+    out.push(r);
+    if (out.length === n) break;
+  }
+  return out;
+}
