@@ -77,6 +77,11 @@ interface Props {
   onSettled?: (town: string) => void;
   /** Play the entrance: flat silhouette, then ease into the camera. */
   intro?: boolean;
+  /**
+   * Resting view as [[west, south], [east, north]] when no town or record is
+   * selected (default: the whole province). Pass a stable value.
+   */
+  view?: [[number, number], [number, number]] | null;
 }
 
 // Free vector basemap (OpenMapTiles schema, includes building heights). No API key.
@@ -231,6 +236,7 @@ export default function AklanMap3D({
   intro = false,
   onBackground,
   onSettled,
+  view = null,
 }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -963,7 +969,7 @@ export default function AklanMap3D({
     } else {
       const f = boundaries.find(b => b.properties.slug === town);
       const bounds = (
-        f ? boundsOf([f]) : boundsOf(boundaries)
+        f ? boundsOf([f]) : (view ?? boundsOf(boundaries))
       ) as LngLatBoundsLike;
       const cam = map.cameraForBounds(bounds, { padding: f ? 48 : PAD });
       if (!cam) return;
@@ -1038,7 +1044,7 @@ export default function AklanMap3D({
     return () => {
       map.off('moveend', onEnd);
     };
-  }, [ready, boundaries, town, selected, townCentres]);
+  }, [ready, boundaries, town, selected, townCentres, view]);
 
   useEffect(() => {
     const map = mapRef.current;

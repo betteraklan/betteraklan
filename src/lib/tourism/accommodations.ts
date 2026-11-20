@@ -132,3 +132,52 @@ export function facetCounts(items: StayLike[], f: StayFilters) {
   }
   return { type, station };
 }
+
+/**
+ * Many published addresses only say "Station 1, Brgy. Balabag", so
+ * geocoding puts dozens of establishments on one point. They share one pin
+ * that lists them all, rather than being fanned out into fake positions.
+ */
+export interface StayGroup<T extends { lat: number; lon: number }> {
+  id: string;
+  lat: number;
+  lon: number;
+  items: T[];
+}
+
+export function groupStays<T extends { lat: number; lon: number }>(
+  points: T[]
+): StayGroup<T>[] {
+  const groups = new Map<string, StayGroup<T>>();
+  for (const p of points) {
+    const key = `${p.lat},${p.lon}`;
+    const g = groups.get(key);
+    if (g) g.items.push(p);
+    else
+      groups.set(key, {
+        id: `here:${key}`,
+        lat: p.lat,
+        lon: p.lon,
+        items: [p],
+      });
+  }
+  return [...groups.values()];
+}
+
+/** [[west, south], [east, north]] around the points, padded; null when empty. */
+export function boundsOfPoints(
+  points: { lat: number; lon: number }[],
+  pad = 0.005
+): [[number, number], [number, number]] | null {
+  if (points.length === 0) return null;
+  const lons = points.map(p => p.lon);
+  const lats = points.map(p => p.lat);
+  return [
+    [Math.min(...lons) - pad, Math.min(...lats) - pad],
+    [Math.max(...lons) + pad, Math.max(...lats) + pad],
+  ];
+}
+
+export function googleMapsUrl(lat: number, lon: number) {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+}

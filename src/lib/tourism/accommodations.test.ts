@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest';
 import accommodations from '@/data/tourism/accommodations.json';
 
 import {
+  boundsOfPoints,
   deriveStation,
   deriveType,
   facetCounts,
+  groupStays,
   hasFilters,
   matchesStay,
   NO_FILTERS,
@@ -189,5 +191,54 @@ describe('facetCounts', () => {
     expect(c.type.get('none')).toBe(1);
     expect(c.station.get('none')).toBe(2);
     expect([...c.type.values()].reduce((a, b) => a + b, 0)).toBe(stays.length);
+  });
+});
+
+describe('groupStays', () => {
+  it('puts stays sharing one coordinate on one pin, keeping order', () => {
+    const pts = [
+      { name: 'A', lat: 11.96, lon: 121.92 },
+      { name: 'B', lat: 11.97, lon: 121.93 },
+      { name: 'C', lat: 11.96, lon: 121.92 },
+    ];
+    const g = groupStays(pts);
+    expect(g).toHaveLength(2);
+    expect(g[0].items.map(p => p.name)).toEqual(['A', 'C']);
+    expect(g[0].id).toBe('here:11.96,121.92');
+    expect(g[1].items.map(p => p.name)).toEqual(['B']);
+  });
+
+  it('every Boracay stay with a location lands in exactly one group', () => {
+    const pts = (
+      accommodations as {
+        area: string;
+        lat: number | null;
+        lon: number | null;
+      }[]
+    ).filter(
+      (a): a is { area: string; lat: number; lon: number } =>
+        a.area === 'boracay' && a.lat != null && a.lon != null
+    );
+    const g = groupStays(pts);
+    expect(g.reduce((n, x) => n + x.items.length, 0)).toBe(pts.length);
+    expect(new Set(g.map(x => x.id)).size).toBe(g.length);
+  });
+});
+
+describe('boundsOfPoints', () => {
+  it('pads the extent and is null for no points', () => {
+    expect(boundsOfPoints([])).toBeNull();
+    expect(
+      boundsOfPoints(
+        [
+          { lat: 1, lon: 2 },
+          { lat: 3, lon: 4 },
+        ],
+        0.5
+      )
+    ).toEqual([
+      [1.5, 0.5],
+      [4.5, 3.5],
+    ]);
   });
 });
