@@ -19,6 +19,7 @@ vi.mock('./components/AklanMap3D', () => ({
 vi.mock('@/lib/tourism/advisories', () => ({
   useAdvisories: () => ({ advisories: [], status: 'live' }),
   advisoriesFor: () => [],
+  townsWithLiveNotices: () => new Set<string>(),
 }));
 vi.mock('@/lib/weather', () => ({
   fetchWeatherForCity: () => Promise.resolve(null),
