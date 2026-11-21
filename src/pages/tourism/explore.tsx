@@ -25,6 +25,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 
 import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL, overlaps } from '@/lib/tourism/festivalDates';
+import { monthRange } from '@/lib/tourism/festivalDateText';
 import {
   densityTier,
   emptyState,
@@ -33,6 +34,7 @@ import {
   type Layer,
   type Rec,
   tierBounds,
+  festivalsInMonth,
   hasNoDate,
 } from '@/lib/tourism/explore';
 import { findMunicipalityAt } from '@/lib/tourism/geo';
@@ -49,6 +51,7 @@ import AklanMap3D, {
   type TourMove,
 } from './components/AklanMap3D';
 import EmptyState from './components/EmptyState';
+import FestivalSeason from './components/FestivalSeason';
 import FestivalStrip from './components/FestivalStrip';
 import FiltersSheet from './components/FiltersSheet';
 import LayerGlyph from './components/LayerGlyph';
@@ -570,6 +573,28 @@ export default function TourismExplore() {
   const [pulse, setPulse] = useState<{ ids: string[]; key: number } | null>(
     null
   );
+  // Festival season slider: festivals per month (by recorded date or the
+  // month the description names), January first.
+  const seasonCounts = useMemo(
+    () =>
+      Array.from(
+        { length: 12 },
+        (_, i) => festivalsInMonth(ALL_RECORDS, i + 1, today).length
+      ),
+    [today]
+  );
+  const pickSeason = (month: number) => {
+    stopTour();
+    if (!month) {
+      update({ from: '', to: '', sel: '' });
+      return;
+    }
+    update({ ...monthRange(month, today), sel: '' });
+    setPulse(p => ({
+      ids: festivalsInMonth(ALL_RECORDS, month, today).map(e => e.id),
+      key: (p?.key ?? 0) + 1,
+    }));
+  };
   const pickedMonth =
     from && to && from.endsWith('-01') && from.slice(0, 7) === to.slice(0, 7)
       ? from.slice(0, 7)
@@ -1126,6 +1151,13 @@ export default function TourismExplore() {
                   </p>
                 </div>
               </div>
+              {(layer === 'all' || layer === 'event') && (
+                <FestivalSeason
+                  month={pickedMonth ? Number(pickedMonth.slice(5, 7)) : 0}
+                  counts={seasonCounts}
+                  onChange={pickSeason}
+                />
+              )}
               <div
                 role='group'
                 aria-label='Map legend'

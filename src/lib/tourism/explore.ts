@@ -1,5 +1,5 @@
 import { filterByDateRange, getDateStatus } from './festivalDates';
-import { parseFestivalDate } from './festivalDateText';
+import { monthRange, parseFestivalDate } from './festivalDateText';
 import { findMunicipalityAt, type BoundaryFeature } from './geo';
 import type {
   Accommodation,
@@ -198,6 +198,23 @@ export function filterRecords(recs: Rec[], f: Filters): Rec[] {
       ).length > 0
     );
   });
+}
+
+/**
+ * Festivals that fall in a month (1 to 12): by recorded date, or by the month
+ * their description names. Undated festivals are not counted as matches.
+ */
+export function festivalsInMonth(
+  recs: Rec[],
+  month: number,
+  today: Date = new Date()
+): Rec[] {
+  return filterRecords(recs, {
+    q: '',
+    town: '',
+    layer: 'event',
+    ...monthRange(month, today),
+  }).filter(r => !hasNoDate(r));
 }
 
 /** A festival with no recorded date whose description names none either. */
