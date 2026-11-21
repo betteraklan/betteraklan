@@ -296,6 +296,25 @@ export function licenceClass(note) {
   return 'other';
 }
 
+/**
+ * The Creative Commons licence a credit names, when it is one the site can
+ * use as-is: Attribution (BY) or Attribution-ShareAlike (BY-SA), versions 2.0
+ * to 4.0. NonCommercial and NoDerivatives licences are not accepted. Returns
+ * the licence name and its deed URL, or null.
+ */
+export function ccLicence(note) {
+  if (/\bNC\b|non-?commercial|\bND\b|no-?deriv/i.test(note)) return null;
+  const m =
+    /\bCC[ -]BY(-SA)?[ -]([234]\.0)\b/i.exec(note) ??
+    /creative commons attribution(-share-?alike)?[ -]([234]\.0)\b/i.exec(note);
+  if (!m) return null;
+  const sa = !!m[1];
+  return {
+    name: `CC BY${sa ? '-SA' : ''} ${m[2]}`,
+    url: `https://creativecommons.org/licenses/by${sa ? '-sa' : ''}/${m[2]}/`,
+  };
+}
+
 /** Applies image rules 1 to 5 to the recorded row. Returns { verdict, reasons }. */
 export function evaluateImage(img) {
   const url = img['Image URL or source'];
@@ -339,14 +358,19 @@ export function evaluateImage(img) {
     );
   if (/\b(partial|name[- ]only)\b/i.test(result))
     reasons.push('3: download result says PARTIAL or NAME-ONLY');
-  // Rule 4: public domain only under the current credit strip.
+  // Rule 4: public domain, or CC BY / BY-SA shown with a link to the licence
+  // and to the photo's source page (owner decision, 2026-11-21).
   const cls = licenceClass(credit);
   if (cls !== 'explicit')
     reasons.push(`4: licence ${cls === 'other' ? 'unclear' : cls}`);
-  else if (!/public domain/i.test(credit))
-    reasons.push(
-      '4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)'
-    );
+  else if (!/public domain/i.test(credit)) {
+    if (!ccLicence(credit))
+      reasons.push(
+        '4: Creative Commons licence is not CC BY or CC BY-SA 2.0 to 4.0 (held)'
+      );
+    else if (!/^https?:\/\//i.test(img['Photo source page'] ?? ''))
+      reasons.push('4: CC photo needs its source page for attribution');
+  }
   // Rule 5: no signed or expiring link.
   if (EXPIRING_URL.test(url) || /expir/i.test(`${result} ${shows}`))
     reasons.push('5: signed or expiring link');
@@ -692,7 +716,18 @@ export function runImport({
       throw new Error(
         `${r['Record ID']}: manifest src must be /tourism/<Record ID>.<ext>`
       );
-    return { src: f.src, alt, credit };
+    // A CC photo carries its licence and source page so the credit can link both.
+    const cc = ccLicence(credit);
+    return cc
+      ? {
+          src: f.src,
+          alt,
+          credit,
+          licence: cc.name,
+          licenceUrl: cc.url,
+          sourcePage: imageRows.get(r['Record ID'])['Photo source page'],
+        }
+      : { src: f.src, alt, credit };
   };
   const workbookEntry = (r, base = {}) => {
     const e = {

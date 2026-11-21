@@ -96,7 +96,14 @@ export function pruneOwnedFiles(dir, manifest) {
 
 /** Fetches one recorded URL; returns a manifest entry or throws why not. */
 export async function fetchImage(recordId, url, fetchImpl = fetch) {
-  const res = await fetchImpl(url, { redirect: 'manual' });
+  // Wikimedia answers 429 to clients without a descriptive User-Agent.
+  const res = await fetchImpl(url, {
+    redirect: 'manual',
+    headers: {
+      'User-Agent':
+        'tourism-image-fetch/1.0 (one-off download of openly licensed photos)',
+    },
+  });
   if (res.status !== 200)
     throw new Error(`HTTP ${res.status} (no redirects followed)`);
   const body = Buffer.from(await res.arrayBuffer());

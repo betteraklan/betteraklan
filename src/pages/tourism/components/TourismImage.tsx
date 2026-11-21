@@ -7,6 +7,55 @@ import { LAYER_ICON } from './layerMeta';
 
 type Layer = Rec['layer'];
 
+const STRIP =
+  'type-meta absolute right-0 bottom-0 max-w-full bg-black/55 px-2 py-0.5 text-white';
+
+/**
+ * The visible credit. A CC photo's credit wraps rather than truncating, and
+ * links the photo's page and its licence, as the licence requires. Inside a
+ * card that is itself a button, links can't nest, so it shows the same words
+ * as plain text; the town page's article cards link them.
+ */
+function Credit({ image, links }: { image: Photo; links: boolean }) {
+  const text = `Photo: ${image.credit}`;
+  if (!image.licenceUrl)
+    return (
+      <span title={text} className={`${STRIP} truncate`}>
+        {text}
+      </span>
+    );
+  return (
+    <span className={`${STRIP} line-clamp-3`}>
+      {links && image.sourcePage ? (
+        <a
+          href={image.sourcePage}
+          target='_blank'
+          rel='noreferrer'
+          className='underline'
+        >
+          {text}
+          <span className='sr-only'> (photo page, opens in a new tab)</span>
+        </a>
+      ) : (
+        text
+      )}{' '}
+      {links ? (
+        <a
+          href={image.licenceUrl}
+          target='_blank'
+          rel='noreferrer license'
+          className='font-semibold underline'
+        >
+          {image.licence}
+          <span className='sr-only'> licence (opens in a new tab)</span>
+        </a>
+      ) : (
+        <span className='font-semibold'>{image.licence}</span>
+      )}
+    </span>
+  );
+}
+
 // Fallback tiles use only brand blue, orange and one existing teal (Tailwind
 // teal-600, the repo's "Dark Teal"). Orange-700 keeps the white icon at 3:1+.
 const TILE: Record<Layer, string> = {
@@ -27,6 +76,8 @@ interface Props {
    * photo can be dropped in later without any layout change.
    */
   fill?: boolean;
+  /** False inside a card that is a button, where links cannot nest. */
+  links?: boolean;
 }
 
 /**
@@ -38,12 +89,12 @@ export default function TourismImage({
   image,
   layer = 'place',
   fill = false,
+  links = true,
 }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const Icon = LAYER_ICON[layer];
   const showPhoto = !!image && !failed;
-  const credit = image ? `Photo: ${image.credit}` : '';
 
   if (fill)
     return (
@@ -68,12 +119,7 @@ export default function TourismImage({
               aria-hidden='true'
               className='absolute inset-0 bg-gradient-to-r from-kapwa-brand-950/90 via-kapwa-brand-950/60 to-kapwa-brand-950/20'
             />
-            <span
-              title={credit}
-              className='type-meta absolute right-0 bottom-0 max-w-full truncate bg-black/55 px-2 py-0.5 text-white'
-            >
-              {credit}
-            </span>
+            <Credit image={image} links={links} />
           </>
         )}
       </span>
@@ -96,12 +142,7 @@ export default function TourismImage({
             onError={() => setFailed(true)}
             className={`h-full w-full object-cover transition-opacity duration-(--dur-base) ease-out-expo motion-reduce:transition-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           />
-          <span
-            title={credit}
-            className='type-meta absolute right-0 bottom-0 max-w-full truncate bg-black/55 px-2 py-0.5 text-white'
-          >
-            {credit}
-          </span>
+          <Credit image={image} links={links} />
         </>
       ) : (
         <span

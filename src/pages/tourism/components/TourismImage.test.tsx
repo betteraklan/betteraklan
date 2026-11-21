@@ -52,6 +52,36 @@ describe('TourismImage', () => {
     expect(screen.getByTitle(`Photo: ${photo.credit}`)).toBeTruthy();
   });
 
+  const cc = {
+    src: '/tourism/AKL-036.jpg',
+    alt: 'Batan Sea Port, Batan',
+    credit: 'Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons).',
+    licence: 'CC BY 3.0',
+    licenceUrl: 'https://creativecommons.org/licenses/by/3.0/',
+    sourcePage: 'https://commons.wikimedia.org/wiki/File:Batan,_Aklan_2.JPG',
+  };
+
+  it('links a CC photo to its page and licence, without truncating', () => {
+    render(<TourismImage image={cc} layer='place' />);
+    const page = screen.getByRole('link', { name: /Heinrich Balbuena/ });
+    expect(page.getAttribute('href')).toBe(cc.sourcePage);
+    const licence = screen.getByRole('link', { name: /CC BY 3.0 licence/ });
+    expect(licence.getAttribute('href')).toBe(cc.licenceUrl);
+    expect(licence.getAttribute('rel')).toContain('license');
+    expect(page.closest('span')!.className).not.toContain('truncate');
+  });
+
+  it('shows the CC credit as text inside a button card (no nested links)', () => {
+    render(
+      <button type='button'>
+        <TourismImage image={cc} layer='place' links={false} />
+      </button>
+    );
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
+    expect(screen.getByText('CC BY 3.0')).toBeTruthy();
+    expect(screen.getByText(/Photo: Heinrich Balbuena/)).toBeTruthy();
+  });
+
   it('falls back to the tile if the photo fails to load', () => {
     const { container } = render(<TourismImage image={photo} layer='event' />);
     fireEvent.error(screen.getByRole('img', { name: photo.alt }));

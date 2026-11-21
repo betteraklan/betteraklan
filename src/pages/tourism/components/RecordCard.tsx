@@ -81,7 +81,7 @@ export default function RecordCard({
           onClick={() => onSelect(rec.id)}
           className={`group bg-kapwa-bg-surface border-kapwa-border-weak flex h-full w-full flex-col overflow-hidden rounded-panel border text-left shadow-elev-1 transition-[box-shadow,translate] duration-(--dur-fast) ease-out-expo hover:shadow-elev-2 motion-safe:hover:-translate-y-0.5 ${selected ? 'ring-2 ring-[#1D4FB0]' : ''}`}
         >
-          <TourismImage image={rec.image} layer={rec.layer} />
+          <TourismImage image={rec.image} layer={rec.layer} links={false} />
 
           <span className='flex flex-1 flex-col gap-1.5 p-3'>
             <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>

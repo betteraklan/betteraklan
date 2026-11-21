@@ -13,6 +13,7 @@ import {
 import {
   CONTENT_HEADERS,
   IMAGE_HEADERS,
+  ccLicence,
   evaluateImage,
   readXlsx,
   runImport,
@@ -520,10 +521,54 @@ describe('image rules', () => {
         'Image URL or source': 'https://scontent.fbcdn.net/v/x.jpg?oe=6740',
       }).verdict
     ).toBe('fail'));
-  it('holds a Creative Commons licence', () => {
+  // Owner decision 2026-11-21: CC BY and CC BY-SA photos may be used when the
+  // credit can link the licence and the photo's source page.
+  const SOURCE = 'https://commons.wikimedia.org/wiki/File:X.jpg';
+  it('passes CC BY / BY-SA with a source page (real credits from the workbook)', () => {
+    for (const credit of [
+      'Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons).',
+      'Gibough; CC BY-SA 4.0 (Wikimedia Commons).',
+      'Photographer Ree Dexter; Wikimedia Commons lists the image under CC BY 3.0. Attribute the photographer and link the license when reusing.',
+    ])
+      expect(
+        ev({
+          'Credit and reuse terms': credit,
+          'Photo source page': SOURCE,
+        }).verdict
+      ).toBe('pass');
+  });
+  it('fails a CC photo without a source page to credit', () => {
     const r = ev({ 'Credit and reuse terms': 'Photo by X, CC BY-SA 4.0.' });
     expect(r.verdict).toBe('fail');
-    expect(r.reasons.join()).toMatch(/Creative Commons/);
+    expect(r.reasons.join()).toMatch(/source page/);
+  });
+  it('holds NonCommercial and NoDerivatives licences', () => {
+    for (const credit of [
+      'Photo by X, CC BY-NC 4.0.',
+      'Photo by X, CC BY-ND 4.0.',
+      'Photo by X, CC BY-NC-SA 2.0.',
+    ]) {
+      const r = ev({
+        'Credit and reuse terms': credit,
+        'Photo source page': SOURCE,
+      });
+      expect(r.verdict).toBe('fail');
+      expect(r.reasons.join()).toMatch(/not CC BY or CC BY-SA/);
+    }
+  });
+  it('names the licence and links its deed', () => {
+    expect(
+      ccLicence('Elmer B. Domingo; CC BY-SA 4.0 (Wikimedia Commons).')
+    ).toEqual({
+      name: 'CC BY-SA 4.0',
+      url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    });
+    expect(
+      ccLicence(
+        'ShmilyDigital; Creative Commons Attribution-ShareAlike 4.0. Credit the author.'
+      )?.url
+    ).toBe('https://creativecommons.org/licenses/by-sa/4.0/');
+    expect(ccLicence('Photo by X; public domain.')).toBeNull();
   });
   it('fails a licence that is not stated', () =>
     expect(

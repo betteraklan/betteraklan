@@ -21,6 +21,12 @@ export interface TourismImage {
   alt: string;
   credit: string;
   color?: string;
+  /** Creative Commons licence name ("CC BY 3.0"), for CC photos only. */
+  licence?: string;
+  /** The licence deed, linked from the credit. */
+  licenceUrl?: string;
+  /** The photo's own page (the attribution link). */
+  sourcePage?: string;
 }
 
 export interface TourismEntry {

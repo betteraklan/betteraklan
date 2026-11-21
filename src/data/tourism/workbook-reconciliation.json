@@ -2105,10 +2105,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": true,
         "file": null
       }
@@ -2406,10 +2404,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": true,
         "file": null
       }
@@ -2640,8 +2636,7 @@
         "licenceClass": "explicit",
         "verdict": "fail",
         "reasons": [
-          "3: subject note says partial, name-only, illustrative or generic",
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
+          "3: subject note says partial, name-only, illustrative or generic"
         ],
         "hasPhotoSlot": true,
         "file": null
@@ -2680,10 +2675,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": false,
         "file": null
       }
@@ -4045,10 +4038,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": false,
         "file": null
       }
@@ -8067,10 +8058,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": false,
         "file": null
       }
@@ -8840,10 +8829,8 @@
           "Open image/source": "Open image"
         },
         "licenceClass": "explicit",
-        "verdict": "fail",
-        "reasons": [
-          "4: Creative Commons licence needs a linked licence notice the truncated credit strip cannot show (held)"
-        ],
+        "verdict": "pass",
+        "reasons": [],
         "hasPhotoSlot": true,
         "file": null
       }
