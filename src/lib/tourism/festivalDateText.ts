@@ -264,6 +264,21 @@ export function dateTile(info: FestivalDateInfo | null): DateTile {
   return { top, bottom, label };
 }
 
+/**
+ * The next whole calendar month `month` (1 to 12), starting this month, as
+ * ISO dates for Explore's `from` and `to`. Festivals recur, so a month
+ * already past this year means next year's.
+ */
+export function monthRange(
+  month: number,
+  today: Date = new Date()
+): { from: string; to: string } {
+  const year = today.getFullYear() + (month < today.getMonth() + 1 ? 1 : 0);
+  const last = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const mm = String(month).padStart(2, '0');
+  return { from: `${year}-${mm}-01`, to: `${year}-${mm}-${last}` };
+}
+
 export const canAddToCalendar = (i: FestivalDateInfo) => i.kind === 'fixed';
 
 // ---------------------------------------------------------------- .ics ----

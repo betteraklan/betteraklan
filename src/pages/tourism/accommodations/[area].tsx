@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 
 import {
   BookmarkIcon,
+  CompassIcon,
   MapPinIcon,
   NavigationIcon,
   SearchIcon,
@@ -483,6 +484,14 @@ export default function AccommodationsPage() {
                           </span>
                         </a>
                       )}
+                      <Link
+                        to={`/tourism/explore?layer=stay&sel=${a.id}`}
+                        className='text-kapwa-text-brand flex min-h-11 items-center gap-1 text-xs font-medium hover:underline'
+                      >
+                        <CompassIcon aria-hidden='true' className='h-3 w-3' />{' '}
+                        Open in Explore
+                        <span className='sr-only'>: {a.name}</span>
+                      </Link>
                       <SaveToTripButton
                         name={a.name}
                         saved={trip.ids.includes(a.id)}

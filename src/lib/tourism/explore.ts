@@ -1,4 +1,5 @@
 import { filterByDateRange, getDateStatus } from './festivalDates';
+import { parseFestivalDate } from './festivalDateText';
 import { findMunicipalityAt, type BoundaryFeature } from './geo';
 import type {
   Accommodation,
@@ -179,16 +180,48 @@ export function filterRecords(recs: Rec[], f: Filters): Rec[] {
         r.description.toLowerCase().includes(q))
   );
   if (!f.from && !f.to) return base;
-  // Date range applies to festivals; undated records remain visible.
-  return base.filter(
-    r =>
-      r.layer !== 'event' ||
+  // Date range applies to festivals. With no recorded date, a festival is
+  // matched by the month its description names, as the Festivals band lists
+  // it; one whose description names no date stays visible.
+  const months = monthsBetween(f.from, f.to);
+  return base.filter(r => {
+    if (r.layer !== 'event') return true;
+    if (r.dateStatus === 'unavailable' && months) {
+      const info = parseFestivalDate(r.description);
+      if (info) return info.months.some(m => months.has(m));
+    }
+    return (
       filterByDateRange(
         [{ name: r.name, description: r.description, dates: r.dates }],
         f.from,
         f.to
       ).length > 0
-  );
+    );
+  });
+}
+
+/** A festival with no recorded date whose description names none either. */
+export const hasNoDate = (r: Rec) =>
+  r.layer === 'event' &&
+  r.dateStatus === 'unavailable' &&
+  !parseFestivalDate(r.description);
+
+/**
+ * Calendar months (1 to 12) an ISO range touches, or null when it is open at
+ * one end or spans a whole year, so any month can match.
+ */
+export function monthsBetween(from?: string, to?: string): Set<number> | null {
+  if (!from || !to) return null;
+  let y = Number(from.slice(0, 4));
+  let m = Number(from.slice(5, 7));
+  const ty = Number(to.slice(0, 4));
+  const tm = Number(to.slice(5, 7));
+  const out = new Set<number>();
+  while ((y < ty || (y === ty && m <= tm)) && out.size < 12) {
+    out.add(m);
+    if (++m > 12) [m, y] = [1, y + 1];
+  }
+  return out.size === 12 ? null : out;
 }
 
 /** Explains an empty result: no data for the category vs. a filter that matched nothing. */

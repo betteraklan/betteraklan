@@ -96,7 +96,11 @@ export default function PlacesTabs() {
               <RecordCard
                 rec={r}
                 selected={false}
-                onSelect={id => navigate(`/tourism/explore?sel=${id}&view=map`)}
+                onSelect={id =>
+                  navigate(
+                    `/tourism/explore?sel=${id}${r.town ? `&town=${r.town}` : ''}&view=map`
+                  )
+                }
               />
             </li>
           ))}

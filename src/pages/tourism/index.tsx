@@ -8,6 +8,7 @@ import {
   ExternalLinkIcon,
   LifeBuoyIcon,
   MapIcon,
+  PlayIcon,
   MapPinIcon,
   PartyPopperIcon,
   ShoppingBagIcon,
@@ -336,13 +337,22 @@ export default function TourismIndex() {
                 municipalities: places, festivals, local products and places to
                 stay.
               </p>
-              <Link
-                to='/tourism/explore?view=map'
-                className='bg-kapwa-bg-brand-default hover:bg-kapwa-bg-brand-hover text-kapwa-text-inverse type-body inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-semibold transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
-              >
-                <MapIcon aria-hidden='true' className='h-4 w-4' />
-                Open the map
-              </Link>
+              <div className='flex flex-wrap gap-2'>
+                <Link
+                  to='/tourism/explore?view=map'
+                  className='bg-kapwa-bg-brand-default hover:bg-kapwa-bg-brand-hover text-kapwa-text-inverse type-body inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-semibold transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
+                >
+                  <MapIcon aria-hidden='true' className='h-4 w-4' />
+                  Open the map
+                </Link>
+                <Link
+                  to='/tourism/explore?view=map&tour=1'
+                  className='border-kapwa-border-brand text-kapwa-text-brand type-body inline-flex min-h-11 items-center gap-2 rounded-full border px-5 font-semibold transition-colors duration-(--dur-fast) hover:bg-kapwa-bg-brand-weak focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kapwa-border-brand'
+                >
+                  <PlayIcon aria-hidden='true' className='h-4 w-4' />
+                  Take the tour
+                </Link>
+              </div>
             </div>
           </section>
 

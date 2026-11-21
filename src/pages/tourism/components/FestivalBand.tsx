@@ -10,6 +10,7 @@ import {
   type FestivalDateInfo,
   MONTH_NAMES,
   monthGrid,
+  monthRange,
   pickFeatured,
   type PlacedFestival,
 } from '@/lib/tourism/festivalDateText';
@@ -99,6 +100,8 @@ function MonthCard({
   const shown = items.slice(0, PER_CARD);
   const more = items.length - shown.length;
   const id = `month-${month.toLowerCase()}`;
+  const { from, to } = monthRange(MONTH_NAMES.indexOf(month as never) + 1);
+  const monthLink = `/tourism/explore?layer=event&from=${from}&to=${to}&view=list`;
   return (
     <li>
       <section
@@ -130,12 +133,14 @@ function MonthCard({
             ))}
           </ul>
         )}
-        {more > 0 && (
+        {items.length > 0 && (
           <Link
-            to='/tourism/explore?layer=event&view=list'
+            to={monthLink}
             className='text-kapwa-text-brand type-meta inline-flex min-h-11 items-center font-semibold hover:underline'
           >
-            {more} more in {month}: see all festivals
+            {more > 0
+              ? `${more} more in ${month}: see all festivals`
+              : `See ${month} in Explore`}
           </Link>
         )}
       </section>

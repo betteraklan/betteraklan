@@ -16,6 +16,7 @@ import {
   RouteIcon,
   PlayIcon,
   XIcon,
+  LinkIcon,
   Share2Icon,
   SlidersHorizontalIcon,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ import {
   type Layer,
   type Rec,
   tierBounds,
+  hasNoDate,
 } from '@/lib/tourism/explore';
 import { findMunicipalityAt } from '@/lib/tourism/geo';
 import {
@@ -139,15 +141,20 @@ export default function TourismExplore() {
   const to = params.get('to') ?? '';
 
   // Replace (not push) so filter and view changes don't flood history.
+  // Two updates in one tick (say, arrival effects) must build on each other,
+  // not on the same stale params, so the latest URL is kept in a ref.
+  const latestParams = useRef(params);
+  latestParams.current = params;
   const update = useCallback(
     (patch: Record<string, string>) => {
-      const next = new URLSearchParams(params);
+      const next = new URLSearchParams(latestParams.current);
       Object.entries(patch).forEach(([k, v]) =>
         v ? next.set(k, v) : next.delete(k)
       );
+      latestParams.current = next;
       setParams(next, { replace: true });
     },
-    [params, setParams]
+    [setParams]
   );
 
   const filters = {
@@ -279,6 +286,16 @@ export default function TourismExplore() {
     setTour({ step, paused: false });
     update({ town: MUNICIPALITIES[step].slug, sel: '' });
   };
+  // `tour=1` (the Overview's "Take the tour") starts the tour on arrival;
+  // the param is dropped so a reload or a shared link doesn't restart it.
+  useEffect(() => {
+    if (params.get('tour') !== '1') return;
+    stepLeft.current = TOUR_STEP_MS;
+    setTour({ step: 0, paused: false });
+    update({ tour: '', view: 'map', town: MUNICIPALITIES[0].slug, sel: '' });
+    // Runs once on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const finishTour = (how: 'done' | 'skipped') => {
     setTour(null);
     update({ town: '', sel: '' });
@@ -655,14 +672,33 @@ export default function TourismExplore() {
               </p>
             </div>
           </div>
-          <button
-            type='button'
-            onClick={() => shareLink(window.location.href, 'Link copied')}
-            className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-control bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-elev-2 sm:px-5'
-          >
-            <Share2Icon aria-hidden='true' className='h-4 w-4' />
-            <span className='sr-only sm:not-sr-only'>Share view</span>
-          </button>
+          <div className='flex shrink-0 items-center gap-2'>
+            <button
+              type='button'
+              onClick={() =>
+                navigator.clipboard
+                  ?.writeText(window.location.href)
+                  .then(() => showToast('Link copied'))
+                  .catch(() =>
+                    showToast(
+                      "Couldn't copy. Copy the link from the address bar."
+                    )
+                  )
+              }
+              className='bg-kapwa-bg-surface text-kapwa-text-brand inline-flex min-h-11 items-center gap-2 rounded-control px-3 text-sm font-bold shadow-elev-2 sm:px-5'
+            >
+              <LinkIcon aria-hidden='true' className='h-4 w-4' />
+              Copy link
+            </button>
+            <button
+              type='button'
+              onClick={() => shareLink(window.location.href, 'Link copied')}
+              className='inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-control bg-white px-3 text-sm font-bold text-[#0B3FAE] shadow-elev-2 sm:px-5'
+            >
+              <Share2Icon aria-hidden='true' className='h-4 w-4' />
+              <span className='sr-only sm:not-sr-only'>Share view</span>
+            </button>
+          </div>
         </div>
         <div className='relative mt-4 sm:mt-6'>
           <SearchBar
@@ -780,14 +816,12 @@ export default function TourismExplore() {
         onClearAll={clearAll}
       />
 
-      {!empty &&
-        (filters.from || filters.to) &&
-        filtered.some(r => r.dateStatus === 'unavailable') && (
-          <p className='text-kapwa-text-muted type-meta'>
-            {filtered.filter(r => r.dateStatus === 'unavailable').length} kept
-            with no recorded date; the rest fall in the range.
-          </p>
-        )}
+      {!empty && (filters.from || filters.to) && filtered.some(hasNoDate) && (
+        <p className='text-kapwa-text-muted type-meta'>
+          {filtered.filter(hasNoDate).length} kept because their description
+          gives no date; the rest fall in the range.
+        </p>
+      )}
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]'>
         <div className='min-w-0 space-y-4'>
