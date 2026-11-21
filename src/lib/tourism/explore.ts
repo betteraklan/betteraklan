@@ -230,6 +230,21 @@ export function distanceKm(r: Rec, from: Point): number | null {
     : haversineKm(from, { lat: r.lat, lon: r.lon });
 }
 
+/** Map bounds as [[west, south], [east, north]]. */
+export type Bounds = [[number, number], [number, number]];
+
+/** The record has a pin inside the bounds. */
+export function inBounds(r: Rec, [[w, s], [e, n]]: Bounds): boolean {
+  return (
+    r.lat != null &&
+    r.lon != null &&
+    r.lat >= s &&
+    r.lat <= n &&
+    r.lon >= w &&
+    r.lon <= e
+  );
+}
+
 /** Nearest first; records without a pin keep their order at the end. */
 export function sortByDistance(recs: Rec[], from: Point): Rec[] {
   const km = new Map(recs.map(r => [r.id, distanceKm(r, from)]));

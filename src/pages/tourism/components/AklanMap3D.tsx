@@ -55,6 +55,8 @@ interface Props {
   tourMove?: TourMove | null;
   /** The viewer dragged, zoomed, rotated or tilted the map themselves. */
   onUserMove?: () => void;
+  /** After the viewer pans or zooms the map: the area now in view, [[west, south], [east, north]]. */
+  onAreaMoved?: (bounds: [[number, number], [number, number]]) => void;
   /** Record hovered in the list: its pin gets a soft highlight. */
   hoverId?: string | null;
   /** The map can't start (no WebGL) or its style failed to load. */
@@ -223,6 +225,7 @@ export default function AklanMap3D({
   onHoverTown,
   tourMove = null,
   onUserMove,
+  onAreaMoved,
   hoverId = null,
   onLoadError,
   pulse = null,
@@ -267,6 +270,7 @@ export default function AklanMap3D({
     onSettled,
     onHoverTown,
     onUserMove,
+    onAreaMoved,
     onLoadError,
   });
   useEffect(() => {
@@ -277,6 +281,7 @@ export default function AklanMap3D({
       onSettled,
       onHoverTown,
       onUserMove,
+      onAreaMoved,
       onLoadError,
     };
   });
@@ -357,10 +362,23 @@ export default function AklanMap3D({
     map.on('resize', fitMin);
 
     // A drag, zoom, rotate or tilt by the viewer (not by code) pauses the tour.
+    // When such a move ends, the area in view is reported ("Search this area").
+    let userMoved = false;
     for (const type of ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart'])
       map.on(type, (e: { originalEvent?: Event }) => {
-        if (e.originalEvent) cb.current.onUserMove?.();
+        if (!e.originalEvent) return;
+        userMoved = true;
+        cb.current.onUserMove?.();
       });
+    map.on('moveend', () => {
+      if (!userMoved) return;
+      userMoved = false;
+      const b = map.getBounds();
+      cb.current.onAreaMoved?.([
+        [b.getWest(), b.getSouth()],
+        [b.getEast(), b.getNorth()],
+      ]);
+    });
     // The compass needle points to true north as the map turns.
     map.on('rotate', () => {
       if (needle.current)

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,6 +7,7 @@ import {
   distanceKm,
   festivalsInMonth,
   formatDistance,
+  inBounds,
   sortByDistance,
 } from '@/lib/tourism/explore';
 import type { Advisory } from '@/types/tourism';
@@ -254,5 +255,49 @@ describe('near me', () => {
     expect(screen.queryByText('Nearest to you first')).toBeNull();
     expect(firstNames(5)).toEqual(before);
     expect(params().get('town')).toBeNull();
+  });
+});
+
+describe('search this area', () => {
+  // Boracay, roughly: west, south, east, north.
+  const BORACAY: [[number, number], [number, number]] = [
+    [121.9, 11.94],
+    [121.96, 12.0],
+  ];
+  const moveMap = (b: typeof BORACAY) =>
+    act(() => (mapProps.current.onAreaMoved as (b: typeof BORACAY) => void)(b));
+
+  it('keeps only records with a pin inside the bounds', () => {
+    const inside = ALL_RECORDS.filter(r => inBounds(r, BORACAY));
+    expect(inside.length).toBeGreaterThan(0);
+    for (const r of inside) {
+      expect(r.lat!).toBeGreaterThanOrEqual(11.94);
+      expect(r.lon!).toBeLessThanOrEqual(121.96);
+    }
+    expect(inBounds({ ...inside[0], lat: null, lon: null }, BORACAY)).toBe(
+      false
+    );
+  });
+
+  it('appears after the map is moved, and limits the list to that area', () => {
+    explore('?view=map');
+    expect(
+      screen.queryByRole('button', { name: 'Search this area' })
+    ).toBeNull();
+    moveMap(BORACAY);
+    fireEvent.click(screen.getByRole('button', { name: 'Search this area' }));
+    const n = ALL_RECORDS.filter(r => inBounds(r, BORACAY)).length;
+    expect(
+      screen.getByRole('heading', { name: `${n} records in this map area` })
+    ).toBeTruthy();
+    // The button goes away until the map moves again.
+    expect(
+      screen.queryByRole('button', { name: 'Search this area' })
+    ).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /Clear map area/ }));
+    expect(
+      screen.getByRole('heading', { name: /records in Aklan$/ })
+    ).toBeTruthy();
   });
 });

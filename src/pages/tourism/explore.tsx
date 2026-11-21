@@ -18,6 +18,7 @@ import {
   XIcon,
   LinkIcon,
   LocateFixedIcon,
+  SearchIcon,
   Share2Icon,
   SlidersHorizontalIcon,
 } from 'lucide-react';
@@ -39,10 +40,12 @@ import {
   type Layer,
   type Rec,
   tierBounds,
+  type Bounds,
   distanceKm,
   festivalsInMonth,
   formatDistance,
   hasNoDate,
+  inBounds,
   type Point,
   sortByDistance,
 } from '@/lib/tourism/explore';
@@ -189,6 +192,10 @@ export default function TourismExplore() {
   );
   // Near me: the visitor's position once tapped (kept on this device only).
   const [near, setNear] = useState<Point | null>(null);
+  // Search this area: the view after the visitor moved the map, and the area
+  // the list is limited to once they ask.
+  const [movedTo, setMovedTo] = useState<Bounds | null>(null);
+  const [area, setArea] = useState<Bounds | null>(null);
   const selected = ALL_RECORDS.find(r => r.id === sel) ?? null;
   const selectedPin = useMemo<MapPin | null>(
     () =>
@@ -414,10 +421,10 @@ export default function TourismExplore() {
   const [pageSize, setPageSize] = useState(RESULTS_PAGE);
   useEffect(() => setPageSize(RESULTS_PAGE), [q, town, layer, from, to]);
   // The list: the filtered records, nearest first after Near me.
-  const listed = useMemo(
-    () => (near ? sortByDistance(filtered, near) : filtered),
-    [filtered, near]
-  );
+  const listed = useMemo(() => {
+    const list = near ? sortByDistance(filtered, near) : filtered;
+    return area ? list.filter(r => inBounds(r, area)) : list;
+  }, [filtered, near, area]);
   const selIndex = listed.findIndex(r => r.id === sel);
   const visible = listed.slice(0, Math.max(pageSize, selIndex + 1));
 
@@ -899,6 +906,7 @@ export default function TourismExplore() {
                   onHoverTown={setHoverTown}
                   tourMove={tourMove}
                   onUserMove={pauseTour}
+                  onAreaMoved={b => !tour && setMovedTo(b)}
                   townCount={counts}
                   town={town}
                   pins={pins}
@@ -1021,6 +1029,23 @@ export default function TourismExplore() {
                     </div>
                   )}
                 </div>
+
+                {/* After a pan or zoom: limit the list to what is in view. */}
+                {movedTo && !tour && (
+                  <div className='absolute top-[72px] left-1/2 z-[500] -translate-x-1/2 sm:top-3'>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setArea(movedTo);
+                        setMovedTo(null);
+                      }}
+                      className='bg-kapwa-bg-surface text-kapwa-text-brand inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold whitespace-nowrap shadow-elev-2 motion-safe:animate-[panel-pop_var(--dur-fast)_var(--ease-out-expo)_both]'
+                    >
+                      <SearchIcon aria-hidden='true' className='h-4 w-4' />
+                      Search this area
+                    </button>
+                  </div>
+                )}
 
                 {/* Tour controls: start, or pause/resume with a progress ring, and skip. */}
                 <div className='absolute top-3 right-3 z-[500] flex items-center gap-2'>
@@ -1312,9 +1337,35 @@ export default function TourismExplore() {
               aria-live='polite'
               className='text-kapwa-text-strong border-kapwa-border-weak type-title border-b px-4 pt-4 pb-3'
             >
-              {filtered.length} record{filtered.length === 1 ? '' : 's'}
-              {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
+              {listed.length} record{listed.length === 1 ? '' : 's'}
+              {area
+                ? ' in this map area'
+                : townInfo
+                  ? ` in ${townInfo.name}`
+                  : ' in Aklan'}
             </h2>
+            {area && (
+              <p className='border-kapwa-border-weak type-meta flex items-center justify-between gap-2 border-b px-4 py-1'>
+                <span className='text-kapwa-text-strong inline-flex items-center gap-1.5 font-semibold'>
+                  <SearchIcon aria-hidden='true' className='h-4 w-4' />
+                  Only what is in the map area you searched
+                </span>
+                <button
+                  type='button'
+                  onClick={() => setArea(null)}
+                  className='text-kapwa-text-brand min-h-11 font-semibold hover:underline'
+                >
+                  Clear
+                  <span className='sr-only'> map area</span>
+                </button>
+              </p>
+            )}
+            {area && listed.length === 0 && filtered.length > 0 && (
+              <p className='text-kapwa-text-support type-body px-4 py-6 text-center'>
+                Nothing here has a pin in that map area. Zoom out and search
+                again, or clear the area.
+              </p>
+            )}
             {near && (
               <p className='border-kapwa-border-weak type-meta flex items-center justify-between gap-2 border-b px-4 py-1'>
                 <span className='text-kapwa-text-strong inline-flex items-center gap-1.5 font-semibold'>
