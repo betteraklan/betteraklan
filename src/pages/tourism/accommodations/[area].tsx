@@ -37,7 +37,7 @@ import {
   type StayType,
   TYPE_LABEL,
 } from '@/lib/tourism/accommodations';
-import { MAX_STOPS, serializeTrip } from '@/lib/tourism/trip';
+import { MAX_STOPS, serializeTripDays } from '@/lib/tourism/trip';
 import { useSavedTrip } from '@/lib/tourism/tripStore';
 
 import accommodationsData from '@/data/tourism/accommodations.json';
@@ -367,7 +367,7 @@ export default function AccommodationsPage() {
           </p>
           {trip.ids.length > 0 && (
             <Link
-              to={`/tourism/explore?trip=${serializeTrip(trip.ids)}`}
+              to={`/tourism/explore?trip=${serializeTripDays(trip.days)}`}
               className='text-kapwa-text-brand type-meta inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
             >
               <BookmarkIcon aria-hidden='true' className='h-4 w-4' />

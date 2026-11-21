@@ -18,8 +18,12 @@ import { displayName } from '@/lib/tourism/displayName';
 interface Props {
   open: boolean;
   onClose: () => void;
-  stops: Rec[];
+  /** Stops by day, Day 1 first. */
+  days: Rec[][];
+  /** Move the stop at `index` (counted across all days) up or down. */
   onMove: (index: number, dir: -1 | 1) => void;
+  /** Put a stop on day `day` (0-based); `days.length` starts a new day. */
+  onSetDay: (id: string, day: number) => void;
   onRemove: (id: string) => void;
   onClear: () => void;
   onShowRoute: () => void;
@@ -28,15 +32,25 @@ interface Props {
 
 const KM = new Intl.NumberFormat('en-PH', { maximumFractionDigits: 1 });
 
+const pinned = (stops: Rec[]) =>
+  stops.filter(
+    (s): s is Rec & { lat: number; lon: number } =>
+      s.lat != null && s.lon != null
+  );
+
+// Matches the map: odd days blue, even days orange.
+const DAY_BADGE = ['bg-[#1D4FB0]', 'bg-kapwa-orange-700'];
+
 /**
- * My trip: saved places in order, total straight-line distance, and a link
+ * My trip: saved places by day, each day's straight-line distance, and a link
  * that carries the trip. A modal sheet on phones, a centred panel on desktop.
  */
 export default function TripTray({
   open,
   onClose,
-  stops,
+  days,
   onMove,
+  onSetDay,
   onRemove,
   onClear,
   onShowRoute,
@@ -50,13 +64,13 @@ export default function TripTray({
     if (!open && d.open) d.close();
   }, [open]);
 
-  const mapped = stops.filter(
-    (s): s is Rec & { lat: number; lon: number } =>
-      s.lat != null && s.lon != null
-  );
-  const km = routeKm(mapped);
+  const stops = days.flat();
+  const mapped = pinned(stops);
+  // Each day is its own route: no line from one day's end to the next's start.
+  const km = days.reduce((sum, d) => sum + routeKm(pinned(d)), 0);
   const approx = mapped.some(s => s.placement === 'approximate');
   const unmapped = stops.length - mapped.length;
+  const multi = days.length > 1;
 
   return (
     <dialog
@@ -94,7 +108,13 @@ export default function TripTray({
               <strong>
                 {stops.length} stop{stops.length === 1 ? '' : 's'}
               </strong>
-              {mapped.length > 1 && (
+              {multi && (
+                <>
+                  {' over '}
+                  <strong>{days.length} days</strong>
+                </>
+              )}
+              {km > 0 && (
                 <>
                   {' · '}
                   {approx ? 'about ' : ''}
@@ -103,61 +123,129 @@ export default function TripTray({
               )}
             </p>
             <p className='text-kapwa-text-support type-meta'>
-              Straight-line distance between stops, not road distance.
+              Straight-line distance between stops, not road distance
+              {multi ? ', counted within each day' : ''}.
               {approx &&
                 ' Some stops use a municipality-centre pin, so the total is approximate.'}
               {unmapped > 0 &&
-                ` ${unmapped} stop${unmapped === 1 ? ' has' : 's have'} no map location and ${unmapped === 1 ? 'is' : 'are'} left out of the route.`}
+                ` ${unmapped} stop${unmapped === 1 ? ' has' : 's have'} no map location and ${unmapped === 1 ? 'is' : 'are'} left out of the route.`}{' '}
+              Use a stop&apos;s Day menu to plan more than one day.
             </p>
 
-            <ol className='divide-kapwa-border-weak max-h-[45vh] divide-y overflow-y-auto'>
-              {stops.map((s, i) => (
-                <li key={s.id} className='flex items-center gap-2 py-2'>
-                  <span
-                    aria-hidden='true'
-                    className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1D4FB0] text-xs font-bold text-white'
+            <div className='max-h-[45vh] space-y-3 overflow-y-auto'>
+              {days.map((day, d) => {
+                const start = days.slice(0, d).flat().length;
+                const dayKm = routeKm(pinned(day));
+                return (
+                  <section
+                    key={d}
+                    aria-labelledby={multi ? `trip-day-${d}` : undefined}
                   >
-                    {i + 1}
-                  </span>
-                  <span className='min-w-0 flex-1'>
-                    <span className='type-meta block truncate font-semibold'>
-                      {displayName(s.name)}
-                    </span>
-                    <span className='text-kapwa-text-support type-meta flex items-center gap-1'>
-                      <LayerGlyph layer={s.layer} size={12} />
-                      {LAYER_LABEL[s.layer]}
-                      {s.townName ? ` · ${s.townName}` : ''}
-                    </span>
-                  </span>
-                  <button
-                    type='button'
-                    aria-label={`Move ${displayName(s.name)} up`}
-                    disabled={i === 0}
-                    onClick={() => onMove(i, -1)}
-                    className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
-                  >
-                    <ArrowUpIcon aria-hidden='true' className='h-4 w-4' />
-                  </button>
-                  <button
-                    type='button'
-                    aria-label={`Move ${displayName(s.name)} down`}
-                    disabled={i === stops.length - 1}
-                    onClick={() => onMove(i, 1)}
-                    className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
-                  >
-                    <ArrowDownIcon aria-hidden='true' className='h-4 w-4' />
-                  </button>
-                  <button
-                    type='button'
-                    aria-label={`Remove ${displayName(s.name)} from my trip`}
-                    onClick={() => onRemove(s.id)}
-                    className='text-kapwa-text-support flex h-11 w-9 items-center justify-center rounded-control'
-                  >
-                    <Trash2Icon aria-hidden='true' className='h-4 w-4' />
-                  </button>
-                </li>
-              ))}
-            </ol>
+                    {multi && (
+                      <h3
+                        id={`trip-day-${d}`}
+                        className='type-meta flex items-center gap-2 font-bold'
+                      >
+                        <span
+                          aria-hidden='true'
+                          className={`h-1 w-5 rounded-full ${DAY_BADGE[d % 2]}`}
+                        />
+                        Day {d + 1}
+                        <span className='text-kapwa-text-support font-normal'>
+                          · {day.length} stop{day.length === 1 ? '' : 's'}
+                          {dayKm > 0 ? ` · ${KM.format(dayKm)} km` : ''}
+                        </span>
+                      </h3>
+                    )}
+                    <ol
+                      start={start + 1}
+                      aria-label={multi ? undefined : 'Stops'}
+                      className='divide-kapwa-border-weak divide-y'
+                    >
+                      {day.map((s, j) => {
+                        const i = start + j;
+                        const name = displayName(s.name);
+                        return (
+                          <li
+                            key={s.id}
+                            className='flex items-center gap-2 py-2'
+                          >
+                            <span
+                              aria-hidden='true'
+                              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${DAY_BADGE[d % 2]}`}
+                            >
+                              {i + 1}
+                            </span>
+                            <span className='min-w-0 flex-1'>
+                              <span className='type-meta block truncate font-semibold'>
+                                {name}
+                              </span>
+                              <span className='text-kapwa-text-support type-meta flex flex-wrap items-center gap-x-1'>
+                                <LayerGlyph layer={s.layer} size={12} />
+                                {LAYER_LABEL[s.layer]}
+                                {s.townName ? ` · ${s.townName}` : ''}
+                              </span>
+                              <select
+                                aria-label={`Day for ${name}`}
+                                value={d}
+                                onChange={e =>
+                                  onSetDay(s.id, Number(e.target.value))
+                                }
+                                className='border-kapwa-border-weak type-meta mt-1 min-h-11 rounded-control border bg-transparent px-2'
+                              >
+                                {days.map((_, k) => (
+                                  <option key={k} value={k}>
+                                    Day {k + 1}
+                                  </option>
+                                ))}
+                                <option value={days.length}>
+                                  New day (Day {days.length + 1})
+                                </option>
+                              </select>
+                            </span>
+                            <button
+                              type='button'
+                              aria-label={`Move ${name} up`}
+                              disabled={i === 0}
+                              onClick={() => onMove(i, -1)}
+                              className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
+                            >
+                              <ArrowUpIcon
+                                aria-hidden='true'
+                                className='h-4 w-4'
+                              />
+                            </button>
+                            <button
+                              type='button'
+                              aria-label={`Move ${name} down`}
+                              disabled={i === stops.length - 1}
+                              onClick={() => onMove(i, 1)}
+                              className='flex h-11 w-9 items-center justify-center rounded-control disabled:opacity-30'
+                            >
+                              <ArrowDownIcon
+                                aria-hidden='true'
+                                className='h-4 w-4'
+                              />
+                            </button>
+                            <button
+                              type='button'
+                              aria-label={`Remove ${name} from my trip`}
+                              onClick={() => onRemove(s.id)}
+                              className='text-kapwa-text-support flex h-11 w-9 items-center justify-center rounded-control'
+                            >
+                              <Trash2Icon
+                                aria-hidden='true'
+                                className='h-4 w-4'
+                              />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </section>
+                );
+              })}
+            </div>
 
             <div className='flex flex-wrap items-center gap-2 pt-1'>
               <button

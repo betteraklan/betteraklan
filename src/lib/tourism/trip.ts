@@ -7,14 +7,8 @@ export const MAX_STOPS = 20;
  * link) are dropped rather than guessed.
  */
 export function parseTrip(value: string | null, known: Set<string>): string[] {
-  if (!value) return [];
-  const out: string[] = [];
-  for (const id of value.split(',')) {
-    const t = id.trim();
-    if (t && known.has(t) && !out.includes(t)) out.push(t);
-    if (out.length === MAX_STOPS) break;
-  }
-  return out;
+  // All stops in order, whatever day they are on (see parseTripDays).
+  return parseTripDays(value, known).flat();
 }
 
 export const serializeTrip = (ids: string[]) => ids.join(',');
@@ -49,4 +43,84 @@ export function moveStop(ids: string[], from: number, dir: -1 | 1): string[] {
   const next = [...ids];
   [next[from], next[to]] = [next[to], next[from]];
   return next;
+}
+
+// ---- Trip days ----------------------------------------------------------
+// A trip is a list of days, each a list of stops. In a link or in storage the
+// days are joined by "|" ("a,b|c"); a value without "|" (every trip saved or
+// shared before days existed) reads as a single day.
+
+/** Days of stops, Day 1 first. Never holds an empty day. */
+export type TripDays = string[][];
+export const DAY_SEP = '|';
+
+/** Days from a `trip` value: known ids only, each once, at most MAX_STOPS in all. */
+export function parseTripDays(
+  value: string | null,
+  known: Set<string>
+): TripDays {
+  if (!value) return [];
+  const seen = new Set<string>();
+  const days: TripDays = [];
+  for (const part of value.split(DAY_SEP)) {
+    const day: string[] = [];
+    for (const id of part.split(',')) {
+      const t = id.trim();
+      if (seen.size === MAX_STOPS) break;
+      if (t && known.has(t) && !seen.has(t)) {
+        seen.add(t);
+        day.push(t);
+      }
+    }
+    if (day.length) days.push(day);
+  }
+  return days;
+}
+
+/** The `trip` value for days; a one-day trip is the same as before days existed. */
+export const serializeTripDays = (days: TripDays) =>
+  days
+    .filter(d => d.length)
+    .map(d => d.join(','))
+    .join(DAY_SEP);
+
+const tidy = (days: TripDays): TripDays => days.filter(d => d.length);
+
+/** Adds a stop to the end of the last day. */
+export const addStop = (days: TripDays, id: string): TripDays =>
+  days.length ? [...days.slice(0, -1), [...days[days.length - 1], id]] : [[id]];
+
+export const removeStop = (days: TripDays, id: string): TripDays =>
+  tidy(days.map(d => d.filter(x => x !== id)));
+
+/**
+ * Moves the stop at `index` (counted across all days) one place up or down.
+ * At the edge of a day it crosses into the next or previous day instead.
+ */
+export function moveStopInDays(
+  days: TripDays,
+  index: number,
+  dir: -1 | 1
+): TripDays {
+  const flat = days.flatMap((d, day) => d.map(id => ({ id, day })));
+  const to = index + dir;
+  if (index < 0 || index >= flat.length) return days;
+  if (to < 0 || to >= flat.length) {
+    // First stop moving up / last stop moving down: nothing beyond it.
+    return days;
+  }
+  if (flat[to].day === flat[index].day)
+    [flat[index], flat[to]] = [flat[to], flat[index]];
+  else flat[index] = { ...flat[index], day: flat[to].day };
+  const out: TripDays = days.map(() => []);
+  for (const s of flat) out[s.day].push(s.id);
+  return tidy(out);
+}
+
+/** Puts a stop at the end of day `day` (0-based); `days.length` starts a new day. */
+export function setStopDay(days: TripDays, id: string, day: number): TripDays {
+  const without = days.map(d => d.filter(x => x !== id));
+  if (day >= without.length) return tidy([...without, [id]]);
+  without[day] = [...without[day], id];
+  return tidy(without);
 }

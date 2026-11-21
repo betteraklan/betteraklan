@@ -61,8 +61,8 @@ interface Props {
   hoverId?: string | null;
   /** The map can't start (no WebGL) or its style failed to load. */
   onLoadError?: () => void;
-  /** My trip: stops in order, drawn as a numbered, dashed route. */
-  route?: { id: string; lat: number; lon: number }[];
+  /** My trip: stops in order, drawn as a numbered, dashed route; one line per day (`day` 1, 2, ...). */
+  route?: { id: string; lat: number; lon: number; day?: number }[];
   /** A new value fits the camera to the route. */
   fitRouteKey?: number;
   /** Where to centre each town's view (lon, lat), e.g. its exactly located records. */
@@ -806,7 +806,13 @@ export default function AklanMap3D({
         filter: ['==', ['geometry-type'], 'LineString'],
         layout: { 'line-cap': 'butt', 'line-join': 'round' },
         paint: {
-          'line-color': '#1D4FB0',
+          // Days alternate blue and orange, so neighbouring days never match.
+          'line-color': [
+            'case',
+            ['==', ['%', ['get', 'day'], 2], 0],
+            '#b45309',
+            '#1D4FB0',
+          ],
           'line-width': 3.5,
           'line-dasharray': DASHES[0],
         },
@@ -1099,7 +1105,15 @@ export default function AklanMap3D({
   }, [ready, hoverId, pins]);
 
   // My trip route data, and a marching-dash animation while it has a line.
-  const routeKey = route.map(r => r.id).join();
+  const routeKey = route.map(r => `${r.id}:${r.day ?? 1}`).join();
+  // Stops grouped by day; only a day with two or more stops gets a line.
+  const routeDays = Object.values(
+    route.reduce<Record<number, typeof route>>((acc, r) => {
+      (acc[r.day ?? 1] ??= []).push(r);
+      return acc;
+    }, {})
+  );
+  const hasLine = routeDays.some(d => d.length > 1);
   useEffect(() => {
     const map = mapRef.current;
     const src = map?.getSource('route') as GeoJSONSource | undefined;
@@ -1107,18 +1121,16 @@ export default function AklanMap3D({
     src.setData({
       type: 'FeatureCollection',
       features: [
-        ...(route.length > 1
-          ? [
-              {
-                type: 'Feature' as const,
-                properties: {},
-                geometry: {
-                  type: 'LineString' as const,
-                  coordinates: route.map(r => [r.lon, r.lat]),
-                },
-              },
-            ]
-          : []),
+        ...routeDays
+          .filter(d => d.length > 1)
+          .map(d => ({
+            type: 'Feature' as const,
+            properties: { day: d[0].day ?? 1 },
+            geometry: {
+              type: 'LineString' as const,
+              coordinates: d.map(r => [r.lon, r.lat]),
+            },
+          })),
         ...route.map((r, i) => ({
           type: 'Feature' as const,
           properties: { n: i + 1 },
@@ -1126,7 +1138,7 @@ export default function AklanMap3D({
         })),
       ],
     });
-    if (route.length < 2 || reducedMotion()) {
+    if (!hasLine || reducedMotion()) {
       map.setPaintProperty('route-line', 'line-dasharray', DASHES[0]);
       return;
     }

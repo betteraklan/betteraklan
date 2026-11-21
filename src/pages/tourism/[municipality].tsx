@@ -36,7 +36,7 @@ import { displayName } from '@/lib/tourism/displayName';
 import { dateTile, parseFestivalDate } from '@/lib/tourism/festivalDateText';
 import { config } from '@/lib/lguConfig';
 import { projectTowns } from '@/lib/tourism/shapes';
-import { MAX_STOPS, serializeTrip } from '@/lib/tourism/trip';
+import { MAX_STOPS, serializeTripDays } from '@/lib/tourism/trip';
 import { useSavedTrip } from '@/lib/tourism/tripStore';
 
 import municipalitiesTourism from '@/data/tourism/municipalities.json';
@@ -411,7 +411,7 @@ export default function TourismMunicipalityDetail() {
       <div className='space-y-1'>
         {trip.ids.length > 0 && (
           <Link
-            to={`/tourism/explore?trip=${serializeTrip(trip.ids)}`}
+            to={`/tourism/explore?trip=${serializeTripDays(trip.days)}`}
             className='text-kapwa-text-brand type-meta inline-flex min-h-11 items-center gap-1.5 font-semibold hover:underline'
           >
             <BookmarkIcon aria-hidden='true' className='h-4 w-4' />

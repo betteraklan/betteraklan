@@ -301,3 +301,40 @@ describe('search this area', () => {
     ).toBeTruthy();
   });
 });
+
+describe('trip days in Explore', () => {
+  const trip = 'place-malay-0,place-malay-1|place-kalibo-0';
+  type Stop = { id: string; day?: number };
+  const route = () => mapProps.current.route as Stop[];
+  const openTray = () =>
+    fireEvent.click(screen.getByRole('button', { name: /^My trip, 3 stops/ }));
+
+  it('opens a shared trip with days, one route per day', () => {
+    explore(`?view=map&trip=${encodeURIComponent(trip)}`);
+    expect(route().map(r => [r.id, r.day])).toEqual([
+      ['place-malay-0', 1],
+      ['place-malay-1', 1],
+      ['place-kalibo-0', 2],
+    ]);
+    openTray();
+    expect(screen.getByRole('heading', { name: /^Day 1/ })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /^Day 2/ })).toBeTruthy();
+  });
+
+  it('opens an old trip link as a single day', () => {
+    explore('?view=map&trip=place-malay-0,place-malay-1,place-kalibo-0');
+    expect(route().every(r => r.day === 1)).toBe(true);
+    openTray();
+    expect(screen.queryByRole('heading', { name: /^Day 2/ })).toBeNull();
+  });
+
+  it('a Day menu moves a stop to another day, in the link and on this device', () => {
+    explore('?view=map&trip=place-malay-0,place-malay-1,place-kalibo-0');
+    openTray();
+    // The last stop's menu: start a new day with it.
+    const menus = screen.getAllByRole('combobox', { name: /^Day for / });
+    fireEvent.change(menus[2], { target: { value: '1' } });
+    expect(params().get('trip')).toBe(trip);
+    expect(localStorage.getItem('betteraklan:trip')).toBe(trip);
+  });
+});

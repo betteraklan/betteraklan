@@ -51,12 +51,16 @@ import {
 } from '@/lib/tourism/explore';
 import { findMunicipalityAt } from '@/lib/tourism/geo';
 import {
+  addStop,
   MAX_STOPS,
-  moveStop,
-  parseTrip,
-  serializeTrip,
+  moveStopInDays,
+  parseTripDays,
+  removeStop,
+  serializeTripDays,
+  setStopDay,
+  type TripDays,
 } from '@/lib/tourism/trip';
-import { readSavedTrip, saveTrip } from '@/lib/tourism/tripStore';
+import { readSavedDays, saveTripDays } from '@/lib/tourism/tripStore';
 
 import AklanMap3D, {
   type MapPin,
@@ -445,40 +449,43 @@ export default function TourismExplore() {
     lastVisible.current = visible;
   });
 
-  // My trip: saved places, in order, kept in the URL (`trip=id1,id2`) so the
-  // link itself is the shareable trip.
-  const tripIds = useMemo(
-    () => parseTrip(params.get('trip'), KNOWN_IDS),
+  // My trip: saved places by day, kept in the URL (`trip=id1,id2|id3`, days
+  // split by "|") so the link itself is the shareable trip. Links from before
+  // days existed have no "|" and open as Day 1.
+  const tripDays = useMemo(
+    () => parseTripDays(params.get('trip'), KNOWN_IDS),
     [params]
   );
+  const tripIds = useMemo(() => tripDays.flat(), [tripDays]);
   const tripSet = useMemo(() => new Set(tripIds), [tripIds]);
-  const tripStops = tripIds.map(id => BY_ID.get(id)!);
   const route = useMemo(
     () =>
-      tripIds
-        .map(id => BY_ID.get(id)!)
-        .filter(r => r.lat != null && r.lon != null)
-        .map(r => ({ id: r.id, lat: r.lat!, lon: r.lon! })),
-    [tripIds]
+      tripDays.flatMap((d, day) =>
+        d
+          .map(id => BY_ID.get(id)!)
+          .filter(r => r.lat != null && r.lon != null)
+          .map(r => ({ id: r.id, lat: r.lat!, lon: r.lon!, day: day + 1 }))
+      ),
+    [tripDays]
   );
   // The trip is also remembered in this browser, but only when the visitor
   // changes it: opening someone's shared link never overwrites a saved trip.
-  const setTrip = (ids: string[]) => {
-    update({ trip: serializeTrip(ids) });
-    saveTrip(ids);
+  const setTrip = (days: TripDays) => {
+    update({ trip: serializeTripDays(days) });
+    saveTripDays(days);
   };
   // Opened without a trip link: pick up the trip saved on this device
   // (for example, stops saved from a town page).
   useEffect(() => {
     if (params.get('trip')) return;
-    const saved = readSavedTrip(KNOWN_IDS);
-    if (saved.length) update({ trip: serializeTrip(saved) });
+    const saved = readSavedDays(KNOWN_IDS);
+    if (saved.length) update({ trip: serializeTripDays(saved) });
     // Runs once on arrival; later changes come from setTrip.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const toggleSaved = (id: string) => {
     if (tripSet.has(id)) {
-      setTrip(tripIds.filter(x => x !== id));
+      setTrip(removeStop(tripDays, id));
       return;
     }
     if (tripIds.length >= MAX_STOPS) {
@@ -487,7 +494,7 @@ export default function TourismExplore() {
       );
       return;
     }
-    setTrip([...tripIds, id]);
+    setTrip(addStop(tripDays, id));
     showToast(
       `Added to My trip · ${tripIds.length + 1} stop${tripIds.length ? 's' : ''}`
     );
@@ -846,9 +853,10 @@ export default function TourismExplore() {
       <TripTray
         open={tripOpen}
         onClose={() => setTripOpen(false)}
-        stops={tripStops}
-        onMove={(i, dir) => setTrip(moveStop(tripIds, i, dir))}
-        onRemove={id => setTrip(tripIds.filter(x => x !== id))}
+        days={tripDays.map(d => d.map(id => BY_ID.get(id)!))}
+        onMove={(i, dir) => setTrip(moveStopInDays(tripDays, i, dir))}
+        onSetDay={(id, day) => setTrip(setStopDay(tripDays, id, day))}
+        onRemove={id => setTrip(removeStop(tripDays, id))}
         onClear={() => setTrip([])}
         onShowRoute={() => {
           setTripOpen(false);
@@ -859,7 +867,7 @@ export default function TourismExplore() {
         }}
         onShare={() => {
           const url = new URL(window.location.pathname, window.location.origin);
-          url.searchParams.set('trip', serializeTrip(tripIds));
+          url.searchParams.set('trip', serializeTripDays(tripDays));
           url.searchParams.set('view', 'map');
           shareLink(url.toString(), 'Trip link copied');
         }}
