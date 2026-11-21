@@ -305,7 +305,7 @@ export default function SearchBar({
         type='button'
         onClick={onNearMe}
         disabled={locating}
-        aria-label='Show the municipality near me'
+        aria-label='Near me: show what is closest to you'
         title='Uses your location once, only on this device'
         className='text-kapwa-text-strong inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold shadow-elev-2'
       >

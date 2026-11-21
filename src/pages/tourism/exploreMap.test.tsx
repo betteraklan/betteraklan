@@ -3,7 +3,12 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { townsWithLiveNotices } from '@/lib/tourism/advisories';
-import { festivalsInMonth } from '@/lib/tourism/explore';
+import {
+  distanceKm,
+  festivalsInMonth,
+  formatDistance,
+  sortByDistance,
+} from '@/lib/tourism/explore';
 import type { Advisory } from '@/types/tourism';
 
 import { ALL_RECORDS } from './components/tourismData';
@@ -173,5 +178,81 @@ describe('notices layer', () => {
     expect(
       screen.getByText(/Orange ring = place in a town with an active notice/)
     ).toBeTruthy();
+  });
+});
+
+describe('near me', () => {
+  // A point in Malay, near the Caticlan jetty.
+  const HERE = { lat: 11.9256, lon: 121.9554 };
+  const geo = (ok: boolean) => {
+    const getCurrentPosition = vi.fn(
+      (yes: PositionCallback, no: PositionErrorCallback) =>
+        ok
+          ? yes({
+              coords: { latitude: HERE.lat, longitude: HERE.lon },
+            } as GeolocationPosition)
+          : no({ code: 1, PERMISSION_DENIED: 1 } as GeolocationPositionError)
+    );
+    Object.defineProperty(navigator, 'geolocation', {
+      value: { getCurrentPosition },
+      configurable: true,
+    });
+    return getCurrentPosition;
+  };
+  const nearMe = () => screen.getByRole('button', { name: /^Near me/ });
+  const firstNames = (n: number) =>
+    screen
+      .getAllByRole('button', { pressed: false })
+      .filter(b => b.closest('[data-rec]'))
+      .slice(0, n)
+      .map(b => b.closest('[data-rec]')!.getAttribute('data-rec')!);
+
+  it('sorts nearest first, and formats distances plainly', () => {
+    const sorted = sortByDistance(ALL_RECORDS, HERE);
+    const km = sorted
+      .map(r => distanceKm(r, HERE))
+      .filter((d): d is number => d != null);
+    expect(km).toEqual([...km].sort((a, b) => a - b));
+    // Records without a pin go last.
+    const firstUnpinned = sorted.findIndex(r => r.lat == null);
+    if (firstUnpinned >= 0)
+      expect(sorted.slice(firstUnpinned).every(r => r.lat == null)).toBe(true);
+    expect(formatDistance(0.43)).toBe('400 m');
+    expect(formatDistance(3.24)).toBe('3.2 km');
+    expect(formatDistance(23.6, true)).toBe('about 24 km');
+  });
+
+  it('asks for location only when tapped, then lists nearest first', () => {
+    const ask = geo(true);
+    explore('?view=list');
+    expect(ask).not.toHaveBeenCalled();
+    fireEvent.click(nearMe());
+    expect(ask).toHaveBeenCalledTimes(1);
+    expect(params().get('town')).toBe('malay');
+    expect(screen.getByText('Nearest to you first')).toBeTruthy();
+    const ids = firstNames(5);
+    const km = ids.map(
+      id => distanceKm(ALL_RECORDS.find(r => r.id === id)!, HERE)!
+    );
+    expect(km).toEqual([...km].sort((a, b) => a - b));
+    expect(screen.getAllByText(/ away$/).length).toBeGreaterThan(0);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /Clear distance sort/ })
+    );
+    expect(screen.queryByText('Nearest to you first')).toBeNull();
+  });
+
+  it('works normally when location is denied', () => {
+    geo(false);
+    explore('?view=list');
+    const before = firstNames(5);
+    fireEvent.click(nearMe());
+    expect(
+      screen.getAllByText(/Location is off for this site/).length
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText('Nearest to you first')).toBeNull();
+    expect(firstNames(5)).toEqual(before);
+    expect(params().get('town')).toBeNull();
   });
 });

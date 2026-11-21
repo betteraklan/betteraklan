@@ -17,6 +17,7 @@ import {
   PlayIcon,
   XIcon,
   LinkIcon,
+  LocateFixedIcon,
   Share2Icon,
   SlidersHorizontalIcon,
 } from 'lucide-react';
@@ -38,8 +39,12 @@ import {
   type Layer,
   type Rec,
   tierBounds,
+  distanceKm,
   festivalsInMonth,
+  formatDistance,
   hasNoDate,
+  type Point,
+  sortByDistance,
 } from '@/lib/tourism/explore';
 import { findMunicipalityAt } from '@/lib/tourism/geo';
 import {
@@ -182,6 +187,8 @@ export default function TourismExplore() {
       }),
     [q, town, layer, from, to]
   );
+  // Near me: the visitor's position once tapped (kept on this device only).
+  const [near, setNear] = useState<Point | null>(null);
   const selected = ALL_RECORDS.find(r => r.id === sel) ?? null;
   const selectedPin = useMemo<MapPin | null>(
     () =>
@@ -406,8 +413,13 @@ export default function TourismExplore() {
   // The selected row is always rendered, even when it sits past the page.
   const [pageSize, setPageSize] = useState(RESULTS_PAGE);
   useEffect(() => setPageSize(RESULTS_PAGE), [q, town, layer, from, to]);
-  const selIndex = filtered.findIndex(r => r.id === sel);
-  const visible = filtered.slice(0, Math.max(pageSize, selIndex + 1));
+  // The list: the filtered records, nearest first after Near me.
+  const listed = useMemo(
+    () => (near ? sortByDistance(filtered, near) : filtered),
+    [filtered, near]
+  );
+  const selIndex = listed.findIndex(r => r.id === sel);
+  const visible = listed.slice(0, Math.max(pageSize, selIndex + 1));
 
   // Filter changes crossfade the list: the old results fade out over the new.
   const filterKey = `${q}|${town}|${layer}|${from}|${to}`;
@@ -510,7 +522,8 @@ export default function TourismExplore() {
     update({ town: '', layer: '', from: '', to: '', sel: '' });
   };
 
-  // Near me: asks for location only when tapped; the position never leaves the device.
+  // Near me: asks for location only when tapped; the position never leaves the
+  // device. With a position, the list is sorted nearest first.
   const [locating, setLocating] = useState(false);
   const nearMe = () => {
     if (!navigator.geolocation) {
@@ -523,6 +536,7 @@ export default function TourismExplore() {
     navigator.geolocation.getCurrentPosition(
       pos => {
         setLocating(false);
+        setNear({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         const slug = findMunicipalityAt(
           pos.coords.latitude,
           pos.coords.longitude,
@@ -530,14 +544,14 @@ export default function TourismExplore() {
         );
         if (!slug) {
           showToast(
-            'You seem to be outside Aklan. Pick a municipality in Filters instead.'
+            'You seem to be outside Aklan. The list is sorted nearest first.'
           );
           return;
         }
         stopTour();
         update({ town: slug, sel: '', view: 'map' });
         showToast(
-          `Showing ${MUNICIPALITIES.find(m => m.slug === slug)?.name}, near you`
+          `Showing ${MUNICIPALITIES.find(m => m.slug === slug)?.name}, nearest first`
         );
       },
       err => {
@@ -1301,6 +1315,22 @@ export default function TourismExplore() {
               {filtered.length} record{filtered.length === 1 ? '' : 's'}
               {townInfo ? ` in ${townInfo.name}` : ' in Aklan'}
             </h2>
+            {near && (
+              <p className='border-kapwa-border-weak type-meta flex items-center justify-between gap-2 border-b px-4 py-1'>
+                <span className='text-kapwa-text-strong inline-flex items-center gap-1.5 font-semibold'>
+                  <LocateFixedIcon aria-hidden='true' className='h-4 w-4' />
+                  Nearest to you first
+                </span>
+                <button
+                  type='button'
+                  onClick={() => setNear(null)}
+                  className='text-kapwa-text-brand min-h-11 font-semibold hover:underline'
+                >
+                  Clear
+                  <span className='sr-only'> distance sort</span>
+                </button>
+              </p>
+            )}
             {(layer === 'all' || layer === 'event') && (
               <FestivalStrip
                 events={EVENTS}
@@ -1347,6 +1377,14 @@ export default function TourismExplore() {
                         saved={tripSet.has(r.id)}
                         onToggleSave={toggleSaved}
                         onHover={setHoverRec}
+                        distance={
+                          near && r.lat != null && r.lon != null
+                            ? formatDistance(
+                                distanceKm(r, near)!,
+                                r.placement === 'approximate'
+                              )
+                            : undefined
+                        }
                       />
                     </li>
                   ))}
@@ -1371,16 +1409,15 @@ export default function TourismExplore() {
                 )}
               </div>
             )}
-            {visible.length < filtered.length && (
+            {visible.length < listed.length && (
               <div className='border-kapwa-border-weak border-t p-2'>
                 <button
                   type='button'
                   onClick={() => setPageSize(s => s + RESULTS_PAGE)}
                   className='text-kapwa-text-brand hover:bg-kapwa-bg-hover min-h-11 w-full rounded-control text-sm font-bold'
                 >
-                  Show{' '}
-                  {Math.min(RESULTS_PAGE, filtered.length - visible.length)}{' '}
-                  more ({filtered.length - visible.length} left)
+                  Show {Math.min(RESULTS_PAGE, listed.length - visible.length)}{' '}
+                  more ({listed.length - visible.length} left)
                 </button>
               </div>
             )}

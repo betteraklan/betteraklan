@@ -15,6 +15,8 @@ import { displayName } from '@/lib/tourism/displayName';
 interface Props {
   rec: Rec;
   selected?: boolean;
+  /** Distance from the visitor ("3.2 km"), shown after the town (Near me). */
+  distance?: string;
   /** Shown as a badge in the article form (town pages). */
   category?: Category;
   /**
@@ -43,6 +45,7 @@ export default function RecordCard({
   selected = false,
   onSelect,
   category,
+  distance,
   corner,
   children,
   saved = false,
@@ -87,9 +90,11 @@ export default function RecordCard({
             <span className='text-kapwa-text-strong type-body line-clamp-2 pr-1 font-semibold'>
               {displayName(rec.name)}
             </span>
-            {rec.townName && (
+            {(rec.townName || distance) && (
               <span className='text-kapwa-text-support type-meta'>
-                {rec.townName}
+                {[rec.townName, distance && `${distance} away`]
+                  .filter(Boolean)
+                  .join(' · ')}
               </span>
             )}
             {pills}

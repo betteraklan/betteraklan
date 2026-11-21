@@ -1,6 +1,7 @@
 import { filterByDateRange, getDateStatus } from './festivalDates';
 import { monthRange, parseFestivalDate } from './festivalDateText';
 import { findMunicipalityAt, type BoundaryFeature } from './geo';
+import { haversineKm } from './trip';
 import type {
   Accommodation,
   DateStatus,
@@ -215,6 +216,42 @@ export function festivalsInMonth(
     layer: 'event',
     ...monthRange(month, today),
   }).filter(r => !hasNoDate(r));
+}
+
+export interface Point {
+  lat: number;
+  lon: number;
+}
+
+/** Straight-line km from a point to a record, or null when it has no pin. */
+export function distanceKm(r: Rec, from: Point): number | null {
+  return r.lat == null || r.lon == null
+    ? null
+    : haversineKm(from, { lat: r.lat, lon: r.lon });
+}
+
+/** Nearest first; records without a pin keep their order at the end. */
+export function sortByDistance(recs: Rec[], from: Point): Rec[] {
+  const km = new Map(recs.map(r => [r.id, distanceKm(r, from)]));
+  return recs
+    .map((r, i) => ({ r, i, d: km.get(r.id) }))
+    .sort((a, b) =>
+      a.d == null || b.d == null
+        ? Number(a.d == null) - Number(b.d == null) || a.i - b.i
+        : a.d - b.d || a.i - b.i
+    )
+    .map(x => x.r);
+}
+
+/** "800 m", "3.2 km", "24 km"; "about" when the pin is approximate. */
+export function formatDistance(km: number, approximate = false): string {
+  const text =
+    km < 1
+      ? `${Math.max(100, Math.round(km * 10) * 100)} m`
+      : km < 10
+        ? `${km.toFixed(1)} km`
+        : `${Math.round(km)} km`;
+  return approximate ? `about ${text}` : text;
 }
 
 /** A festival with no recorded date whose description names none either. */
