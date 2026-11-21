@@ -7,6 +7,12 @@ import { LAYER_ICON } from './layerMeta';
 
 type Layer = Rec['layer'];
 
+/** WebP photos come in 1200 and 600 px; let the browser pick by width. */
+const srcSet = (src: string) =>
+  src.endsWith('.webp')
+    ? `${src.replace(/\.webp$/, '-600.webp')} 600w, ${src} 1200w`
+    : undefined;
+
 const STRIP =
   'type-meta absolute right-0 bottom-0 max-w-full bg-black/55 px-2 py-0.5 text-white';
 
@@ -106,6 +112,8 @@ export default function TourismImage({
           <>
             <img
               src={image.src}
+              srcSet={srcSet(image.src)}
+              sizes='100vw'
               alt={image.alt}
               width={1600}
               height={1000}
@@ -133,6 +141,8 @@ export default function TourismImage({
         <>
           <img
             src={image.src}
+            srcSet={srcSet(image.src)}
+            sizes='(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw'
             alt={image.alt}
             width={1600}
             height={1000}

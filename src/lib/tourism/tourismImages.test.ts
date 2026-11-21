@@ -22,10 +22,21 @@ describe('tourism-images.json', () => {
 
   it('points only at live workbook records', () => {
     type Rec = { recordId?: string };
-    type Muni = { attractions: Rec[]; festivals: Rec[]; products: Rec[] };
+    type Muni = {
+      attractions: Rec[];
+      festivals: Rec[];
+      products: Rec[];
+      overview?: Rec;
+    };
+    // A town overview is live too: its photo is the town page hero.
     const live = new Set(
       (municipalities as Muni[])
-        .flatMap(m => [...m.attractions, ...m.festivals, ...m.products])
+        .flatMap(m => [
+          ...m.attractions,
+          ...m.festivals,
+          ...m.products,
+          ...(m.overview ? [m.overview] : []),
+        ])
         .map(e => e.recordId)
     );
     for (const e of images as { recordId: string }[])

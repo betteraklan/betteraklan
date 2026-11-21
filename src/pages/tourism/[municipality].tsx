@@ -331,6 +331,7 @@ export default function TourismMunicipalityDetail() {
       {/* --- HERO --- */}
       <TourismHero
         eyebrow='Municipality'
+        image={municipality.overview?.image}
         title={municipality.name}
         description={`Festivals, spots, and local products of the Municipality of ${municipality.name}, Aklan.`}
         actions={

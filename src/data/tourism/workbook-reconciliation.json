@@ -621,8 +621,8 @@
         "licenceClass": "explicit",
         "verdict": "pass",
         "reasons": [],
-        "hasPhotoSlot": false,
-        "file": null
+        "hasPhotoSlot": true,
+        "file": "/tourism/AKL-001.webp"
       }
     },
     {
@@ -1216,7 +1216,7 @@
         "licenceClass": "other",
         "verdict": "fail",
         "reasons": ["4: licence unclear"],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -1690,7 +1690,7 @@
         "reasons": [
           "3: Shows a single landmark standing for the whole municipality overview; needs an owner decision that it represents Banga."
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -1943,7 +1943,7 @@
           "2: result does not record verification of an image",
           "4: licence see-source"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -2108,7 +2108,7 @@
         "verdict": "pass",
         "reasons": [],
         "hasPhotoSlot": true,
-        "file": "/tourism/AKL-036.jpg"
+        "file": "/tourism/AKL-036.webp"
       }
     },
     {
@@ -2407,7 +2407,7 @@
         "verdict": "pass",
         "reasons": [],
         "hasPhotoSlot": true,
-        "file": "/tourism/AKL-045.jpg"
+        "file": "/tourism/AKL-045.webp"
       }
     },
     {
@@ -2677,8 +2677,8 @@
         "licenceClass": "explicit",
         "verdict": "pass",
         "reasons": [],
-        "hasPhotoSlot": false,
-        "file": null
+        "hasPhotoSlot": true,
+        "file": "/tourism/AKL-051.webp"
       }
     },
     {
@@ -3503,7 +3503,7 @@
           "2: result does not record verification of an image",
           "4: licence see-source"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -4040,8 +4040,8 @@
         "licenceClass": "explicit",
         "verdict": "pass",
         "reasons": [],
-        "hasPhotoSlot": false,
-        "file": null
+        "hasPhotoSlot": true,
+        "file": "/tourism/AKL-082.webp"
       }
     },
     {
@@ -4969,7 +4969,7 @@
         "licenceClass": "not-stated",
         "verdict": "fail",
         "reasons": ["4: licence not-stated"],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -5335,7 +5335,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -5820,7 +5820,7 @@
           "2: result does not record verification of an image",
           "4: licence see-source"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -6126,7 +6126,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -6443,7 +6443,7 @@
           "2: result does not record verification of an image",
           "4: licence see-source"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -7267,7 +7267,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -7709,7 +7709,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -8060,8 +8060,8 @@
         "licenceClass": "explicit",
         "verdict": "pass",
         "reasons": [],
-        "hasPhotoSlot": false,
-        "file": null
+        "hasPhotoSlot": true,
+        "file": "/tourism/AKL-178.webp"
       }
     },
     {
@@ -8745,7 +8745,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },
@@ -8832,7 +8832,7 @@
         "verdict": "pass",
         "reasons": [],
         "hasPhotoSlot": true,
-        "file": "/tourism/AKL-195.jpg"
+        "file": "/tourism/AKL-195.webp"
       }
     },
     {
@@ -9150,7 +9150,7 @@
           "2: result does not record verification of an image",
           "4: licence not-stated"
         ],
-        "hasPhotoSlot": false,
+        "hasPhotoSlot": true,
         "file": null
       }
     },

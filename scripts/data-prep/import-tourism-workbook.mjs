@@ -761,6 +761,9 @@ export function runImport({
         text: r['Content Description'],
         sourceUrl: r['Source URL'],
       };
+      // The overview's photo is the town page hero.
+      const heroImg = imageFor(r);
+      if (heroImg) m.overview.image = heroImg;
       continue;
     }
     const st = status.get(id);
@@ -966,7 +969,8 @@ export function runImport({
           licenceClass: licenceClass(img['Credit and reuse terms']),
           verdict: ev.verdict,
           reasons: ev.reasons,
-          hasPhotoSlot: r.Category !== 'Description',
+          // Every record has a slot: cards for places, the hero for overviews.
+          hasPhotoSlot: true,
           file: manifestById.get(id)?.src ?? null,
         },
       };

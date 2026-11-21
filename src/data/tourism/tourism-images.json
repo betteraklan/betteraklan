@@ -1,19 +1,43 @@
 [
   {
+    "recordId": "AKL-001",
+    "src": "/tourism/AKL-001.webp",
+    "alt": "Altavas municipal overview, Altavas",
+    "credit": "U.S. Navy photo by Senior Chief Mass Communication Specialist Spike Call; public domain (Wikimedia Commons)."
+  },
+  {
     "recordId": "AKL-036",
-    "src": "/tourism/AKL-036.jpg",
+    "src": "/tourism/AKL-036.webp",
     "alt": "Batan Sea Port, Batan",
     "credit": "Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons)."
   },
   {
     "recordId": "AKL-045",
-    "src": "/tourism/AKL-045.jpg",
+    "src": "/tourism/AKL-045.webp",
     "alt": "Pandan Hills, Batan",
     "credit": "Photographer Ree Dexter; Wikimedia Commons lists the image under CC BY 3.0. Attribute the photographer and link the license when reusing."
   },
   {
+    "recordId": "AKL-051",
+    "src": "/tourism/AKL-051.webp",
+    "alt": "Buruanga municipal overview, Buruanga",
+    "credit": "Ree Dexter; CC BY 3.0 (Wikimedia Commons)."
+  },
+  {
+    "recordId": "AKL-082",
+    "src": "/tourism/AKL-082.webp",
+    "alt": "Kalibo municipal overview, Kalibo",
+    "credit": "Elmer B. Domingo; CC BY-SA 4.0 (Wikimedia Commons)."
+  },
+  {
+    "recordId": "AKL-178",
+    "src": "/tourism/AKL-178.webp",
+    "alt": "New Washington municipal overview, New Washington",
+    "credit": "Elmer B. Domingo; CC BY-SA 4.0 (Wikimedia Commons)."
+  },
+  {
     "recordId": "AKL-195",
-    "src": "/tourism/AKL-195.jpg",
+    "src": "/tourism/AKL-195.webp",
     "alt": "Albasan Elementary School acacia trees, Numancia",
     "credit": "Gibough; CC BY-SA 4.0 (Wikimedia Commons)."
   }

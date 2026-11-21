@@ -105,7 +105,12 @@
       "recordId": "AKL-001",
       "itemName": "Altavas municipal overview",
       "text": "An inland municipality in eastern Aklan, formerly called Jemino and renamed in honor of Senator Jose Altavas. Local tourism materials highlight its upland landscape, waterfalls and caves. The town’s January Santo Niño celebration is tied to a local armistice observance. Outside the town center, Barangay Talon has waterfalls and caves, while Tinagong Dagat lies along the boundary with Batan. Altavas is also associated with toasted rice cakes and nito handicrafts.",
-      "sourceUrl": "https://altavasaklan.gov.ph/about-us/"
+      "sourceUrl": "https://altavasaklan.gov.ph/about-us/",
+      "image": {
+        "src": "/tourism/AKL-001.webp",
+        "alt": "Altavas municipal overview, Altavas",
+        "credit": "U.S. Navy photo by Senior Chief Mass Communication Specialist Spike Call; public domain (Wikimedia Commons)."
+      }
     }
   },
   {
@@ -296,7 +301,7 @@
         "location": "Batan",
         "sourceUrl": "https://aklan.gov.ph/tourism/batan/",
         "image": {
-          "src": "/tourism/AKL-045.jpg",
+          "src": "/tourism/AKL-045.webp",
           "alt": "Pandan Hills, Batan",
           "credit": "Photographer Ree Dexter; Wikimedia Commons lists the image under CC BY 3.0. Attribute the photographer and link the license when reusing.",
           "licence": "CC BY 3.0",
@@ -315,7 +320,7 @@
         "location": "Poblacion",
         "sourceUrl": "https://aklan.gov.ph/tourism/batan/",
         "image": {
-          "src": "/tourism/AKL-036.jpg",
+          "src": "/tourism/AKL-036.webp",
           "alt": "Batan Sea Port, Batan",
           "credit": "Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons).",
           "licence": "CC BY 3.0",
@@ -538,7 +543,15 @@
       "recordId": "AKL-051",
       "itemName": "Buruanga municipal overview",
       "text": "A coastal municipality at the northwestern end of Aklan, with beaches, hills, caves, waterfalls and fishing communities. Its shoreline includes Hinugtan and Talisay beaches, while Sabang and Sapsapon caves and Tigis Falls show the variety of its inland and coastal terrain. The Panagat Festival celebrates fishing, and in Bagongbayan, fish drying on rocks is a documented local practice.",
-      "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/"
+      "sourceUrl": "https://aklan.gov.ph/tourism/buruanga/",
+      "image": {
+        "src": "/tourism/AKL-051.webp",
+        "alt": "Buruanga municipal overview, Buruanga",
+        "credit": "Ree Dexter; CC BY 3.0 (Wikimedia Commons).",
+        "licence": "CC BY 3.0",
+        "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "sourcePage": "https://commons.wikimedia.org/wiki/File:Buruanga_(57498824).jpeg"
+      }
     }
   },
   {
@@ -815,7 +828,15 @@
       "recordId": "AKL-082",
       "itemName": "Kalibo municipal overview",
       "text": "The provincial capital and a central hub for Aklan’s civic, cultural and visitor activities, including the Ati-Atihan tradition and piña-fiber craft. The town is a center for the Santo Niño Ati-Atihan celebration and for weaving cloth from pineapple fibers. Visitors can learn about provincial history at Museo it Akean or see the mangrove forest at Bakhawan Eco-Park in New Buswang.",
-      "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/"
+      "sourceUrl": "https://aklan.gov.ph/tourism/kalibo/",
+      "image": {
+        "src": "/tourism/AKL-082.webp",
+        "alt": "Kalibo municipal overview, Kalibo",
+        "credit": "Elmer B. Domingo; CC BY-SA 4.0 (Wikimedia Commons).",
+        "licence": "CC BY-SA 4.0",
+        "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "sourcePage": "https://commons.wikimedia.org/wiki/File:Kalibo_Town_Hall.jpg"
+      }
     }
   },
   {
@@ -1536,7 +1557,15 @@
       "recordId": "AKL-178",
       "itemName": "New Washington municipal overview",
       "text": "A coastal municipality with fishing livelihoods and a historic Pacto de Sangre site in Ochando. The Lagatik River and the coast are part of the town’s fishing and seafood economy. The Pink Sisters Convent is in Polo, while Ochando is associated with the 1897 Pacto de Sangre. Local foods include crabs, prawns and rice delicacies such as ibos and suman.",
-      "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/"
+      "sourceUrl": "https://aklan.gov.ph/tourism/new-washington/",
+      "image": {
+        "src": "/tourism/AKL-178.webp",
+        "alt": "New Washington municipal overview, New Washington",
+        "credit": "Elmer B. Domingo; CC BY-SA 4.0 (Wikimedia Commons).",
+        "licence": "CC BY-SA 4.0",
+        "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "sourcePage": "https://commons.wikimedia.org/wiki/File:Municipal_Hall_of_New_Washington,_Aklan.jpg"
+      }
     }
   },
   {
@@ -1578,7 +1607,7 @@
         "location": "Albasan",
         "sourceUrl": "https://aklan.gov.ph/tourism/numancia/",
         "image": {
-          "src": "/tourism/AKL-195.jpg",
+          "src": "/tourism/AKL-195.webp",
           "alt": "Albasan Elementary School acacia trees, Numancia",
           "credit": "Gibough; CC BY-SA 4.0 (Wikimedia Commons).",
           "licence": "CC BY-SA 4.0",

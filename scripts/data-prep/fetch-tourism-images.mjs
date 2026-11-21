@@ -79,12 +79,48 @@ export function sniffImage(b) {
   return null;
 }
 
-const OWNED_FILE = /^AKL-\d{3}\.(jpg|png|webp)$/;
+const OWNED_FILE = /^AKL-\d{3}(-600)?\.(jpg|png|webp)$/;
+
+/** The 600 px file that goes with a 1200 px WebP src. */
+export const smallSrc = src => src.replace(/\.webp$/, '-600.webp');
+
+/**
+ * Writes <id>.webp (at most 1200 px wide) and <id>-600.webp (at most 600 px)
+ * from the downloaded bytes. Never enlarges a smaller original.
+ */
+export async function exportWebp(body, dir, recordId) {
+  let sharp;
+  try {
+    sharp = (await import('sharp')).default;
+  } catch {
+    throw new Error('sharp is not installed (npm i -D sharp) to export WebP');
+  }
+  const out = {};
+  for (const [width, name] of [
+    [1200, `${recordId}.webp`],
+    [600, `${recordId}-600.webp`],
+  ]) {
+    const info = await sharp(body)
+      .rotate()
+      .resize({ width, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(join(dir, name));
+    out[width] = {
+      file: name,
+      width: info.width,
+      height: info.height,
+      bytes: info.size,
+    };
+  }
+  return out;
+}
 
 /** Deletes importer-owned files in `dir` that the manifest does not list. */
 export function pruneOwnedFiles(dir, manifest) {
   if (!existsSync(dir)) return [];
-  const keep = new Set(manifest.map(f => f.src.split('/').pop()));
+  const keep = new Set(
+    manifest.flatMap(f => [f.src, smallSrc(f.src)].map(s => s.split('/').pop()))
+  );
   const removed = [];
   for (const f of readdirSync(dir))
     if (OWNED_FILE.test(f) && !keep.has(f)) {
@@ -147,17 +183,18 @@ async function main() {
         r.image.row['Image URL or source']
       );
       mkdirSync(dir, { recursive: true });
-      writeFileSync(join(dir, entry.file), body);
+      const webp = await exportWebp(body, dir, r.recordId);
+      entry.webp = webp;
       // Manifest entry: alt and credit are copied from the workbook, verbatim.
       manifest.push({
         recordId: r.recordId,
-        src: `/tourism/${entry.file}`,
+        src: `/tourism/${webp[1200].file}`,
         alt: `${r.itemName}, ${r.municipality}`,
         credit: r.image.row['Credit and reuse terms'],
       });
       r.image.file = entry;
       console.log(
-        `${r.recordId}: saved ${entry.file} ${entry.width}x${entry.height}${entry.overBudget ? ' (over 500 KB)' : ''}`
+        `${r.recordId}: saved ${webp[1200].file} ${webp[1200].width}x${webp[1200].height} (${Math.round(webp[1200].bytes / 1024)} KB) and ${webp[600].file} (${Math.round(webp[600].bytes / 1024)} KB)`
       );
     } catch (e) {
       console.log(`${r.recordId}: not saved: ${e.message}`);

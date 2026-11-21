@@ -50,6 +50,8 @@ export interface TourismOverview {
   itemName: string;
   text: string;
   sourceUrl: string;
+  /** Photo for the town page hero, when one with a documented licence exists. */
+  image?: TourismImage;
 }
 
 export interface Advisory {
