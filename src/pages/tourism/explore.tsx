@@ -23,7 +23,11 @@ import {
 
 import { Card, CardContent } from '@/components/ui/Card';
 
-import { advisoriesFor, useAdvisories } from '@/lib/tourism/advisories';
+import {
+  advisoriesFor,
+  townsWithLiveNotices,
+  useAdvisories,
+} from '@/lib/tourism/advisories';
 import { DATE_STATUS_LABEL, overlaps } from '@/lib/tourism/festivalDates';
 import { monthRange } from '@/lib/tourism/festivalDateText';
 import {
@@ -213,6 +217,16 @@ export default function TourismExplore() {
 
   // Client-only map display toggles (the Layer filter above still drives the list).
   const [hiddenLayers, setHiddenLayers] = useState<Layer[]>([]);
+  // Notices layer: rings places in towns with a live, verified advisory.
+  const [showNotices, setShowNotices] = useState(false);
+  const noticeTowns = useMemo(
+    () =>
+      townsWithLiveNotices(
+        MUNICIPALITIES.map(m => m.slug),
+        advisories
+      ),
+    [advisories]
+  );
   // Off: each municipality in its own colour. On: shade by record density.
   const [shade, setShade] = useState(false);
   const counts = useMemo(() => {
@@ -235,10 +249,15 @@ export default function TourismExplore() {
         town: r.town,
         approximate: r.placement === 'approximate',
         label: LAYER_LABEL[r.layer],
+        notice:
+          showNotices &&
+          r.layer === 'place' &&
+          !!r.town &&
+          noticeTowns.has(r.town),
       })),
-    // shownKey captures every change to the pin list.
+    // shownKey captures every change to the pin list; notices add a ring.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shownKey]
+    [shownKey, showNotices, noticeTowns]
   );
   const tierOf = (n: number) => (shade ? densityTier(n, maxCount) : 0);
   const townTier = useMemo(
@@ -974,6 +993,17 @@ export default function TourismExplore() {
                       >
                         Shade by records
                       </button>
+                      <button
+                        type='button'
+                        aria-pressed={showNotices && noticeTowns.size > 0}
+                        disabled={noticeTowns.size === 0}
+                        onClick={() => setShowNotices(v => !v)}
+                        className={`type-meta flex min-h-11 items-center rounded-control px-3 text-left font-semibold transition-colors duration-(--dur-fast) disabled:cursor-default ${showNotices && noticeTowns.size > 0 ? 'bg-white/15 text-white' : 'text-white/60 enabled:hover:bg-white/5'}`}
+                      >
+                        {noticeTowns.size > 0
+                          ? `Notices · ${noticeTowns.size} town${noticeTowns.size === 1 ? '' : 's'}`
+                          : 'Notices · none active'}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1217,6 +1247,15 @@ export default function TourismExplore() {
                   <LayerGlyph layer='stay' hollow />
                   Dashed outline = approximate location
                 </span>
+                {showNotices && noticeTowns.size > 0 && (
+                  <span className='flex items-center gap-1.5'>
+                    <span
+                      aria-hidden='true'
+                      className='border-kapwa-orange-700 h-4 w-4 rounded-full border-[3px]'
+                    />
+                    Orange ring = place in a town with an active notice
+                  </span>
+                )}
                 <span className='flex items-center gap-1.5'>
                   <span
                     aria-hidden='true'

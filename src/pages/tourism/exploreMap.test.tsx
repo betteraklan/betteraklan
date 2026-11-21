@@ -2,7 +2,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { townsWithLiveNotices } from '@/lib/tourism/advisories';
 import { festivalsInMonth } from '@/lib/tourism/explore';
+import type { Advisory } from '@/types/tourism';
 
 import { ALL_RECORDS } from './components/tourismData';
 import TourismExplore from './explore';
@@ -15,9 +17,11 @@ vi.mock('./components/AklanMap3D', () => ({
     return <div data-testid='map' />;
   },
 }));
-vi.mock('@/lib/tourism/advisories', () => ({
-  useAdvisories: () => ({ advisories: [], status: 'live' }),
-  advisoriesFor: () => [],
+// The advisory list each test sees; the real helpers do the matching.
+const notices = vi.hoisted(() => ({ list: [] as Advisory[] }));
+vi.mock('@/lib/tourism/advisories', async importOriginal => ({
+  ...(await importOriginal<typeof import('@/lib/tourism/advisories')>()),
+  useAdvisories: () => ({ advisories: notices.list, status: 'live' }),
 }));
 vi.stubGlobal('fetch', () => Promise.reject(new Error('offline')));
 
@@ -27,6 +31,7 @@ beforeEach(() => {
   vi.setSystemTime(TODAY);
 });
 afterEach(() => {
+  notices.list = [];
   vi.useRealTimers();
   localStorage.clear();
   sessionStorage.clear();
@@ -101,5 +106,72 @@ describe('festival season slider', () => {
     expect(
       screen.queryByRole('slider', { name: 'Festival season' })
     ).toBeNull();
+  });
+});
+
+const notice = (over: Partial<Advisory>): Advisory => ({
+  id: 'n1',
+  kind: 'closure',
+  title: 'Road closed',
+  summary: '',
+  affects: { municipality: 'kalibo' },
+  issuer: 'MDRRMO',
+  sourceUrl: 'https://example.gov.ph/n1',
+  publishedAt: '2026-11-01',
+  ...over,
+});
+type Pin = { id: string; layer: string; town: string | null; notice?: boolean };
+const pins = () => mapProps.current.pins as Pin[];
+const noticesButton = () => screen.getByRole('button', { name: /^Notices/ });
+
+describe('notices layer', () => {
+  it('finds towns with a live notice only', () => {
+    const now = TODAY.getTime();
+    const list = [
+      notice({ id: 'live' }),
+      notice({
+        id: 'later',
+        affects: { municipality: 'malay' },
+        publishedAt: '2026-12-25',
+      }),
+      notice({
+        id: 'over',
+        affects: { municipality: 'nabas' },
+        endsAt: '2026-11-10',
+      }),
+    ];
+    expect([
+      ...townsWithLiveNotices(['kalibo', 'malay', 'nabas', 'lezo'], list, now),
+    ]).toEqual(['kalibo']);
+    expect(townsWithLiveNotices(['kalibo'], [], now).size).toBe(0);
+  });
+
+  it('with no live notices: the toggle says so and nothing is drawn', () => {
+    explore();
+    const btn = noticesButton();
+    expect(btn.textContent).toBe('Notices · none active');
+    expect((btn as HTMLButtonElement).disabled).toBe(true);
+    expect(pins().some(p => p.notice)).toBe(false);
+  });
+
+  it('rings only the places in towns with a live notice when on', () => {
+    notices.list = [notice({})];
+    explore();
+    const btn = noticesButton();
+    expect(btn.textContent).toBe('Notices · 1 town');
+    expect(btn.getAttribute('aria-pressed')).toBe('false');
+    expect(pins().some(p => p.notice)).toBe(false);
+
+    fireEvent.click(btn);
+    expect(btn.getAttribute('aria-pressed')).toBe('true');
+    const ringed = pins().filter(p => p.notice);
+    expect(ringed.length).toBeGreaterThan(0);
+    for (const p of ringed) {
+      expect(p.town).toBe('kalibo');
+      expect(p.layer).toBe('place');
+    }
+    expect(
+      screen.getByText(/Orange ring = place in a town with an active notice/)
+    ).toBeTruthy();
   });
 });

@@ -35,6 +35,8 @@ export interface MapPin {
   town: string | null;
   approximate: boolean;
   label: string;
+  /** A place in a town with a live notice (the Notices layer): drawn with a ring. */
+  notice?: boolean;
 }
 
 interface Props {
@@ -610,6 +612,19 @@ export default function AklanMap3D({
           'circle-stroke-opacity': 0,
         },
       });
+      // Notices layer: an orange ring around places in towns with a live notice.
+      map.addLayer({
+        id: 'pin-notice',
+        type: 'circle',
+        source: 'pins',
+        filter: ['all', notCluster, ['==', ['get', 'notice'], true]],
+        paint: {
+          'circle-radius': 17,
+          'circle-color': 'rgba(0,0,0,0)',
+          'circle-stroke-color': '#b45309',
+          'circle-stroke-width': 3,
+        },
+      });
       // Selected pin: a brand ring under the enlarged icon.
       map.addLayer({
         id: 'pin-ring',
@@ -914,7 +929,8 @@ export default function AklanMap3D({
         type: 'Feature',
         properties: {
           id: p.id,
-          name: `${displayName(p.name)} · ${p.label}${p.approximate ? ' (approximate location)' : ''}`,
+          name: `${displayName(p.name)} · ${p.label}${p.approximate ? ' (approximate location)' : ''}${p.notice ? ' · notice in this town' : ''}`,
+          notice: !!p.notice,
           color: p.color,
           layer: p.layer,
           town: p.town ?? '',

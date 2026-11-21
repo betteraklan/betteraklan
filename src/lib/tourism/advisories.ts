@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import advisoriesData from '@/data/tourism/advisories.json';
 import type { Advisory } from '@/types/tourism';
 
+import { advisoryPhase } from './advisoryWindow';
+
 /** Bundled snapshot, used until the live list loads or when the API fails. */
 export const fallbackAdvisories = advisoriesData as Advisory[];
 
@@ -12,6 +14,22 @@ export function advisoriesFor(
   list: Advisory[] = fallbackAdvisories
 ): Advisory[] {
   return list.filter(a => a.affects.municipality === municipalitySlug);
+}
+
+/**
+ * Municipalities with at least one advisory live right now (published, not
+ * scheduled for later, not ended). Empty when there are none.
+ */
+export function townsWithLiveNotices(
+  towns: string[],
+  list: Advisory[] = fallbackAdvisories,
+  now: number = Date.now()
+): Set<string> {
+  return new Set(
+    towns.filter(slug =>
+      advisoriesFor(slug, list).some(a => advisoryPhase(a, now) === 'live')
+    )
+  );
 }
 
 const KINDS = new Set<Advisory['kind']>(['closure', 'access', 'event']);
