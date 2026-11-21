@@ -10,6 +10,10 @@ const PAGES = [
   ['Town page', '/tourism/kalibo'],
   ['Town page with a long spot list', '/tourism/malay'],
   ['Explore list', '/tourism/explore?view=list'],
+  [
+    'Explore map',
+    '/tourism/explore?view=map&trip=place-malay-0,place-malay-1|place-kalibo-0',
+  ],
   ['Boracay stays', '/tourism/accommodations/boracay'],
   ['Mainland stays', '/tourism/accommodations/mainland'],
 ] as const;
