@@ -294,7 +294,15 @@
         "description": "Pandan Hills is upland attraction listed in the municipal tourism profile. The coast includes beaches in Songcolan, Mandong, Napti and Mambuquiao.",
         "recordId": "AKL-045",
         "location": "Batan",
-        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/",
+        "image": {
+          "src": "/tourism/AKL-045.jpg",
+          "alt": "Pandan Hills, Batan",
+          "credit": "Photographer Ree Dexter; Wikimedia Commons lists the image under CC BY 3.0. Attribute the photographer and link the license when reusing.",
+          "licence": "CC BY 3.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:Pandal_Hill_%2857136008%29.jpeg"
+        }
       },
       {
         "name": null,
@@ -305,7 +313,15 @@
         "description": "Batan has a port located in Poblacion and considered the oldest in the province of Aklan. It is L-type made up of concrete material having a total length of 130 meters. It can accommodate inter-island shipping. The port is the shortest route entry and exit from Batan to the capital town of Kalibo via Dumaguit. A ferry boat service is available every 15 minutes.",
         "recordId": "AKL-036",
         "location": "Poblacion",
-        "sourceUrl": "https://aklan.gov.ph/tourism/batan/"
+        "sourceUrl": "https://aklan.gov.ph/tourism/batan/",
+        "image": {
+          "src": "/tourism/AKL-036.jpg",
+          "alt": "Batan Sea Port, Batan",
+          "credit": "Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons).",
+          "licence": "CC BY 3.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File%3ABatan%2C_Aklan_2.JPG"
+        }
       },
       {
         "name": "San Lorenzo Ruiz de Manila Parish Church",
@@ -1560,7 +1576,15 @@
         "description": "Historic acacia trees at a school site; profile notes a connection dating to 1892. The recorded location is Albasan. The Lechon Parade celebrates a food tradition associated with the municipality.",
         "recordId": "AKL-195",
         "location": "Albasan",
-        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/"
+        "sourceUrl": "https://aklan.gov.ph/tourism/numancia/",
+        "image": {
+          "src": "/tourism/AKL-195.jpg",
+          "alt": "Albasan Elementary School acacia trees, Numancia",
+          "credit": "Gibough; CC BY-SA 4.0 (Wikimedia Commons).",
+          "licence": "CC BY-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:THE_CENTENTIAL_ACACIA_TREE.jpg"
+        }
       },
       {
         "name": "Camanci Beach",

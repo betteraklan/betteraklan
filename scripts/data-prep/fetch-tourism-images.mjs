@@ -101,7 +101,7 @@ export async function fetchImage(recordId, url, fetchImpl = fetch) {
     redirect: 'manual',
     headers: {
       'User-Agent':
-        'tourism-image-fetch/1.0 (one-off download of openly licensed photos)',
+        'BetterAklan-tourism-image-fetch/1.0 (https://github.com/betteraklan/betteraklan)',
     },
   });
   if (res.status !== 200)

@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "recordId": "AKL-036",
+    "src": "/tourism/AKL-036.jpg",
+    "alt": "Batan Sea Port, Batan",
+    "credit": "Heinrich Balbuena; CC BY 3.0 (Wikimedia Commons)."
+  },
+  {
+    "recordId": "AKL-045",
+    "src": "/tourism/AKL-045.jpg",
+    "alt": "Pandan Hills, Batan",
+    "credit": "Photographer Ree Dexter; Wikimedia Commons lists the image under CC BY 3.0. Attribute the photographer and link the license when reusing."
+  },
+  {
+    "recordId": "AKL-195",
+    "src": "/tourism/AKL-195.jpg",
+    "alt": "Albasan Elementary School acacia trees, Numancia",
+    "credit": "Gibough; CC BY-SA 4.0 (Wikimedia Commons)."
+  }
+]
